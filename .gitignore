@@ -1,0 +1,19 @@
+# Node / Next / Payload (aplican una vez exista blog/src)
+node_modules/
+.next/
+dist/
+build/
+.turbo/
+
+# Env y secretos
+.env
+.env.*
+!.env.example
+
+# Logs / OS / editor
+*.log
+.DS_Store
+Thumbs.db
+
+# Uploads locales de Payload (media generada)
+blog/media/
