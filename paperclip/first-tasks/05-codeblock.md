@@ -1,6 +1,6 @@
-# Tarea 04 — `<CodeBlock>` (Shiki + tema oscuro + botón copiar)
+# Tarea 05 — `<CodeBlock>` (Shiki + tema oscuro + botón copiar)
 
-**Asignar a:** Frontend · **Depende de:** 02 · **Tipo:** render (no dato)
+**Asignar a:** Frontend · **Depende de:** 02, 03 (tokens) · **Tipo:** render (no dato)
 
 ## Prompt para el issue
 > Implementa `<CodeBlock>` para renderizar los nodos de código built-in de Lexical.

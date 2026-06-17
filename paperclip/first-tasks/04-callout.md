@@ -1,6 +1,6 @@
-# Tarea 03 — Bloque `Callout` + renderer
+# Tarea 04 — Bloque `Callout` + renderer
 
-**Asignar a:** Engineer (define el bloque) + Frontend (renderer) · **Depende de:** 02
+**Asignar a:** Engineer (define el bloque) + Frontend (renderer) · **Depende de:** 02, 03 (tokens)
 
 ## Prompt para el issue
 > Implementa el **único bloque custom** de Lexical: `Callout` (ver ADR 0003).

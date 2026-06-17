@@ -1,6 +1,6 @@
-# Tarea 05 — Render Lexical → React + páginas derivadas
+# Tarea 06 — Render Lexical → React + páginas derivadas
 
-**Asignar a:** Frontend · **Depende de:** 02, 03, 04
+**Asignar a:** Frontend · **Depende de:** 02, 03 (tokens), 04 (Callout), 05 (CodeBlock)
 
 ## Prompt para el issue
 > Implementa el render del cuerpo Lexical de un Post a React (headings, listas, links, imágenes,
