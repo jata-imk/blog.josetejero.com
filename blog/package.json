@@ -1,0 +1,41 @@
+{
+  "name": "josetejero-blog",
+  "version": "0.1.0",
+  "description": "Blog/portafolio de José Tejero — Next.js + Payload CMS v3 + PostgreSQL",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "payload": "payload",
+    "generate:types": "payload generate:types",
+    "generate:importmap": "payload generate:importmap"
+  },
+  "dependencies": {
+    "@payloadcms/db-postgres": "3.85.1",
+    "@payloadcms/next": "3.85.1",
+    "@payloadcms/richtext-lexical": "3.85.1",
+    "graphql": "^16.8.1",
+    "next": "16.2.9",
+    "payload": "3.85.1",
+    "react": "19.2.7",
+    "react-dom": "19.2.7",
+    "sharp": "^0.33.5"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@tailwindcss/postcss": "^4.0.0",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "eslint": "^10.5.0",
+    "tailwindcss": "^4.0.0",
+    "typescript": "^5.5.0",
+    "typescript-eslint": "^8.61.1"
+  },
+  "engines": {
+    "node": ">=20.9.0"
+  }
+}
