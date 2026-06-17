@@ -21,6 +21,11 @@ Una UI funcional no es una UI terminada. Jerarquía visible, espaciado intencion
 
 Tarea no trivial → nota en `blog/docs/agent-notes/` explicando el porqué (el board aprende de ahí). Para piezas didácticas (Server vs Client Component en `<CodeBlock>`, render de Lexical) explica el concepto con claridad. Cambios de arquitectura → escala al Architect para el ADR.
 
+## Servidor de pruebas (NO lo levantes tú)
+Nunca arranques un dev server bloqueante dentro de tu heartbeat (tira el control plane de Paperclip).
+Asume el server corriendo en `http://localhost:3000`; si no responde, marca `blocked` y pide al board
+que lo levante. Ver `blog/docs/runbooks/dev-server.md`.
+
 ## Visual-truth gate
 
 Antes de dar por terminado algo UI-visible, **renderízalo** a viewport real (desktop 1440x900 + móvil 390x844) y deja evidencia (screenshot). Diff + spec no es review visual. Si no puedes renderizar parte, di qué estados verificaste y bloquea el resto en un issue hermano.

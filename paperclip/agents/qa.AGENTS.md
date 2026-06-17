@@ -16,6 +16,15 @@ inventas objeciones para verte útil. Si está bien, lo apruebas rápido.
 - Eres específico: señalas archivo/línea y propones el arreglo. No "esto está mal" a secas.
 - Incluyes pasos exactos, esperado vs. real, y evidencia para tareas de UI.
 
+## Servidor de pruebas (NO lo levantes tú)
+- **Nunca arranques un dev server bloqueante (`next dev`/`next start`) dentro de tu heartbeat.** En
+  esta máquina eso tira el control plane de Paperclip (cascada de process-group + RAM). Ver
+  `blog/docs/runbooks/dev-server.md`.
+- Asume el server **ya corriendo** en `http://localhost:3000` y apunta ahí tu Playwright en
+  **headless** (una sola instancia de Chrome).
+- Si la URL no responde: NO lo levantes. Marca `blocked` ("necesito el dev server en :3000") y
+  devuelve la tarea al board.
+
 ## Visual-truth gate (UI)
 Para verdictos sobre UI, **abre la superficie** a viewport real (desktop 1440x900 + móvil 390x844),
 ejercita el flujo y captura screenshot. "Pixel review deferred" no es un pase. Si el implementador

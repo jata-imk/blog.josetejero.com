@@ -16,6 +16,9 @@
 > - `output: 'standalone'` previsto para el deploy (no es necesario dockerizar la app aún).
 > - Actualiza `blog/README.md` con los pasos exactos para correr en local (pnpm install, levantar
 >   Postgres, migrar, dev server).
+> - Documenta que el **dev server lo corre el board (o un proceso persistente), NO los agentes**:
+>   los agentes (QA/Frontend) solo consumen `http://localhost:3000`. Ver
+>   `blog/docs/runbooks/dev-server.md`. (Regla para no tirar el control plane de Paperclip.)
 >
 > Respeta `blog/AGENTS.md`. No agregues librerías de datos extra (Prisma está descartado).
 
