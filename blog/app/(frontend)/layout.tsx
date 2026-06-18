@@ -1,4 +1,5 @@
 import '../globals.css'
+import { inter, jetbrainsMono } from '../fonts'
 
 export default function FrontendLayout({
   children,
@@ -6,7 +7,7 @@ export default function FrontendLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="es">
+    <html lang="es" className={`${inter.variable} ${jetbrainsMono.variable}`}>
       <body>{children}</body>
     </html>
   )
