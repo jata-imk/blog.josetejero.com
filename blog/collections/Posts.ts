@@ -1,12 +1,23 @@
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import type { CollectionConfig } from 'payload'
 
+import { isAdmin, isAdminOrEditor } from '@/lib/access'
+import { autoSlug } from '@/lib/slug'
+
 export const Posts: CollectionConfig = {
   slug: 'posts',
   admin: {
     useAsTitle: 'title',
     group: 'Contenido',
     defaultColumns: ['title', 'status', 'publishedAt', 'author'],
+  },
+  access: {
+    create: isAdminOrEditor,
+    update: isAdminOrEditor,
+    delete: isAdmin,
+  },
+  hooks: {
+    beforeValidate: [autoSlug('title')],
   },
   fields: [
     { name: 'title', type: 'text', required: true, label: 'Título' },
@@ -32,6 +43,9 @@ export const Posts: CollectionConfig = {
       label: 'Autor',
       admin: { position: 'sidebar' },
       defaultValue: ({ user }) => user?.id,
+      access: {
+        update: isAdmin,
+      },
     },
     {
       name: 'status',

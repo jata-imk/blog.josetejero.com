@@ -1,11 +1,20 @@
 import type { CollectionConfig } from 'payload'
 
+import { isAdmin, isAdminOrCurrentUser } from '@/lib/access'
+
 export const Users: CollectionConfig = {
   slug: 'users',
   auth: true,
   admin: {
     useAsTitle: 'email',
     group: 'Admin',
+    hidden: ({ user }) => user?.role !== 'admin',
+  },
+  access: {
+    create: isAdmin,
+    read: isAdminOrCurrentUser,
+    update: isAdminOrCurrentUser,
+    delete: isAdmin,
   },
   fields: [
     {
@@ -23,6 +32,9 @@ export const Users: CollectionConfig = {
       ],
       defaultValue: 'editor',
       required: true,
+      access: {
+        update: isAdmin,
+      },
     },
     {
       name: 'avatar',

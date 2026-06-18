@@ -1,7 +1,14 @@
 import type { CollectionConfig } from 'payload'
 
+import { isAdmin, isAdminOrEditor } from '@/lib/access'
+
 export const Media: CollectionConfig = {
   slug: 'media',
+  access: {
+    create: isAdminOrEditor,
+    update: isAdminOrEditor,
+    delete: isAdmin,
+  },
   upload: {
     imageSizes: [
       { name: 'thumbnail', width: 400, height: 300, position: 'centre' },

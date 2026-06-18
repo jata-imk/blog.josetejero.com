@@ -1,5 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
+import { isAdmin, isAdminOrEditor } from '@/lib/access'
+
 export const Comments: CollectionConfig = {
   slug: 'comments',
   admin: {
@@ -13,8 +15,8 @@ export const Comments: CollectionConfig = {
       if (req.user) return true
       return { status: { equals: 'approved' } }
     },
-    update: ({ req }) => !!req.user,
-    delete: ({ req }) => !!req.user,
+    update: isAdminOrEditor,
+    delete: isAdmin,
   },
   fields: [
     {

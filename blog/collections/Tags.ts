@@ -1,10 +1,21 @@
 import type { CollectionConfig } from 'payload'
 
+import { isAdmin, isAdminOrEditor } from '@/lib/access'
+import { autoSlug } from '@/lib/slug'
+
 export const Tags: CollectionConfig = {
   slug: 'tags',
   admin: {
     useAsTitle: 'name',
     group: 'Contenido',
+  },
+  access: {
+    create: isAdminOrEditor,
+    update: isAdminOrEditor,
+    delete: isAdmin,
+  },
+  hooks: {
+    beforeValidate: [autoSlug('name')],
   },
   fields: [
     { name: 'name', type: 'text', required: true, label: 'Nombre' },
