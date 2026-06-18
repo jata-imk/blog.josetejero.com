@@ -21,8 +21,11 @@ Thumbs.db
 # Uploads locales de Payload (media generada)
 blog/media/
 
-# QA artifacts (testing screenshots)
+# QA artifacts (testing screenshots, capturas y logs de Playwright)
 .qa-artifacts/
+artifacts/
+.playwright-mcp/
+admin-login*.png
 
 # TypeScript incremental build
 *.tsbuildinfo
