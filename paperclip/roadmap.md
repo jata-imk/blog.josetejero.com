@@ -17,17 +17,20 @@ Versión operable del plan. Cada fase deja ADR/agent-notes; el CEO no marca `don
    entorno del Frontend.
 
 ## Fase 2 — Boilerplate (donde la IA es experta)
-1. Scaffolding Next + Payload v3 + Postgres en Docker (Engineer) → `first-tasks/01-scaffolding.md`.
-2. Colecciones del modelo de datos (Engineer) → `first-tasks/02-colecciones.md`. ADR por decisión no trivial.
-3. Tokens del handoff → `globals.css` + Tailwind v4 (Frontend) → `first-tasks/03-tokens.md`.
+1. ✅ Scaffolding Next + Payload v3 + Postgres en Docker (Engineer) → `first-tasks/01-scaffolding.md`.
+2. ✅ Colecciones del modelo de datos (Engineer) → `first-tasks/02-colecciones.md` + cierre
+   (auto-slug, access por role, ADR 0005) → `first-tasks/02b-cierre-colecciones.md`.
+3. **Fundación (en paralelo, bloquean 04-06):**
+   - Tokens del handoff → `app/globals.css` + Tailwind v4 (Frontend) → `first-tasks/03-tokens.md`.
+   - Estructura del frontend + ADR 0006 (Architect) → `first-tasks/03b-arquitectura.md`.
 4. Bloque `Callout` + renderer (Engineer define / Frontend renderiza) → `first-tasks/04-callout.md`.
 5. `<CodeBlock>`: Shiki + tema oscuro + botón copiar (Frontend) → `first-tasks/05-codeblock.md`.
 6. Render Lexical → React + páginas derivadas (Frontend) → `first-tasks/06-lexical-render.md`.
 
-> Asignación Fase 2: directo a **Engineer/Frontend** (ejecución; el diseño y el modelo ya están
-> decididos), no al Architect. Reserva el Architect para trabajo que necesite plan/ADR antes de
-> codear (p. ej. el importador de Fase 3). Opcional: corre la 1ª tarea vía CEO para practicar la
-> delegación.
+> Asignación Fase 2: ejecución directa a **Engineer/Frontend**; la **03b va al Architect** porque
+> define estructura/capas y deja ADR antes de que existan componentes. El resto del diseño y el
+> modelo ya están decididos. Reserva al Architect también para el importador de Fase 3. Opcional:
+> corre alguna tarea vía CEO para practicar la delegación.
 
 ## Fase 3 — Piezas peludas (vigilar de cerca)
 7. Importador Astro/MD → Lexical (Architect planea; Engineer implementa; palanca de subir modelo).
