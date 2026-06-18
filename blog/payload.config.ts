@@ -12,6 +12,7 @@ import { Posts } from './collections/Posts'
 import { Series } from './collections/Series'
 import { Tags } from './collections/Tags'
 import { Users } from './collections/Users'
+import { seedUsers } from './lib/seed'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -39,5 +40,15 @@ export default buildConfig({
     importMap: {
       baseDir: path.resolve(dirname),
     },
+  },
+
+  onInit: async (payload) => {
+    if (process.env.NODE_ENV === 'production') return
+
+    try {
+      await seedUsers(payload)
+    } catch (err) {
+      payload.logger.warn(`[seed] Skipped — DB not ready or error: ${String(err)}`)
+    }
   },
 })
