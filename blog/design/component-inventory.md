@@ -46,6 +46,6 @@ Comentarios (estados) · 404 · variantes Mobile · Design system. Definidas en 
 | `404` | `.ab-404-code` | — | número 150px con gradiente clip |
 
 ## Cómo lo usa el Frontend (Fase 2)
-1. Implementa el **token layer** primero (`design/globals.css` → `src/app/globals.css`).
+1. Implementa el **token layer** primero (`design/globals.css` → `app/globals.css`).
 2. Toma un componente, abre su clase en `aleliz.css` + su JSX, reprodúcelo en React+Tailwind con tokens.
 3. Cubre todos los estados de la fila. QA compara render vs. el prototipo (desktop + móvil).

@@ -35,7 +35,7 @@ crece monstruosa, pártela.
   → El board (José) **no escribe código**; aprende leyendo estas notas y los ADR. Si una pieza es
   didáctica (App Router, Server vs Client Components, render de Lexical, `<CodeBlock>`), la nota
   debe explicar el concepto con claridad suficiente para alguien que está aprendiendo Next.js.
-- Respeta los **design tokens** (`src/app/globals.css` + config de Tailwind) — son la fuente de
+- Respeta los **design tokens** (`app/globals.css` + config de Tailwind) — son la fuente de
   verdad visual. **Cero valores hardcodeados** de color/espaciado/tipografía.
 - Si algo no está decidido aquí, **escala** al Architect/CEO. No improvises arquitectura.
 - No marques `done` sin que QA pueda revisar y sin haber dejado rastro (ADR/nota).

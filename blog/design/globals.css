@@ -1,7 +1,7 @@
 /* ============================================================
    Aleliz Blog — Token layer (light only)
    Implementación del design system del handoff (design/handoff/).
-   Destino: copiar a src/app/globals.css cuando exista el scaffolding (Fase 2).
+   Destino: fusionar en app/globals.css (junto al `@import 'tailwindcss';` existente). Fase 2.
    Fuente de verdad visual: design/handoff/sistema-de-pantallas/project/aleliz.css
    Regla dura: los componentes referencian estas variables, nunca valores crudos.
    ============================================================ */

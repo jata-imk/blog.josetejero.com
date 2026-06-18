@@ -1,7 +1,7 @@
 # Design tokens — Aleliz Blog (extraídos del handoff)
 
 > Extraídos del `:root` y las clases de `handoff/sistema-de-pantallas/project/aleliz.css` (fuente de
-> verdad). La versión ejecutable está en `design/globals.css` (lista para `src/app/globals.css`).
+> verdad). La versión ejecutable está en `design/globals.css` (se fusiona en `app/globals.css`).
 > Estilo: editorial · técnico · minimal · **light only**. Inter + JetBrains Mono.
 > **Regla dura:** cero hardcodeo en componentes — siempre la variable/clase.
 

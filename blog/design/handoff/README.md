@@ -17,7 +17,7 @@ Es la **fuente de verdad visual**. No se edita; se consume.
 ## Specs derivadas (ya extraídas)
 - `../tokens.md` — tabla legible de tokens reales.
 - `../component-inventory.md` — mapeo componente → clase CSS → estados.
-- `../globals.css` — **token layer ejecutable**, listo para copiar a `src/app/globals.css` (Fase 2).
+- `../globals.css` — **token layer ejecutable**, se fusiona en `app/globals.css` (Fase 2).
 
 ## Notas
 - El prototipo está scoped bajo `.ab`. Al implementar en React+Tailwind: **reproducir el resultado
