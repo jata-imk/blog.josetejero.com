@@ -1,6 +1,12 @@
 # Tarea 05 — `<CodeBlock>` (Shiki + tema oscuro + botón copiar)
 
-**Asignar a:** Frontend · **Depende de:** 02, 03 (tokens) · **Tipo:** render (no dato)
+**Asignar a:** Frontend · **Depende de:** 02, 03 (tokens), 03c · **Tipo:** render (no dato)
+
+> **Estado actual (re-scope):** ya existe el **chrome** en `blog/components/blocks/CodeBlock.tsx`
+> (barra, semáforos, botón copiar funcional como Client Component) y los estilos `.ab-code-*`.
+> **No lo reescribas**, reúsalo. Pendiente real: integrar **Shiki** (hoy solo vuelca `<code>` sin
+> resaltado), separar el resaltado (server) del botón copiar (cliente), y mover el tema oscuro a
+> tokens `--code-*` (lo aborda la 03c). Los semáforos hardcodeados se arreglan en la 03c.
 
 ## Prompt para el issue
 > Implementa `<CodeBlock>` para renderizar los nodos de código built-in de Lexical.

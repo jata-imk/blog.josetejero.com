@@ -1,6 +1,12 @@
 # Tarea 04 — Bloque `Callout` + renderer
 
-**Asignar a:** Engineer (define el bloque) + Frontend (renderer) · **Depende de:** 02, 03 (tokens)
+**Asignar a:** Engineer (define el bloque) + Frontend (renderer) · **Depende de:** 02, 03 (tokens), 03c
+
+> **Estado actual (re-scope):** el Frontend ya adelantó el **shell visual** en
+> `blog/components/blocks/Callout.tsx` y los estilos `.ab-callout-*`. **No lo reescribas**, reúsalo.
+> Pendiente real: (a) Engineer define el bloque Lexical en Payload; (b) el renderer soporta las
+> **4 variantes del ADR 0003 — `note|tip|warning|danger`** (hoy solo hay `note|tip|warn`: falta
+> `danger` y `warn` debe renombrarse a `warning`); (c) cablear el renderer al nodo real de Lexical.
 
 ## Prompt para el issue
 > Implementa el **único bloque custom** de Lexical: `Callout` (ver ADR 0003).

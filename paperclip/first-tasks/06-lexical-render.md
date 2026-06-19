@@ -2,6 +2,12 @@
 
 **Asignar a:** Frontend · **Depende de:** 02, 03 (tokens), 04 (Callout), 05 (CodeBlock)
 
+> **Estado actual (re-scope):** el Frontend ya adelantó los **shells de presentación** (home,
+> `PostCard`/`FeaturedCard`/`ListRow`, `Prose`, `TableOfContents`, comentarios) con datos de ejemplo.
+> **Reúsalos.** Pendiente real: (a) el **serializador Lexical → React** en `blog/lib/lexical/`
+> (hoy vacío); (b) conectar las páginas a datos reales vía `lib/data/*` (no `payload.find` directo —
+> ADR 0006); (c) páginas derivadas de serie/tag/categoría con la posición de serie **derivada**.
+
 ## Prompt para el issue
 > Implementa el render del cuerpo Lexical de un Post a React (headings, listas, links, imágenes,
 > código vía `<CodeBlock>`, y `<Callout>`), fiel al handoff y con design tokens.
