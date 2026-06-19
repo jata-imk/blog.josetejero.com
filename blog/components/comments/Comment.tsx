@@ -56,7 +56,7 @@ export function Comment({
           </button>
         </div>
         {children && (
-          <div style={{ marginTop: 16, paddingLeft: 24, borderLeft: '2px solid var(--line)' }}>
+          <div className="ab-comment-replies">
             {children}
           </div>
         )}

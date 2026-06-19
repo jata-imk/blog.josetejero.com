@@ -13,7 +13,7 @@ para Tailwind v4 y fuentes via `next/font`.
 | `app/fonts.ts` | **Nuevo** — Inter y JetBrains Mono via `next/font/google` |
 | `app/(frontend)/layout.tsx` | Aplica variables CSS de fuentes en `<html>` |
 
-## Decisiones técnicas
+## decisiónes técnicas
 
 ### Estructura del @theme
 

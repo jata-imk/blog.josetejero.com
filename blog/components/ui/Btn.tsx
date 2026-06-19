@@ -1,13 +1,11 @@
 import type { ReactNode } from 'react'
 
-type Variant = 'grad' | 'secondary' | 'ghost' | 'primary'
-type Size    = 'sm' | 'md'
+type Variant = 'grad' | 'secondary'
 
 export function Btn({
   href,
   onClick,
   variant = 'secondary',
-  size = 'md',
   disabled,
   type = 'button',
   children,
@@ -15,19 +13,11 @@ export function Btn({
   href?: string
   onClick?: () => void
   variant?: Variant
-  size?: Size
   disabled?: boolean
   type?: 'button' | 'submit' | 'reset'
   children: ReactNode
 }) {
-  const cls = [
-    'btn',
-    variant === 'grad'      ? 'btn-grad' :
-    variant === 'secondary' ? 'btn-secondary' :
-    variant === 'ghost'     ? 'btn-ghost' :
-                              'btn-primary',
-    size === 'sm' ? 'btn-sm' : '',
-  ].filter(Boolean).join(' ')
+  const cls = ['btn', variant === 'grad' ? 'btn-grad' : 'btn-secondary'].join(' ')
 
   if (href) {
     return <a href={href} className={cls}>{children}</a>

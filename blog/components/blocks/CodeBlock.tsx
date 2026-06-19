@@ -27,16 +27,15 @@ export function CodeBlock({
     <div className="ab-code">
       <div className="ab-code-bar">
         <div className="ab-code-dots">
-          <i style={{ background: '#ff5f57' }} />
-          <i style={{ background: '#febc2e' }} />
-          <i style={{ background: '#28c840' }} />
+          <i style={{ background: 'var(--mac-red)' }} />
+          <i style={{ background: 'var(--mac-amber)' }} />
+          <i style={{ background: 'var(--mac-green)' }} />
         </div>
         {lang && <span className="ab-code-lang">{lang}</span>}
         <button
           className="ab-code-copy"
           onClick={copy}
           aria-label={copied ? 'Copiado' : 'Copiar código'}
-          style={{ marginLeft: 'auto' }}
         >
           <Ic name={copied ? 'check2' : 'copy'} size={13} sw={2} />
           {copied ? 'Copiado' : 'Copiar'}

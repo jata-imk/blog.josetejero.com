@@ -15,7 +15,7 @@ Creada la estructura `components/` completa, traduciendo el inventario del hando
 
 | Carpeta | Componentes |
 |---|---|
-| `components/ui/` | `Ic`, `Cat`, `Tag`, `Badge`, `Status`, `Thumb`, `Meta`, `Breadcrumb`, `SearchInput`, `EmptyState`, `Pagination`, `Btn`, `Skill` |
+| `components/ui/` | `Ic`, `Cat`, `Tag`, `Badge`, `Status`, `Thumb`, `Meta`, `Breadcrumb`, `SearchInput`, `EmptyState`, `Págination`, `Btn`, `Skill` |
 | `components/layout/` | `Header`, `Footer` |
 | `components/blocks/` | `Callout`, `CodeBlock`, `Prose`, `TableOfContents` |
 | `components/post/` | `PostCard`, `FeaturedCard`, `ListRow`, `PrevNext`, `AuthorCard` |
@@ -35,7 +35,7 @@ Creada la estructura `components/` completa, traduciendo el inventario del hando
 
 ### CSS portado desde el handoff
 
-Las clases `ab-*` del prototipo (`aleliz.css`) se portaron a `app/globals.css` como capa de componentes. Esto incluye: status badges, featured card, prose, code block, callouts, TOC, breadcrumb, search, form fields, comments, series steps, empty state, pagination, prev/next, author card, skill chips, 404.
+Las clases `ab-*` del prototipo (`aleliz.css`) se portaron a `app/globals.css` como capa de componentes. Esto incluye: status badges, featured card, prose, code block, callouts, TOC, breadcrumb, search, form fields, comments, series steps, empty state, Págination, prev/next, author card, skill chips, 404.
 
 ## Por qué `ab-*` en producción
 
@@ -44,7 +44,7 @@ El handoff usa `ab-` como namespace de scope en el prototipo HTML. Al implementa
 ## Verificación
 
 - `tsc --noEmit`: sin errores.
-- Render visual: el dev server lo gestiona el equipo de infra (no se levanta en el heartbeat por política de recursos).
+- Render visual: el dev server lo Gestióna el equipo de infra (no se levanta en el heartbeat por política de recursos).
 
 ## Pendiente (próximas issues)
 

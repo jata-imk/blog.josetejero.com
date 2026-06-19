@@ -2,10 +2,10 @@
 
 ## Que hice
 
-Cerre la decision arquitectonica del frontend publico del blog sin escribir implementacion:
+Cerre la decisión arquitectonica del frontend público del blog sin escribir Implementación:
 
 - escribi el ADR `0006-estructura-frontend.md`
-- actualice `docs/architecture/overview.md` con el arbol de carpetas, reglas de capas y mapa del
+- actualice `docs/architecture/overview.md` con el árbol de carpetas, reglas de capas y mapa del
   inventario de componentes
 - converti la tarea en un plan ejecutable para Engineer, Frontend y QA
 
@@ -21,7 +21,7 @@ renderizar HTML sin enviar JavaScript extra al navegador. Para este blog eso enc
 `'use client'` solo entra cuando existe una interaccion real que lo justifica. En este proyecto los
 casos claros son:
 
-- boton de copiar en bloques de codigo
+- boton de copiar en bloques de Código
 - menu movil
 - estado activo del TOC mientras se hace scroll
 - formulario de comentarios
@@ -33,25 +33,25 @@ debe quedarse en servidor.
 ## Por que aislar datos en `lib/data`
 
 Payload ya es la capa de datos. Eso significa que no necesitamos inventar repositories ni una capa
-de casos de uso para sentirnos "ordenados". Pero si dejamos que cada pagina llame `payload.find`
+de casos de uso para sentirnos "ordenados". Pero si dejamos que cada página llame `payload.find`
 directamente, el acoplamiento se dispersa muy rapido.
 
-`lib/data/*` resuelve ese problema con una capa minima:
+`lib/data/*` resuelve ese problema con una capa mínima:
 
 - cada consulta importante tiene un nombre que expresa intencion (`getPostBySlug`, `getPosts`,
   `getSeriesWithPosts`)
-- la logica de filtros, drafts, profundidad de relaciones y orden queda en un solo sitio
-- las paginas consumen datos del dominio del blog, no detalles del API de Payload
-- Engineer puede probar y evolucionar consultas sin tocar la capa de presentacion
+- la lógica de filtros, drafts, profundidad de relaciones y orden queda en un solo sitio
+- las páginas consumen datos del dominio del blog, no detalles del API de Payload
+- Engineer puede probar y evolucionar consultas sin tocar la capa de Presentación
 
-Esta no es una arquitectura enterprise. Es una barrera pragmatica para mantener el codigo legible y
+Esta no es una arquitectura enterprise. Es una barrera pragmática para mantener el código legible y
 para que el board pueda ubicar rapido donde se obtienen datos y donde solo se renderizan.
 
 ## Limites deliberados
 
 - no se introduce store global mientras no exista un problema real que lo exija
-- no se persiste informacion derivable, como la posicion visible de un post dentro de una serie
-- el render enriquecido (`CodeBlock`, tema oscuro, copiar, `Callout`) sigue siendo presentacion, no
+- no se persiste informacion derivable, como la posición visible de un post dentro de una serie
+- el render enriquecido (`CodeBlock`, tema oscuro, copiar, `Callout`) sigue siendo Presentación, no
   parte del schema de contenido
 
 Ese limite es parte de la arquitectura: evita que el proyecto pague complejidad antes de necesitarla.

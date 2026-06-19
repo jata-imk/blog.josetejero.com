@@ -28,16 +28,16 @@ export function CommentForm({ postId }: { postId: string }) {
   }
 
   return (
-    <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-      <h3 style={{ fontSize: 18, fontWeight: 700, margin: 0 }}>Deja un comentario</h3>
+    <form onSubmit={submit} className="flex flex-col gap-4">
+      <h3 className="text-lg font-bold m-0">Deja un comentario</h3>
 
       {state === 'error' && (
-        <p style={{ color: 'var(--rose)', fontSize: 14 }}>
+        <p className="text-rose text-sm">
           No se pudo enviar el comentario. Inténtalo de nuevo.
         </p>
       )}
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+      <div className="grid grid-cols-2 gap-3">
         <div className="ab-field">
           <label htmlFor="cf-name">Nombre</label>
           <input
@@ -77,15 +77,14 @@ export function CommentForm({ postId }: { postId: string }) {
         />
       </div>
 
-      <p style={{ fontSize: 12.5, color: 'var(--muted)' }}>
+      <p className="text-xs text-muted">
         Los comentarios se publican tras moderación.
       </p>
 
       <button
         type="submit"
-        className="btn btn-grad"
+        className="btn btn-grad self-start"
         disabled={state === 'sending'}
-        style={{ alignSelf: 'flex-start' }}
       >
         {state === 'sending' ? 'Enviando…' : 'Publicar comentario'}
       </button>
