@@ -42,10 +42,6 @@ const CATS: Record<CatKey, { label: string; thumb: string }> = {
   'tutoriales':     { label: 'Tutoriales',             thumb: 'thumb-amber' },
 }
 
-const CAT_GLOW: Record<string, string> = {
-  'thumb-blue': '#2563eb', 'thumb-violet': '#7c3aed',
-  'thumb-cyan': '#06b6d4', 'thumb-green': '#10b981', 'thumb-amber': '#f59e0b',
-}
 
 /* ─── primitives ─────────────────────────────────────────────── */
 function CatPill({ cat, lg }: { cat: CatKey; lg?: boolean }) {
@@ -73,7 +69,7 @@ function Thumb({ cat, label, glow }: { cat: CatKey; label?: string; glow?: boole
   const tone = CATS[cat].thumb
   return (
     <div className={`thumb ${tone}`}>
-      <div className="thumb-glow" style={{ background: CAT_GLOW[tone], top: glow ? '-30%' : '-40%', left: glow ? '-10%' : '40%' }} />
+      <div className="thumb-glow" style={{ top: glow ? '-30%' : '-40%', left: glow ? '-10%' : '40%' }} />
       <span className="label">{label ?? '// cover image'}</span>
     </div>
   )
@@ -149,8 +145,8 @@ const POSTS: Post[] = [
   {
     cat: 'backend',
     title: 'Next.js + PostgreSQL: creando un blog personal rápido',
-    excerpt: 'Guía práctica para montar un blog rápido y SEO-friendly con Next.js, PostgreSQL y Prisma.',
-    tags: ['Next.js', 'PostgreSQL', 'Prisma'],
+    excerpt: 'Guía práctica para montar un blog rápido y SEO-friendly con Next.js, PostgreSQL y Payload CMS.',
+    tags: ['Next.js', 'PostgreSQL', 'Payload'],
     date: '5 mar 2026',
     read: '12 min',
     comments: 8,
@@ -210,7 +206,7 @@ function ListRow({ post }: { post: Post }) {
     <a className="list-row" href="#">
       <div className="thumb" style={{ width: 120, height: 80, flexShrink: 0, borderRadius: 'var(--r)' }}>
         <div className={`thumb ${CATS[post.cat].thumb}`} style={{ width: 120, height: 80, borderRadius: 'var(--r)', border: 0 }}>
-          <div className="thumb-glow" style={{ background: CAT_GLOW[CATS[post.cat].thumb] }} />
+          <div className="thumb-glow" />
         </div>
       </div>
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -338,13 +334,13 @@ export default function Home() {
       {/* ── featured posts ─────────────────────────────────────── */}
       <section className="wrap" style={{ paddingBottom: 70 }}>
         <SectionHead eyebrow="Lo más reciente" title="Posts destacados" link="Ver todo" />
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 24 }}>
+        <div className="grid-posts">
           {POSTS.map((p) => <PostCard key={p.title} post={p} />)}
         </div>
       </section>
 
       {/* ── latest + categories ─────────────────────────────────── */}
-      <section className="wrap" style={{ paddingBottom: 70, display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: 48 }}>
+      <section className="wrap grid-latest" style={{ paddingBottom: 70 }}>
         <div>
           <SectionHead title="Últimas publicaciones" />
           <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
@@ -369,7 +365,7 @@ export default function Home() {
       <section style={{ background: 'var(--bg-soft)', borderTop: '1px solid var(--line)', borderBottom: '1px solid var(--line)', padding: '60px 0' }}>
         <div className="wrap">
           <SectionHead eyebrow="Aprende paso a paso" title="Series recomendadas" link="Todas las series" />
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 24 }}>
+          <div className="grid-series">
             <SeriesCard
               title="Construyendo un blog moderno con Next.js"
               desc="De cero a producción: rutas, datos, SEO y deploy."
