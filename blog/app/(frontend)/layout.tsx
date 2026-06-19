@@ -8,7 +8,7 @@ export default function FrontendLayout({
 }) {
   return (
     <html lang="es" className={`${inter.variable} ${jetbrainsMono.variable}`}>
-      <body>{children}</body>
+      <body className="bg-bg text-ink font-sans">{children}</body>
     </html>
   )
 }

@@ -70,7 +70,7 @@ function Thumb({ cat, label, glow }: { cat: CatKey; label?: string; glow?: boole
   return (
     <div className={`thumb ${tone}`}>
       <div className="thumb-glow" style={{ top: glow ? '-30%' : '-40%', left: glow ? '-10%' : '40%' }} />
-      <span className="label">{label ?? '// cover image'}</span>
+      <span className="label font-mono">{label ?? '// cover image'}</span>
     </div>
   )
 }
@@ -79,7 +79,7 @@ function Thumb({ cat, label, glow }: { cat: CatKey; label?: string; glow?: boole
 function SiteHeader() {
   const nav = ['Inicio', 'Blog', 'Series', 'Categorías', 'Sobre mí']
   return (
-    <header className="site-header">
+    <header className="site-header border-b border-line">
       <div className="site-header-in">
         <a className="logo" href="/">
           <span className="logo-mark">J</span>
@@ -111,7 +111,7 @@ function SectionHead({ eyebrow, title, link }: { eyebrow?: string; title: string
         <h2 style={{ fontSize: 26, fontWeight: 750, letterSpacing: '-.03em' }}>{title}</h2>
       </div>
       {link && (
-        <a href="#" style={{ fontSize: 14, fontWeight: 600, color: 'var(--blue)', display: 'inline-flex', alignItems: 'center', gap: 5, whiteSpace: 'nowrap' }}>
+        <a href="#" className="text-blue" style={{ fontSize: 14, fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 5, whiteSpace: 'nowrap' }}>
           {link}<Ic name="arrowRight" size={15} sw={2.2} />
         </a>
       )}
@@ -171,7 +171,7 @@ const LATEST_POSTS: Post[] = [
 /* ─── post card ───────────────────────────────────────────────── */
 function PostCard({ post }: { post: Post }) {
   return (
-    <article className="card card-hover post-card">
+    <article className="card card-hover post-card bg-bg border-line rounded-lg">
       <Thumb cat={post.cat} />
       <div className="post-card-body">
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
@@ -183,7 +183,7 @@ function PostCard({ post }: { post: Post }) {
           )}
         </div>
         <h3 className="post-card-title">{post.title}</h3>
-        <p className="post-card-excerpt">{post.excerpt}</p>
+        <p className="post-card-excerpt text-ink-3">{post.excerpt}</p>
         <div className="tagrow">
           {post.tags.map((t) => <span key={t} className="tag-pill">#{t}</span>)}
         </div>
@@ -203,7 +203,7 @@ function PostCard({ post }: { post: Post }) {
 /* ─── list row ────────────────────────────────────────────────── */
 function ListRow({ post }: { post: Post }) {
   return (
-    <a className="list-row" href="#">
+    <a className="list-row rounded" href="#">
       <div className="thumb" style={{ width: 120, height: 80, flexShrink: 0, borderRadius: 'var(--r)' }}>
         <div className={`thumb ${CATS[post.cat].thumb}`} style={{ width: 120, height: 80, borderRadius: 'var(--r)', border: 0 }}>
           <div className="thumb-glow" />
@@ -230,21 +230,21 @@ function SeriesCard({ title, desc, count, level, cat = 'frontend' as CatKey, pro
   title: string; desc: string; count: number; level: string; cat?: CatKey; progress?: number
 }) {
   return (
-    <article className="card card-hover" style={{ padding: 22, display: 'flex', flexDirection: 'column', gap: 12 }}>
+    <article className="card card-hover bg-bg border-line rounded-lg" style={{ padding: 22, display: 'flex', flexDirection: 'column', gap: 12 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
         <span className="badge badge-series"><Ic name="layers" size={11} sw={2.2} />Serie</span>
-        <span style={{ fontSize: 12.5, color: 'var(--muted)', fontWeight: 500 }}>{count} partes · {level}</span>
+        <span className="text-muted" style={{ fontSize: 12.5, fontWeight: 500 }}>{count} partes · {level}</span>
       </div>
       <CatPill cat={cat} />
       <h3 style={{ fontSize: 18, fontWeight: 700, letterSpacing: '-.02em', lineHeight: 1.3 }}>{title}</h3>
-      <p style={{ fontSize: 14, color: 'var(--ink-3)', lineHeight: 1.55 }}>{desc}</p>
+      <p className="text-ink-3" style={{ fontSize: 14, lineHeight: 1.55 }}>{desc}</p>
       {progress != null && (
         <div style={{ marginTop: 2 }}>
           <div className="progress-bar"><i style={{ width: `${progress}%` }} /></div>
           <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 6 }}>{progress}% completado</div>
         </div>
       )}
-      <a href="#" style={{ marginTop: 'auto', paddingTop: 4, fontSize: 14, fontWeight: 600, color: 'var(--blue)', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+      <a href="#" className="text-blue" style={{ marginTop: 'auto', paddingTop: 4, fontSize: 14, fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
         {progress ? 'Continuar' : 'Empezar serie'}<Ic name="arrowRight" size={15} sw={2.2} />
       </a>
     </article>
@@ -254,7 +254,7 @@ function SeriesCard({ title, desc, count, level, cat = 'frontend' as CatKey, pro
 /* ─── site footer ─────────────────────────────────────────────── */
 function SiteFooter() {
   return (
-    <footer className="site-footer">
+    <footer className="site-footer bg-bg-soft border-t border-line">
       <div className="site-footer-in">
         <div className="footer-cols">
           <div>
@@ -285,7 +285,7 @@ function SiteFooter() {
             </nav>
           </div>
         </div>
-        <p className="footer-copy">© 2026 José Alejandro Tejero Aguilar · Hecho con Next.js + PostgreSQL</p>
+        <p className="footer-copy text-muted">© 2026 José Alejandro Tejero Aguilar · Hecho con Next.js + PostgreSQL</p>
         <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
           <button className="icon-btn" aria-label="GitHub"><Ic name="github" size={18} sw={1.8} /></button>
           <button className="icon-btn" aria-label="X / Twitter"><Ic name="twitter" size={18} sw={1.8} /></button>
@@ -313,11 +313,11 @@ export default function Home() {
 
       {/* ── hero ───────────────────────────────────────────────── */}
       <section style={{ textAlign: 'center', padding: '92px 40px 70px', maxWidth: 760, margin: '0 auto' }}>
-        <div className="eyebrow" style={{ marginBottom: 18 }}>Desarrollo · Automatización · IA</div>
-        <h1 style={{ fontSize: 52, fontWeight: 800, letterSpacing: '-.04em', lineHeight: 1.08 }}>
+        <div className="eyebrow text-blue" style={{ marginBottom: 18 }}>Desarrollo · Automatización · IA</div>
+        <h1 className="text-ink" style={{ fontSize: 52, fontWeight: 800, letterSpacing: '-.04em', lineHeight: 1.08 }}>
           Hola, soy José Alejandro <span style={{ WebkitTextFillColor: 'initial' }}>👨‍💻</span>
         </h1>
-        <p style={{ fontSize: 19, color: 'var(--ink-3)', lineHeight: 1.6, marginTop: 22, maxWidth: 620, marginInline: 'auto' }}>
+        <p className="text-ink-3" style={{ fontSize: 19, lineHeight: 1.6, marginTop: 22, maxWidth: 620, marginInline: 'auto' }}>
           Escribo sobre desarrollo web, automatización, inteligencia artificial, backend, frontend
           y aprendizajes construyendo software.
         </p>
@@ -332,7 +332,7 @@ export default function Home() {
       </section>
 
       {/* ── featured posts ─────────────────────────────────────── */}
-      <section className="wrap" style={{ paddingBottom: 70 }}>
+      <section className="wrap bg-bg" style={{ paddingBottom: 70 }}>
         <SectionHead eyebrow="Lo más reciente" title="Posts destacados" link="Ver todo" />
         <div className="grid-posts">
           {POSTS.map((p) => <PostCard key={p.title} post={p} />)}
@@ -351,10 +351,10 @@ export default function Home() {
           <SectionHead title="Categorías" />
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {CATS_HOME.map(({ c, n }) => (
-              <a key={c} className="card card-hover" href="#"
+              <a key={c} className="card card-hover bg-bg border-line rounded" href="#"
                 style={{ padding: '13px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <CatPill cat={c} lg />
-                <span style={{ fontSize: 13, color: 'var(--muted)', fontWeight: 500 }}>{n} posts</span>
+                <span className="text-muted" style={{ fontSize: 13, fontWeight: 500 }}>{n} posts</span>
               </a>
             ))}
           </div>
@@ -362,7 +362,7 @@ export default function Home() {
       </section>
 
       {/* ── series ─────────────────────────────────────────────── */}
-      <section style={{ background: 'var(--bg-soft)', borderTop: '1px solid var(--line)', borderBottom: '1px solid var(--line)', padding: '60px 0' }}>
+      <section className="bg-bg-soft border-t border-b border-line" style={{ padding: '60px 0' }}>
         <div className="wrap">
           <SectionHead eyebrow="Aprende paso a paso" title="Series recomendadas" link="Todas las series" />
           <div className="grid-series">
