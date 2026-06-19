@@ -22,10 +22,14 @@ Thumbs.db
 blog/media/
 
 # QA artifacts (testing screenshots, capturas y logs de Playwright)
+# Cubre toda la raíz y blog/: las capturas de QA usan prefijo tod-<n>-... y *-rerun/-final.
 .qa-artifacts/
 artifacts/
 .playwright-mcp/
 admin-login*.png
+tod-*.png
+*-rerun.png
+*-final.png
 
 # TypeScript incremental build
 *.tsbuildinfo
