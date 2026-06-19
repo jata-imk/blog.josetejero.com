@@ -142,6 +142,7 @@
   --blue-border:   #c7dafd;
   --green-border:  #bbe9d4;
   --amber-border:  #f4ddb0;
+  --rose-border:   #fbc5cd;
 
   /* bloque de código (tema oscuro slate) */
   --code-bg:     #0f172a;
@@ -425,9 +426,12 @@ code, pre, .mono { font-family: var(--font-mono); }
 .ab-callout-tip { background: var(--green-tint); border-color: var(--green-border); color: var(--ink-2); }
 .ab-callout-tip .ic { background: var(--green); }
 .ab-callout-tip b { color: var(--green-700); }
-.ab-callout-warn { background: var(--amber-tint); border-color: var(--amber-border); color: var(--ink-2); }
-.ab-callout-warn .ic { background: var(--amber); }
-.ab-callout-warn b { color: var(--amber-800); }
+.ab-callout-warning { background: var(--amber-tint); border-color: var(--amber-border); color: var(--ink-2); }
+.ab-callout-warning .ic { background: var(--amber); }
+.ab-callout-warning b { color: var(--amber-800); }
+.ab-callout-danger { background: var(--rose-tint); border-color: var(--rose-border); color: var(--ink-2); }
+.ab-callout-danger .ic { background: var(--rose); }
+.ab-callout-danger b { color: var(--rose-700); }
 
 /* table of contents */
 .ab-toc { font-size: 13.5px; }

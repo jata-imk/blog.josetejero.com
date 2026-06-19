@@ -1,5 +1,6 @@
-import { lexicalEditor } from '@payloadcms/richtext-lexical'
+import { BlocksFeature, lexicalEditor } from '@payloadcms/richtext-lexical'
 import type { CollectionConfig } from 'payload'
+import { calloutBlock } from '@/lib/lexical/calloutBlock'
 
 import { isAdmin, isAdminOrEditor } from '@/lib/access'
 import { autoSlug } from '@/lib/slug'
@@ -69,7 +70,12 @@ export const Posts: CollectionConfig = {
       name: 'body',
       type: 'richText',
       label: 'Cuerpo',
-      editor: lexicalEditor(),
+      editor: lexicalEditor({
+        features: ({ defaultFeatures }) => [
+          ...defaultFeatures,
+          BlocksFeature({ blocks: [calloutBlock] }),
+        ],
+      }),
     },
     {
       name: 'series',

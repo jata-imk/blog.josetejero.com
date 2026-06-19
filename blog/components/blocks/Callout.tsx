@@ -1,12 +1,13 @@
 import type { ReactNode } from 'react'
 import { Ic } from '../ui/Ic'
 
-type Kind = 'note' | 'tip' | 'warn'
+type Kind = 'note' | 'tip' | 'warning' | 'danger'
 
 const CONFIG: Record<Kind, { icon: string; label: string }> = {
-  note: { icon: 'info',     label: 'Nota' },
-  tip:  { icon: 'check',    label: 'Consejo' },
-  warn: { icon: 'alertTri', label: 'Atención' },
+  note:    { icon: 'info',     label: 'Nota' },
+  tip:     { icon: 'check',    label: 'Consejo' },
+  warning: { icon: 'alertTri', label: 'Atención' },
+  danger:  { icon: 'xCircle',  label: 'Peligro' },
 }
 
 export function Callout({

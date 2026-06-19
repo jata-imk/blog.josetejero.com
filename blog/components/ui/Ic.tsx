@@ -20,6 +20,7 @@ const PATHS: Record<string, string> = {
   reply:      'M9 17 3 11l6-6M3 11h13a4 4 0 0 1 0 8h-1',
   chevRight:  'M9 18l6-6-6-6',
   chevLeft:   'M15 18l-6-6 6-6',
+  xCircle:    'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM15 9l-6 6M9 9l6 6',
 }
 
 export function Ic({
