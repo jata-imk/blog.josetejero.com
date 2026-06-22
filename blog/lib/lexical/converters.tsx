@@ -16,9 +16,8 @@ type CalloutFields = {
 }
 
 type CodeFields = {
-  blockType: 'Code'
-  language?: string
   code?: string
+  language?: string
 }
 
 // Exported so pages can pass it directly to <RichText converters={bodyConverters} />.
@@ -27,6 +26,12 @@ export const bodyConverters: JSXConvertersFunction = ({ defaultConverters }) => 
     ...defaultConverters,
     blocks: {
       ...defaultConverters.blocks,
+      Code: ({ node }: { node: SerializedBlockNode<CodeFields> }) => {
+        const fields = node.fields ?? {}
+        const code = fields.code ?? ''
+        const language = fields.language
+        return <CodeBlock lang={language} code={code} />
+      },
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       callout: ({ node }: { node: SerializedBlockNode<any> }) => {
         const typedNode = node as SerializedBlockNode<CalloutFields>
@@ -39,12 +44,6 @@ export const bodyConverters: JSXConvertersFunction = ({ defaultConverters }) => 
               : null}
           </Callout>
         )
-      },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      Code: ({ node }: { node: SerializedBlockNode<any> }) => {
-        const typedNode = node as SerializedBlockNode<CodeFields>
-        const { language, code } = typedNode.fields
-        return <CodeBlock lang={language} code={code} />
       },
     },
   }
