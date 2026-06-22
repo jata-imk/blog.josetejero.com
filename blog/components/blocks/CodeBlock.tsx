@@ -1,5 +1,5 @@
 import { highlightCode } from '@/lib/code-highlight'
-import { CopyButton } from './CopyButton'
+import { CodeBlockClient } from './CodeBlockClient'
 
 export async function CodeBlock({
   lang,
@@ -10,21 +10,5 @@ export async function CodeBlock({
 }) {
   const text = code ?? ''
   const html = await highlightCode(text, lang)
-
-  return (
-    <div className="ab-code">
-      <div className="ab-code-bar">
-        <div className="ab-code-dots">
-          <i style={{ background: 'var(--mac-red)' }} />
-          <i style={{ background: 'var(--mac-amber)' }} />
-          <i style={{ background: 'var(--mac-green)' }} />
-        </div>
-        {lang && <span className="ab-code-lang">{lang}</span>}
-        <CopyButton code={text} />
-      </div>
-      <pre tabIndex={0}>
-        <code dangerouslySetInnerHTML={{ __html: html }} />
-      </pre>
-    </div>
-  )
+  return <CodeBlockClient lang={lang} code={text} html={html} />
 }
