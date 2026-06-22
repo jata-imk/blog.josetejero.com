@@ -11,17 +11,18 @@ const CONFIG: Record<Kind, { icon: string; label: string }> = {
 }
 
 export function Callout({
-  kind = 'note',
+  kind,
   title,
   children,
 }: {
-  kind?: Kind
+  kind?: Kind | null
   title?: string
   children: ReactNode
 }) {
-  const { icon, label } = CONFIG[kind]
+  const safeKind: Kind = (kind && CONFIG[kind]) ? kind : 'note'
+  const { icon, label } = CONFIG[safeKind]
   return (
-    <div className={`ab-callout ab-callout-${kind}`}>
+    <div className={`ab-callout ab-callout-${safeKind}`}>
       <div className="ic">
         <Ic name={icon} size={14} sw={2.2} />
       </div>

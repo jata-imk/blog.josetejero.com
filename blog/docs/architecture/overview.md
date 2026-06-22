@@ -52,6 +52,11 @@ lib/
 hooks/                     # client hooks solo para interactividad real
 ```
 
+Rutas publicas minimas ya fijadas:
+
+- `/` para home
+- `/blog/[slug]` como detalle canonico de post y compuerta de QA para render de `body`
+
 ## Reglas de capas
 
 - Server Components por defecto. Solo llevan `'use client'` las hojas interactivas: copiar codigo,
@@ -60,6 +65,8 @@ hooks/                     # client hooks solo para interactividad real
   `payload.find` directo.
 - `lib/lexical/*` transforma el JSON de Lexical en React. `Callout` es el unico bloque custom; el
   resaltado de codigo y el boton copiar son decisiones de render.
+- `CodeBlock` se divide por responsabilidad: el resaltado con Shiki ocurre en servidor y el boton
+  copiar vive en una hoja cliente minima.
 - Sin store global por ahora. Estado UI con hooks locales o Context puntual si aparece una necesidad
   real.
 - Los tokens de `app/globals.css` siguen siendo la unica fuente de verdad visual.

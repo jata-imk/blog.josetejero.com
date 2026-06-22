@@ -1,4 +1,4 @@
-# 0007 — Contrato del `Callout` entre editor y renderer
+# 0008 — Contrato del `Callout` entre editor y renderer
 
 - Estado: aceptada
 - Fecha: 2026-06-19

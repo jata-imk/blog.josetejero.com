@@ -1,27 +1,15 @@
-'use client'
+import { highlightCode } from '@/lib/code-highlight'
+import { CopyButton } from './CopyButton'
 
-import { useState } from 'react'
-import type { ReactNode } from 'react'
-import { Ic } from '../ui/Ic'
-
-export function CodeBlock({
+export async function CodeBlock({
   lang,
   code,
-  children,
 }: {
   lang?: string
   code?: string
-  children?: ReactNode
 }) {
-  const [copied, setCopied] = useState(false)
-
-  function copy() {
-    const text = code ?? ''
-    navigator.clipboard.writeText(text).then(() => {
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-    })
-  }
+  const text = code ?? ''
+  const html = await highlightCode(text, lang)
 
   return (
     <div className="ab-code">
@@ -32,17 +20,10 @@ export function CodeBlock({
           <i style={{ background: 'var(--mac-green)' }} />
         </div>
         {lang && <span className="ab-code-lang">{lang}</span>}
-        <button
-          className="ab-code-copy"
-          onClick={copy}
-          aria-label={copied ? 'Copiado' : 'Copiar código'}
-        >
-          <Ic name={copied ? 'check2' : 'copy'} size={13} sw={2} />
-          {copied ? 'Copiado' : 'Copiar'}
-        </button>
+        <CopyButton code={text} />
       </div>
       <pre>
-        {children ?? <code>{code}</code>}
+        <code dangerouslySetInnerHTML={{ __html: html }} />
       </pre>
     </div>
   )
