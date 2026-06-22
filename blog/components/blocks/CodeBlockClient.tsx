@@ -1,16 +1,31 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { CopyButton } from './CopyButton'
+import { highlightCodeClient } from '@/lib/code-highlight-client'
 
 export function CodeBlockClient({
   lang,
   code,
-  html,
+  html: initialHtml,
 }: {
   lang?: string
   code: string
   html: string
 }) {
+  const [html, setHtml] = useState(initialHtml)
+
+  useEffect(() => {
+    // Only highlight if we have code and initial HTML is just escaped fallback
+    if (code && initialHtml) {
+      highlightCodeClient(code, lang)
+        .then(setHtml)
+        .catch(() => {
+          // Keep the fallback HTML if highlighting fails
+        })
+    }
+  }, [code, lang, initialHtml])
+
   return (
     <div className="ab-code">
       <div className="ab-code-bar">

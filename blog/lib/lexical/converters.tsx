@@ -6,7 +6,7 @@ import {
 } from '@payloadcms/richtext-lexical/react'
 import type { SerializedBlockNode } from '@payloadcms/richtext-lexical'
 import { Callout } from '@/components/blocks/Callout'
-import { CodeBlock } from '@/components/blocks/CodeBlock'
+import { CodeBlockClient } from '@/components/blocks/CodeBlockClient'
 
 type CalloutFields = {
   blockType: 'callout'
@@ -51,6 +51,14 @@ function extractCodeText(children: LexicalChildNode[]): string {
   return lines.join('\n')
 }
 
+function escapeHtml(text: string): string {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+}
+
 // Exported so pages can pass it directly to <RichText converters={bodyConverters} />.
 export const bodyConverters: JSXConvertersFunction = ({ defaultConverters }) => {
   const converters: JSXConverters = {
@@ -59,7 +67,9 @@ export const bodyConverters: JSXConvertersFunction = ({ defaultConverters }) => 
       const children = node.children ?? []
       const text = extractCodeText(children)
       const language = node.language
-      return <CodeBlock lang={language} code={text} />
+      // Return CodeBlockClient directly with escaped HTML fallback
+      // CodeBlockClient will progressively enhance with Shiki highlighting on the client
+      return <CodeBlockClient lang={language} code={text} html={escapeHtml(text)} />
     },
     blocks: {
       ...defaultConverters.blocks,
