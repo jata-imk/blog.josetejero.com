@@ -100,7 +100,8 @@
   --sh-1: 0 1px 2px rgba(15, 23, 42, .04), 0 1px 3px rgba(15, 23, 42, .05);
   --sh-2: 0 2px 4px rgba(15, 23, 42, .04), 0 6px 18px rgba(15, 23, 42, .06);
   --sh-3: 0 10px 30px rgba(15, 23, 42, .08), 0 2px 6px rgba(15, 23, 42, .05);
-  --ring:  0 0 0 3px rgba(37, 99, 235, .16);
+  --ring:      0 0 0 3px rgba(37, 99, 235, .16);
+  --ring-dark: 0 0 0 2px rgba(255, 255, 255, .28);
 
   /* alpha surfaces */
   --bg-glass:       rgba(255,255,255,.82);
@@ -411,10 +412,11 @@ code, pre, .mono { font-family: var(--font-mono); }
 .ab-code-dots { display: flex; gap: 6px; }
 .ab-code-dots i { width: 10px; height: 10px; border-radius: 50%; display: block; }
 .ab-code-lang { margin-left: 6px; font-family: var(--font-mono); font-size: 12px; color: var(--muted); font-weight: 500; }
-.ab-code-copy { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; font-size: 12px; font-weight: 500; color: var(--line-3); background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); padding: 4px 9px; border-radius: 7px; font-family: inherit; }
+.ab-code-copy { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; font-size: 12px; font-weight: 500; color: var(--line-3); background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); padding: 4px 9px; border-radius: 7px; font-family: inherit; transition: background .15s, color .15s; }
 .ab-code-copy:hover { background: rgba(255,255,255,.12); color: var(--on-accent); }
-.ab-code pre { margin: 0; padding: 16px 18px; overflow: auto; }
-.ab-code code { font-family: var(--font-mono); font-size: 13.5px; line-height: 1.7; color: var(--code-text); }
+.ab-code-copy:focus-visible { outline: none; box-shadow: var(--ring-dark); border-color: rgba(255,255,255,.25); }
+.ab-code pre { margin: 0; padding: 16px 18px; overflow-x: auto; }
+.ab-code code { display: block; font-family: var(--font-mono); font-size: 13.5px; line-height: 1.7; color: var(--code-text); tab-size: 2; }
 
 /* callouts */
 .ab-callout { display: flex; gap: 13px; padding: 16px 18px; border-radius: var(--r); border: 1px solid; font-size: 15px; line-height: 1.6; }

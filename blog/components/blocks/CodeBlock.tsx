@@ -22,7 +22,7 @@ export async function CodeBlock({
         {lang && <span className="ab-code-lang">{lang}</span>}
         <CopyButton code={text} />
       </div>
-      <pre>
+      <pre tabIndex={0}>
         <code dangerouslySetInnerHTML={{ __html: html }} />
       </pre>
     </div>
