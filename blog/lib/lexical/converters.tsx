@@ -15,23 +15,54 @@ type CalloutFields = {
   content: Parameters<typeof RichText>[0]['data']
 }
 
-type CodeFields = {
-  code?: string
-  language?: string
+type LexicalChildNode = {
+  type: string
+  text?: string
+  children?: LexicalChildNode[]
+}
+
+function extractCodeText(children: LexicalChildNode[]): string {
+  const lines: string[] = []
+
+  for (const child of children) {
+    if (child.type === 'line') {
+      let lineText = ''
+      if (child.children && Array.isArray(child.children)) {
+        for (const token of child.children) {
+          if (token.type === 'tab') {
+            lineText += '\t'
+          } else if ('text' in token && typeof token.text === 'string') {
+            lineText += token.text
+          }
+        }
+      }
+      lines.push(lineText)
+    } else if (child.type === 'linebreak') {
+      lines.push('')
+    } else if (child.type === 'tab') {
+      if (lines.length === 0) lines.push('')
+      lines[lines.length - 1] += '\t'
+    } else if ('text' in child && typeof child.text === 'string') {
+      if (lines.length === 0) lines.push('')
+      lines[lines.length - 1] += child.text
+    }
+  }
+
+  return lines.join('\n')
 }
 
 // Exported so pages can pass it directly to <RichText converters={bodyConverters} />.
 export const bodyConverters: JSXConvertersFunction = ({ defaultConverters }) => {
   const converters: JSXConverters = {
     ...defaultConverters,
+    code: ({ node }: { node: { language?: string; children?: LexicalChildNode[] } }) => {
+      const children = node.children ?? []
+      const text = extractCodeText(children)
+      const language = node.language
+      return <CodeBlock lang={language} code={text} />
+    },
     blocks: {
       ...defaultConverters.blocks,
-      Code: ({ node }: { node: SerializedBlockNode<CodeFields> }) => {
-        const fields = node.fields ?? {}
-        const code = fields.code ?? ''
-        const language = fields.language
-        return <CodeBlock lang={language} code={code} />
-      },
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       callout: ({ node }: { node: SerializedBlockNode<any> }) => {
         const typedNode = node as SerializedBlockNode<CalloutFields>
