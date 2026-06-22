@@ -35,7 +35,7 @@ export function Header({ activePath = '/' }: { activePath?: string }) {
           ))}
         </nav>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+        <div className="header-social">
           {SOCIAL_LINKS.map((s) => (
             <a
               key={s.name}

@@ -244,6 +244,9 @@ code, pre, .mono { font-family: var(--font-mono); }
   height: 2px; border-radius: 2px; background: var(--blue);
 }
 
+/* ── header social icons ─────────────────────────────────────── */
+.header-social { display: flex; align-items: center; gap: 4px; }
+
 /* ── icon button ─────────────────────────────────────────────── */
 .icon-btn {
   width: 36px; height: 36px; border-radius: 9px; display: grid; place-items: center;
@@ -368,6 +371,7 @@ code, pre, .mono { font-family: var(--font-mono); }
 @media (max-width: 768px) {
   .wrap, .wrap-narrow     { padding: 0 18px; }
   .site-header-in         { padding: 0 18px; height: 56px; }
+  .site-nav, .header-social { display: none; }
   .footer-cols            { grid-template-columns: 1fr; }
   .grid-posts, .grid-series { grid-template-columns: 1fr; }
   .grid-latest            { grid-template-columns: 1fr; gap: 32px; }
