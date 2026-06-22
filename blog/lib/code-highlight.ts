@@ -1,10 +1,20 @@
 import 'server-only'
 import { codeToHtml } from 'shiki'
 
-export async function highlightCode(
-  code: string,
-  lang: string | undefined,
-): Promise<string> {
+export type LexicalChildNode = {
+  type: string
+  text?: string
+  language?: string
+  children?: LexicalChildNode[]
+  fields?: { content?: { root?: { children?: LexicalChildNode[] } } }
+}
+
+/**
+ * Resalta `code` en servidor con Shiki (tema oscuro) y devuelve solo el HTML
+ * interior del `<code>`. Cae a HTML escapado si Shiki falla o el lenguaje no existe.
+ * Fuente de verdad del resaltado según ADR 0008 (servidor, no cliente).
+ */
+export async function highlightCode(code: string, lang: string | undefined): Promise<string> {
   if (!code) return ''
 
   const language = normalizeLang(lang)
@@ -17,6 +27,75 @@ export async function highlightCode(
     return extractCodeContent(html)
   } catch {
     return escapeHtml(code)
+  }
+}
+
+/**
+ * Extrae el texto plano de un nodo `code` de Lexical. Soporta dos estructuras:
+ *  - anidada: `code → line → token` (la real que serializa Lexical)
+ *  - plana: hijos `text`/`linebreak`/`tab` directos (edge cases)
+ * Recorre 2 niveles a propósito: una recursión genérica perdería la forma por líneas.
+ */
+export function extractCodeText(children: LexicalChildNode[]): string {
+  const lines: string[] = []
+
+  for (const child of children) {
+    if (child.type === 'line') {
+      let lineText = ''
+      if (Array.isArray(child.children)) {
+        for (const token of child.children) {
+          if (token.type === 'tab') lineText += '\t'
+          else if (typeof token.text === 'string') lineText += token.text
+        }
+      }
+      lines.push(lineText)
+    } else if (child.type === 'linebreak') {
+      lines.push('')
+    } else if (child.type === 'tab') {
+      if (lines.length === 0) lines.push('')
+      lines[lines.length - 1] += '\t'
+    } else if (typeof child.text === 'string') {
+      if (lines.length === 0) lines.push('')
+      lines[lines.length - 1] += child.text
+    }
+  }
+
+  return lines.join('\n')
+}
+
+/**
+ * Recorre el árbol Lexical, resalta en servidor cada nodo `code` (incluidos los
+ * anidados dentro de bloques como Callout) y devuelve un mapa
+ * `texto-del-snippet → HTML resaltado`. El converter usa este mapa para emitir un
+ * Client Component síncrono sin meter Shiki en el bundle del navegador.
+ */
+export async function highlightLexicalCode(
+  root: { children?: LexicalChildNode[] } | null | undefined,
+): Promise<Map<string, string>> {
+  const snippets = new Map<string, string | undefined>()
+  collectCodeNodes(root?.children ?? [], snippets)
+
+  const result = new Map<string, string>()
+  await Promise.all(
+    [...snippets.entries()].map(async ([code, lang]) => {
+      result.set(code, await highlightCode(code, lang))
+    }),
+  )
+  return result
+}
+
+function collectCodeNodes(
+  children: LexicalChildNode[],
+  out: Map<string, string | undefined>,
+): void {
+  for (const node of children) {
+    if (node.type === 'code') {
+      const text = extractCodeText(node.children ?? [])
+      if (!out.has(text)) out.set(text, node.language)
+    }
+    if (node.children) collectCodeNodes(node.children, out)
+    const nested = node.fields?.content?.root?.children
+    if (nested) collectCodeNodes(nested, out)
   }
 }
 
@@ -49,7 +128,7 @@ function extractCodeContent(html: string): string {
   return escapeHtml(html)
 }
 
-function escapeHtml(text: string): string {
+export function escapeHtml(text: string): string {
   return text
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')

@@ -62,3 +62,16 @@ Contrato arquitectonico:
   la salida siga siendo correcta en movil.
 - Deuda asumida: por ahora solo se cubre tema oscuro y snippet simple. Numeracion de lineas,
   resaltado por linea o temas alternos quedan fuera por YAGNI.
+
+## Seguimiento (2026-06-22)
+
+Durante la implementacion (TOD-53) el codigo derivo a resaltar en **cliente** (Shiki en el
+navegador + `useEffect`), contradiciendo esta decision. Se diagnostico mal la causa: se creia
+que el converter corria en cliente, pero `RichText` de Payload es un Server Component. La causa
+real era devolver un componente **async** desde un converter sincrono.
+
+Limpieza aplicada para volver a esta decision: la pagina pre-resalta los nodos `code` en
+servidor (`highlightLexicalCode` en `lib/code-highlight.ts`) y pasa el HTML al converter, que
+emite un `CodeBlockClient` sincrono cuyo unico rol de cliente es el boton copiar. Se elimino
+`lib/code-highlight-client.ts` y el `CodeBlock.tsx` async (codigo muerto). **La decision de
+resaltar en servidor sigue vigente.**

@@ -1,31 +1,21 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import { CopyButton } from './CopyButton'
-import { highlightCodeClient } from '@/lib/code-highlight-client'
 
+/**
+ * Shell de cliente del bloque de código: pinta el chrome y el botón copiar.
+ * El `html` llega ya resaltado desde servidor (Shiki, ADR 0008); aquí no se
+ * resalta nada, así que Shiki no entra al bundle del navegador.
+ */
 export function CodeBlockClient({
   lang,
   code,
-  html: initialHtml,
+  html,
 }: {
   lang?: string
   code: string
   html: string
 }) {
-  const [html, setHtml] = useState(initialHtml)
-
-  useEffect(() => {
-    // Only highlight if we have code and initial HTML is just escaped fallback
-    if (code && initialHtml) {
-      highlightCodeClient(code, lang)
-        .then(setHtml)
-        .catch(() => {
-          // Keep the fallback HTML if highlighting fails
-        })
-    }
-  }, [code, lang, initialHtml])
-
   return (
     <div className="ab-code">
       <div className="ab-code-bar">

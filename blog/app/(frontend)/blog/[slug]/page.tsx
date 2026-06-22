@@ -2,7 +2,8 @@ import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { RichText } from '@payloadcms/richtext-lexical/react'
 import { getPostBySlug } from '@/lib/data'
-import { bodyConverters } from '@/lib/lexical/converters'
+import { makeBodyConverters } from '@/lib/lexical/converters'
+import { highlightLexicalCode, type LexicalChildNode } from '@/lib/code-highlight'
 import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
 
@@ -23,6 +24,11 @@ export default async function PostPage({ params }: Props) {
   const post = await getPostBySlug(slug)
 
   if (!post) notFound()
+
+  // Pre-resaltado de los bloques de código en servidor (Shiki, ADR 0008).
+  const highlightMap = await highlightLexicalCode(
+    post.body?.root as { children?: LexicalChildNode[] } | undefined,
+  )
 
   const publishedAt = post.publishedAt
     ? new Intl.DateTimeFormat('es-ES', { dateStyle: 'long' }).format(new Date(post.publishedAt))
@@ -57,7 +63,7 @@ export default async function PostPage({ params }: Props) {
           {/* rich-text body */}
           {post.body ? (
             <div className="ab-prose">
-              <RichText data={post.body} converters={bodyConverters} />
+              <RichText data={post.body} converters={makeBodyConverters(highlightMap)} />
             </div>
           ) : (
             <p style={{ color: 'var(--muted)', fontStyle: 'italic' }}>Este post no tiene contenido todavía.</p>
