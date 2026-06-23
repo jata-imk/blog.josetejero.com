@@ -6,7 +6,11 @@ export type LexicalChildNode = {
   text?: string
   language?: string
   children?: LexicalChildNode[]
-  fields?: { content?: { root?: { children?: LexicalChildNode[] } } }
+  fields?: {
+    content?: string | { root?: { children?: LexicalChildNode[] } }
+    blockType?: string
+    language?: string
+  }
 }
 
 /**
@@ -89,13 +93,23 @@ function collectCodeNodes(
   out: Map<string, string | undefined>,
 ): void {
   for (const node of children) {
+    // Current format: type: 'code' with children structure
     if (node.type === 'code') {
       const text = extractCodeText(node.children ?? [])
       if (!out.has(text)) out.set(text, node.language)
     }
+    // Legacy format: type: 'block' with fields.blockType: 'Code' and fields.content as string
+    if (node.type === 'block' && node.fields?.blockType === 'Code') {
+      const content = node.fields.content
+      if (typeof content === 'string' && content && !out.has(content)) {
+        out.set(content, node.fields.language)
+      }
+    }
     if (node.children) collectCodeNodes(node.children, out)
-    const nested = node.fields?.content?.root?.children
-    if (nested) collectCodeNodes(nested, out)
+    const nested = node.fields?.content
+    if (nested && typeof nested === 'object' && nested.root?.children) {
+      collectCodeNodes(nested.root.children, out)
+    }
   }
 }
 

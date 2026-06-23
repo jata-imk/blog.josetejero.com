@@ -16,6 +16,12 @@ type CalloutFields = {
   content: Parameters<typeof RichText>[0]['data']
 }
 
+type LegacyCodeFields = {
+  blockType: 'Code'
+  language?: string
+  content?: string
+}
+
 type HeadingNode = {
   tag?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
   children?: LexicalChildNode[]
@@ -90,6 +96,14 @@ export function makeBodyConverters(highlightMap: Map<string, string>): JSXConver
               ) : null}
             </Callout>
           )
+        },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        Code: ({ node }: { node: SerializedBlockNode<any> }) => {
+          const typedNode = node as SerializedBlockNode<LegacyCodeFields>
+          const fields = typedNode.fields ?? {}
+          const text = fields.content ?? ''
+          const html = highlightMap.get(text) ?? escapeHtml(text)
+          return <CodeBlockClient lang={fields.language} code={text} html={html} />
         },
       },
     }
