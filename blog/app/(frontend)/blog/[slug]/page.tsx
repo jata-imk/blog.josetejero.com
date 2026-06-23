@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { RichText } from '@payloadcms/richtext-lexical/react'
-import { getPostBySlug, getPostsInSeries, getCommentsByPost } from '@/lib/data'
+import { getPostBySlug, getPosts, getPostsInSeries, getCommentsByPost } from '@/lib/data'
 import { makeBodyConverters, extractToc } from '@/lib/lexical'
 import { highlightLexicalCode, type LexicalChildNode } from '@/lib/code-highlight'
 import { Header } from '@/components/layout/Header'
@@ -20,6 +20,11 @@ import { Comment } from '@/components/comments/Comment'
 import type { Category, Tag as TagType, Series, User } from '@/payload-types'
 
 type Props = { params: Promise<{ slug: string }> }
+
+export async function generateStaticParams() {
+  const posts = await getPosts(100)
+  return posts.map((post) => ({ slug: post.slug }))
+}
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params

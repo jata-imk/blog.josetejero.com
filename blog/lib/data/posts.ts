@@ -6,7 +6,12 @@ export async function getPostBySlug(slug: string): Promise<Post | null> {
   const payload = await getPayload()
   const { docs } = await payload.find({
     collection: 'posts',
-    where: { slug: { equals: slug } },
+    where: {
+      and: [
+        { slug: { equals: slug } },
+        { status: { equals: 'published' } },
+      ],
+    },
     depth: 2,
     limit: 1,
   })
