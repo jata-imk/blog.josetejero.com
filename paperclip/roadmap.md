@@ -34,7 +34,16 @@ Versión operable del plan. Cada fase deja ADR/agent-notes; el CEO no marca `don
 
 4. Bloque `Callout` (Engineer define / Frontend renderiza, +variante `danger`) → `first-tasks/04-callout.md`.
 5. `<CodeBlock>`: integrar Shiki sobre el chrome ya hecho (Frontend) → `first-tasks/05-codeblock.md`.
-6. Serializador Lexical → React + datos reales vía `lib/data` + páginas derivadas → `first-tasks/06-lexical-render.md`.
+6. **Fundación de datos** (Engineer, paralela a 04/05): seed de contenido dev + expandir `lib/data`
+   → `first-tasks/06-datos.md`. **Desbloquea las pantallas.**
+
+   **Pantallas (dependen de 04, 05, 06; la 06 era un monolito, ahora partida por pantalla):**
+   7. Serializador Lexical + página de post (keystone, Frontend) → `first-tasks/07-post-detail.md`.
+   8. Home real + blog index + listados serie/tag/categoría (Frontend) → `first-tasks/08-home-listados.md`.
+   9. Sobre mí + 404 (Frontend, puede ir temprano/en paralelo) → `first-tasks/09-about-404.md`.
+
+   > Búsqueda y comentarios **no** se construyen aquí: su shell visual ya existe y se **cablean en
+   > Fase 3** (backend de búsqueda y moderación). No duplicar.
 
 > Asignación Fase 2: ejecución directa a **Engineer/Frontend**; la **03b va al Architect** porque
 > define estructura/capas y deja ADR antes de que existan componentes. El resto del diseño y el
@@ -42,13 +51,15 @@ Versión operable del plan. Cada fase deja ADR/agent-notes; el CEO no marca `don
 > corre alguna tarea vía CEO para practicar la delegación.
 
 ## Fase 3 — Piezas peludas (vigilar de cerca)
-7. Importador Astro/MD → Lexical (Architect planea; Engineer implementa; palanca de subir modelo).
-8. Buscador (server-side sobre Postgres, o client-side Pagefind/Orama).
-9. Comentarios + moderación (pending/approved/spam/rejected; crear público, leer solo approved).
+10. Importador Astro/MD → Lexical (Architect planea; Engineer implementa; palanca de subir modelo).
+11. Buscador (server-side sobre Postgres, o client-side Pagefind/Orama) — **cablea el shell de
+    búsqueda** ya existente (`SearchInput`, `ListRow`); añade `searchPosts` a `lib/data`.
+12. Comentarios + moderación (pending/approved/spam/rejected; crear público, leer solo approved) —
+    **cablea el shell de comentarios** ya existente (`Comment`, `CommentForm`).
 
 ## Fase 4 — Cierre
-10. Dockerizar y desplegar al VPS (Engineer + `blog/docs/runbooks/deploy.md`).
-11. QA pasa por todo (build, lint, gate visual) y verifica ADR/notas de cada fase.
+13. Dockerizar y desplegar al VPS (Engineer + `blog/docs/runbooks/deploy.md`).
+14. QA pasa por todo (build, lint, gate visual) y verifica ADR/notas de cada fase.
 
 ## Señales para ajustar
 - Si José solo revisa diffs y no entiende el Next.js → exigir mejores agent-notes (su meta #1 es aprender).
