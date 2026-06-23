@@ -25,3 +25,37 @@ export async function getPosts(limit = 10, page = 1): Promise<Post[]> {
   })
   return docs
 }
+
+export async function getPostsByCategory(slug: string): Promise<Post[]> {
+  const payload = await getPayload()
+  const { docs } = await payload.find({
+    collection: 'posts',
+    where: {
+      and: [
+        { 'categories.slug': { equals: slug } },
+        { status: { equals: 'published' } },
+      ],
+    },
+    depth: 1,
+    limit: 100,
+    sort: '-publishedAt',
+  })
+  return docs
+}
+
+export async function getPostsByTag(slug: string): Promise<Post[]> {
+  const payload = await getPayload()
+  const { docs } = await payload.find({
+    collection: 'posts',
+    where: {
+      and: [
+        { 'tags.slug': { equals: slug } },
+        { status: { equals: 'published' } },
+      ],
+    },
+    depth: 1,
+    limit: 100,
+    sort: '-publishedAt',
+  })
+  return docs
+}
