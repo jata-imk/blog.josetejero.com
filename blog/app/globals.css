@@ -367,6 +367,22 @@ code, pre, .mono { font-family: var(--font-mono); }
 .grid-latest { display: grid; grid-template-columns: 1.6fr 1fr; gap: 48px; }
 .grid-series { display: grid; grid-template-columns: repeat(3,1fr); gap: 24px; }
 
+/* ── post page layout ─────────────────────────────────────────── */
+.post-body {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 44px 40px 0;
+  display: grid;
+  grid-template-columns: 1fr 232px;
+  gap: 56px;
+  align-items: start;
+}
+.post-body-aside {
+  position: sticky;
+  top: 88px;
+  align-self: start;
+}
+
 /* ── responsive ──────────────────────────────────────────────── */
 @media (max-width: 768px) {
   .wrap, .wrap-narrow     { padding: 0 18px; }
@@ -378,6 +394,8 @@ code, pre, .mono { font-family: var(--font-mono); }
   .ab-feat                { grid-template-columns: 1fr; }
   .ab-feat .thumb         { min-height: 220px; }
   .ab-prevnext            { grid-template-columns: 1fr; }
+  .post-body              { grid-template-columns: 1fr; padding: 28px 18px 0; gap: 0; }
+  .post-body-aside        { display: none; }
 }
 
 /* ── component layer (ported from design handoff aleliz.css) ─── */

@@ -16,6 +16,42 @@ type CalloutFields = {
   content: Parameters<typeof RichText>[0]['data']
 }
 
+type HeadingNode = {
+  tag?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
+  children?: LexicalChildNode[]
+}
+
+/**
+ * Extrae el texto plano de un heading para generar su ID.
+ */
+function extractHeadingText(children: LexicalChildNode[] | undefined): string {
+  if (!children) return ''
+  let result = ''
+  for (const child of children) {
+    if (typeof child.text === 'string') {
+      result += child.text
+    }
+    if (child.children) {
+      result += extractHeadingText(child.children)
+    }
+  }
+  return result.trim()
+}
+
+/**
+ * Convierte texto de heading en slug para ID (coherente con toc.ts).
+ */
+function slugifyHeading(text: string): string {
+  return text
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/[\s]+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-+|-+$/g, '')
+}
+
 /**
  * Crea los converters del body. Recibe el mapa `texto → HTML resaltado` que la
  * página pre-calcula en servidor (ver `highlightLexicalCode`). El converter `code`
@@ -26,6 +62,15 @@ export function makeBodyConverters(highlightMap: Map<string, string>): JSXConver
   return ({ defaultConverters }) => {
     const converters: JSXConverters = {
       ...defaultConverters,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      heading: (args: any) => {
+        const node = args.node as HeadingNode
+        const Tag = node.tag ?? 'h2'
+        const text = extractHeadingText(node.children)
+        const id = text ? slugifyHeading(text) : undefined
+        const children = args.nodesToJSX({ nodes: node.children ?? [] })
+        return <Tag id={id}>{children}</Tag>
+      },
       code: ({ node }: { node: { language?: string; children?: LexicalChildNode[] } }) => {
         const text = extractCodeText(node.children ?? [])
         const html = highlightMap.get(text) ?? escapeHtml(text)
