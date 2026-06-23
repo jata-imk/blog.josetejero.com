@@ -1,4 +1,7 @@
-# 0008 — Contrato del `Callout` entre editor y renderer
+# 0010 — Contrato del `Callout` entre editor y renderer
+
+> Nota: originalmente numerado 0008 por error (colisión con el ADR de CodeBlock).
+> Renumerado a 0010 para mantener identificadores únicos.
 
 - Estado: aceptada
 - Fecha: 2026-06-19

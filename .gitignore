@@ -26,10 +26,15 @@ blog/media/
 .qa-artifacts/
 artifacts/
 .playwright-mcp/
+test-results/
 admin-login*.png
 tod-*.png
 *-rerun.png
 *-final.png
+
+# Evitar que las capturas temporales o JSONs en la raíz del repo queden sin ignorar
+/*.png
+/*.json
 
 # TypeScript incremental build
 *.tsbuildinfo
