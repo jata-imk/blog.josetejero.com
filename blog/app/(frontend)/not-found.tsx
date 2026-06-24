@@ -88,7 +88,6 @@ export default function NotFound() {
             { label: 'Blog', href: '/blog' },
             { label: 'Series', href: '/series' },
             { label: 'Categorías', href: '/categorias' },
-            { label: 'Tags', href: '/tags' },
           ].map((link) => (
             <a
               key={link.href}
