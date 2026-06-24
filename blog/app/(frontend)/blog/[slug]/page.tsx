@@ -10,7 +10,7 @@ import { Breadcrumb } from '@/components/ui/Breadcrumb'
 import { Cat, type CatKey } from '@/components/ui/Cat'
 import { Tag, TagRow } from '@/components/ui/Tag'
 import { Meta, MetaSep } from '@/components/ui/Meta'
-import { TableOfContents } from '@/components/blocks/TableOfContents'
+import { TableOfContents, MobileToc } from '@/components/blocks/TableOfContents'
 import { Prose } from '@/components/blocks/Prose'
 import { AuthorCard } from '@/components/post/AuthorCard'
 import { PrevNext } from '@/components/post/PrevNext'
@@ -98,7 +98,7 @@ export default async function PostPage({ params }: Props) {
       <Header activePath="/blog" />
 
       {/* Cabecera del artículo — máx 820px (handoff) */}
-      <div style={{ maxWidth: 820, margin: '0 auto', padding: '32px 40px 0' }}>
+      <div className="post-head">
         <Breadcrumb items={breadcrumbItems} />
 
         {primaryCategory && (
@@ -107,35 +107,14 @@ export default async function PostPage({ params }: Props) {
           </div>
         )}
 
-        <h1
-          style={{
-            fontSize: 40,
-            fontWeight: 800,
-            letterSpacing: '-.035em',
-            lineHeight: 1.12,
-            marginTop: 16,
-            color: 'var(--ink)',
-          }}
-        >
-          {post.title}
-        </h1>
+        <h1 className="post-title">{post.title}</h1>
 
         {post.excerpt && (
-          <p style={{ fontSize: 19, color: 'var(--ink-3)', lineHeight: 1.6, marginTop: 18 }}>
-            {post.excerpt}
-          </p>
+          <p className="post-excerpt">{post.excerpt}</p>
         )}
 
         {/* Meta row */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            flexWrap: 'wrap',
-            marginTop: 22,
-          }}
-        >
+        <div className="post-meta-row">
           {author?.name && (
             <>
               <span style={{ fontSize: 13.5, color: 'var(--ink-2)', fontWeight: 500 }}>
@@ -160,7 +139,7 @@ export default async function PostPage({ params }: Props) {
         </div>
 
         {tags.length > 0 && (
-          <div style={{ marginTop: 14 }}>
+          <div className="post-tags-row">
             <TagRow>
               {tags.map((tag) => (
                 <Tag key={tag.id}>{tag.name}</Tag>
@@ -168,9 +147,12 @@ export default async function PostPage({ params }: Props) {
             </TagRow>
           </div>
         )}
+
+        {/* Mobile TOC — colapsado por defecto, oculto en desktop */}
+        <MobileToc items={toc} />
       </div>
 
-      {/* Cuerpo: artículo (izquierda) + TOC sticky (derecha) */}
+      {/* Cuerpo: artículo (izquierda) + TOC sticky (derecha, solo desktop) */}
       <div className="post-body">
         <article style={{ maxWidth: 720 }}>
           <Prose>
@@ -193,31 +175,29 @@ export default async function PostPage({ params }: Props) {
 
       {/* Bloque de serie completo — todos los posts del track */}
       {series && seriesPosts.length > 0 && (
-        <div style={{ maxWidth: 820, margin: '48px auto 0', padding: '0 40px' }}>
+        <div className="post-wrap" style={{ marginTop: 48 }}>
           <SeriesNav series={series} posts={seriesPosts} currentPostId={post.id} />
         </div>
       )}
 
       {/* Anterior / Siguiente (solo dentro de la misma serie) */}
       {(prevPost || nextPost) && (
-        <div style={{ maxWidth: 820, margin: '36px auto 0', padding: '0 40px' }}>
+        <div className="post-wrap" style={{ marginTop: 36 }}>
           <PrevNext prev={prevPost} next={nextPost} />
         </div>
       )}
 
       {/* Tarjeta del autor */}
       {author?.name && (
-        <div style={{ maxWidth: 820, margin: '32px auto 0', padding: '0 40px' }}>
+        <div className="post-wrap" style={{ marginTop: 32 }}>
           <AuthorCard name={author.name} />
         </div>
       )}
 
       {/* Comentarios */}
-      <div style={{ maxWidth: 820, margin: '48px auto 0', padding: '0 40px 80px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 24 }}>
-          <h2 style={{ fontSize: 24, fontWeight: 750, letterSpacing: '-.03em', margin: 0 }}>
-            Comentarios
-          </h2>
+      <div className="post-comments" style={{ marginTop: 48 }}>
+        <div className="post-comments-head">
+          <h2 className="post-comments-title">Comentarios</h2>
           {comments.length > 0 && (
             <span
               className="badge badge-soft"
@@ -235,7 +215,7 @@ export default async function PostPage({ params }: Props) {
             Sé la primera persona en comentar.
           </p>
         ) : (
-          <div style={{ marginTop: 28, display: 'flex', flexDirection: 'column', gap: 26 }}>
+          <div className="post-comments-list">
             {comments.map((c) => (
               <Comment
                 key={c.id}

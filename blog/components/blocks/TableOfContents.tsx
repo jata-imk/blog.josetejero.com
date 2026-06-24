@@ -8,6 +8,24 @@ export type TocItem = {
   level: 2 | 3
 }
 
+export function MobileToc({ items }: { items: TocItem[] }) {
+  if (items.length === 0) return null
+  return (
+    <div className="post-toc-mobile">
+      <details>
+        <summary>En esta página</summary>
+        <div className="ab-toc">
+          {items.map((item) => (
+            <a key={item.id} href={`#${item.id}`} className={item.level === 3 ? 'sub' : ''}>
+              {item.label}
+            </a>
+          ))}
+        </div>
+      </details>
+    </div>
+  )
+}
+
 export function TableOfContents({ items }: { items: TocItem[] }) {
   const [activeId, setActiveId] = useState<string | null>(null)
 

@@ -2,5 +2,13 @@ export { getPayload } from './getPayload'
 export { getPostBySlug, getPosts, getPostsByCategory, getPostsByTag } from './posts'
 export { getCategoryBySlug, getCategories } from './categories'
 export { getTagBySlug, getTags } from './tags'
-export { getSeriesBySlug, getSeries, getSeriesList, getSeriesWithPosts, getPostsInSeries } from './series'
+export {
+  getSeriesBySlug,
+  getSeries,
+  getSeriesList,
+  getSeriesWithPosts,
+  getPostsInSeries,
+  getSeriesNavigationContext,
+  type SeriesNavigationContext,
+} from './series'
 export { getCommentsByPost, getPendingComments } from './comments'
