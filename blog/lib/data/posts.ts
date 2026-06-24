@@ -18,9 +18,22 @@ export async function getPostBySlug(slug: string): Promise<Post | null> {
   return docs[0] ?? null
 }
 
-export async function getPosts(limit = 10, page = 1): Promise<Post[]> {
+export type PaginatedPosts = {
+  docs: Post[]
+  totalDocs: number
+  limit: number
+  totalPages: number
+  page?: number | undefined
+  pagingCounter: number
+  hasPrevPage: boolean
+  hasNextPage: boolean
+  prevPage?: number | null
+  nextPage?: number | null
+}
+
+export async function getPosts(limit = 10, page = 1): Promise<PaginatedPosts> {
   const payload = await getPayload()
-  const { docs } = await payload.find({
+  const result = await payload.find({
     collection: 'posts',
     where: { status: { equals: 'published' } },
     depth: 1,
@@ -28,7 +41,7 @@ export async function getPosts(limit = 10, page = 1): Promise<Post[]> {
     page,
     sort: '-publishedAt',
   })
-  return docs
+  return result
 }
 
 export async function getPostsByCategory(slug: string): Promise<Post[]> {

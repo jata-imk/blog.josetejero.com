@@ -22,7 +22,7 @@ import type { Category, Tag as TagType, Series, User } from '@/payload-types'
 type Props = { params: Promise<{ slug: string }> }
 
 export async function generateStaticParams() {
-  const posts = await getPosts(100)
+  const { docs: posts } = await getPosts(100)
   return posts.map((post) => ({ slug: post.slug }))
 }
 
@@ -88,7 +88,7 @@ export default async function PostPage({ params }: Props) {
     { label: 'Inicio', href: '/' },
     { label: 'Blog', href: '/blog' },
     ...(primaryCategory
-      ? [{ label: primaryCategory.name, href: `/categoria/${primaryCategory.slug}` }]
+      ? [{ label: primaryCategory.name, href: `/categorias/${primaryCategory.slug}` }]
       : []),
     { label: post.title },
   ]

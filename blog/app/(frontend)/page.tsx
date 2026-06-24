@@ -111,7 +111,7 @@ function postTags(post: Post): string[] {
 
 /* ── page ─────────────────────────────────────────────────────── */
 export default async function Home() {
-  const [allPosts, categories, seriesList] = await Promise.all([
+  const [{ docs: allPosts }, categories, seriesList] = await Promise.all([
     getPosts(7),
     getCategories(),
     getSeriesList(),
@@ -184,7 +184,7 @@ export default async function Home() {
           <SectionHead title="Categorías" />
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {categories.map((cat) => (
-              <a key={cat.id} className="card card-hover" href={`/categoria/${cat.slug}`}
+              <a key={cat.id} className="card card-hover" href={`/categorias/${cat.slug}`}
                 style={{ padding: '13px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <Cat cat={cat.slug as CatKey} lg />
               </a>

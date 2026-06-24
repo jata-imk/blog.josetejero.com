@@ -1,10 +1,13 @@
 import { Header } from '../../../components/layout/Header'
 import { Footer } from '../../../components/layout/Footer'
 import { PostCard } from '../../../components/post/PostCard'
+import { Pagination } from '../../../components/ui/Pagination'
 import { Breadcrumb } from '../../../components/ui/Breadcrumb'
 import { getPosts } from '../../../lib/data'
 import type { Post, Category } from '../../../payload-types'
 import type { CatKey } from '../../../components/ui/Cat'
+
+const POSTS_PER_PAGE = 12
 
 function primaryCatSlug(post: Post): CatKey {
   const cats = (post.categories ?? []) as Array<number | Category>
@@ -33,8 +36,15 @@ const breadcrumbItems = [
   { label: 'Blog' },
 ]
 
-export default async function BlogPage() {
-  const posts = await getPosts(100)
+export default async function BlogPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>
+}) {
+  const { page: pageParam } = await searchParams
+  const page = Math.max(1, Number(pageParam ?? 1))
+
+  const { docs: posts, totalPages } = await getPosts(POSTS_PER_PAGE, page)
 
   return (
     <>
@@ -58,20 +68,32 @@ export default async function BlogPage() {
             Todavía no hay posts publicados.
           </p>
         ) : (
-          <div className="grid-posts">
-            {posts.map((p) => (
-              <PostCard
-                key={p.id}
-                cat={primaryCatSlug(p)}
-                title={p.title}
-                excerpt={p.excerpt ?? ''}
-                tags={postTags(p)}
-                date={fmtDate(p.publishedAt)}
-                readTime={estimateReadTime(p.body)}
-                href={`/blog/${p.slug}`}
-              />
-            ))}
-          </div>
+          <>
+            <div className="grid-posts">
+              {posts.map((p) => (
+                <PostCard
+                  key={p.id}
+                  cat={primaryCatSlug(p)}
+                  title={p.title}
+                  excerpt={p.excerpt ?? ''}
+                  tags={postTags(p)}
+                  date={fmtDate(p.publishedAt)}
+                  readTime={estimateReadTime(p.body)}
+                  href={`/blog/${p.slug}`}
+                />
+              ))}
+            </div>
+
+            {totalPages > 1 && (
+              <div style={{ marginTop: 52, display: 'flex', justifyContent: 'center' }}>
+                <Pagination
+                  currentPage={page}
+                  totalPages={totalPages}
+                  getHref={(p) => p === 1 ? '/blog' : `/blog?page=${p}`}
+                />
+              </div>
+            )}
+          </>
         )}
       </div>
 
