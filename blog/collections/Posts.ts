@@ -1,4 +1,4 @@
-import { BlocksFeature, lexicalEditor } from '@payloadcms/richtext-lexical'
+import { BlocksFeature, CodeBlock, lexicalEditor } from '@payloadcms/richtext-lexical'
 import type { CollectionConfig } from 'payload'
 import { calloutBlock } from '@/lib/lexical/calloutBlock'
 
@@ -73,7 +73,7 @@ export const Posts: CollectionConfig = {
       editor: lexicalEditor({
         features: ({ defaultFeatures }) => [
           ...defaultFeatures,
-          BlocksFeature({ blocks: [calloutBlock] }),
+          BlocksFeature({ blocks: [calloutBlock, CodeBlock()] }),
         ],
       }),
     },

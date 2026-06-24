@@ -75,3 +75,12 @@ servidor (`highlightLexicalCode` en `lib/code-highlight.ts`) y pasa el HTML al c
 emite un `CodeBlockClient` sincrono cuyo unico rol de cliente es el boton copiar. Se elimino
 `lib/code-highlight-client.ts` y el `CodeBlock.tsx` async (codigo muerto). **La decision de
 resaltar en servidor sigue vigente.**
+
+## Seguimiento (2026-06-24) — premisa de "nodo built-in" reemplazada
+
+La premisa del Contexto "el codigo usa el nodo built-in de Lexical, no un bloque custom" resulto
+**falsa en la practica**: el editor del body nunca registro un feature de codigo, asi que ese nodo
+`type:'code'` jamas se pudo autorear ni validaba. Ver **ADR 0013**, que adopta el `CodeBlock` premade
+de Payload (un bloque, `blockType:'Code'`, campo `code` string) como formato unico. **La parte de
+este ADR sobre resaltar en servidor + copiar en cliente sigue vigente**; solo cambia el tipo de nodo
+del que sale el string `code`.

@@ -7,7 +7,10 @@ export type LexicalChildNode = {
   language?: string
   children?: LexicalChildNode[]
   fields?: {
-    content?: string | { root?: { children?: LexicalChildNode[] } }
+    /** Código del bloque `Code` premade de Payload (string). */
+    code?: string
+    /** Contenido richText anidado (p. ej. el del Callout). */
+    content?: { root?: { children?: LexicalChildNode[] } }
     blockType?: string
     language?: string
   }
@@ -35,40 +38,7 @@ export async function highlightCode(code: string, lang: string | undefined): Pro
 }
 
 /**
- * Extrae el texto plano de un nodo `code` de Lexical. Soporta dos estructuras:
- *  - anidada: `code → line → token` (la real que serializa Lexical)
- *  - plana: hijos `text`/`linebreak`/`tab` directos (edge cases)
- * Recorre 2 niveles a propósito: una recursión genérica perdería la forma por líneas.
- */
-export function extractCodeText(children: LexicalChildNode[]): string {
-  const lines: string[] = []
-
-  for (const child of children) {
-    if (child.type === 'line') {
-      let lineText = ''
-      if (Array.isArray(child.children)) {
-        for (const token of child.children) {
-          if (token.type === 'tab') lineText += '\t'
-          else if (typeof token.text === 'string') lineText += token.text
-        }
-      }
-      lines.push(lineText)
-    } else if (child.type === 'linebreak') {
-      lines.push('')
-    } else if (child.type === 'tab') {
-      if (lines.length === 0) lines.push('')
-      lines[lines.length - 1] += '\t'
-    } else if (typeof child.text === 'string') {
-      if (lines.length === 0) lines.push('')
-      lines[lines.length - 1] += child.text
-    }
-  }
-
-  return lines.join('\n')
-}
-
-/**
- * Recorre el árbol Lexical, resalta en servidor cada nodo `code` (incluidos los
+ * Recorre el árbol Lexical, resalta en servidor cada bloque `Code` (incluidos los
  * anidados dentro de bloques como Callout) y devuelve un mapa
  * `texto-del-snippet → HTML resaltado`. El converter usa este mapa para emitir un
  * Client Component síncrono sin meter Shiki en el bundle del navegador.
@@ -93,19 +63,15 @@ function collectCodeNodes(
   out: Map<string, string | undefined>,
 ): void {
   for (const node of children) {
-    // Current format: type: 'code' with children structure
-    if (node.type === 'code') {
-      const text = extractCodeText(node.children ?? [])
-      if (!out.has(text)) out.set(text, node.language)
-    }
-    // Legacy format: type: 'block' with fields.blockType: 'Code' and fields.content as string
+    // Bloque `Code` (premade de Payload): el código vive como string en `fields.code`.
     if (node.type === 'block' && node.fields?.blockType === 'Code') {
-      const content = node.fields.content
-      if (typeof content === 'string' && content && !out.has(content)) {
-        out.set(content, node.fields.language)
+      const code = node.fields.code
+      if (typeof code === 'string' && code && !out.has(code)) {
+        out.set(code, node.fields.language)
       }
     }
     if (node.children) collectCodeNodes(node.children, out)
+    // Contenido richText anidado (p. ej. el del Callout) puede contener más bloques `Code`.
     const nested = node.fields?.content
     if (nested && typeof nested === 'object' && nested.root?.children) {
       collectCodeNodes(nested.root.children, out)

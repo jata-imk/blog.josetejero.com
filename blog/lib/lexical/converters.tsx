@@ -7,7 +7,7 @@ import {
 import type { SerializedBlockNode } from '@payloadcms/richtext-lexical'
 import { Callout } from '@/components/blocks/Callout'
 import { CodeBlockClient } from '@/components/blocks/CodeBlockClient'
-import { extractCodeText, escapeHtml, type LexicalChildNode } from '@/lib/code-highlight'
+import { escapeHtml, type LexicalChildNode } from '@/lib/code-highlight'
 
 type CalloutFields = {
   blockType: 'callout'
@@ -16,10 +16,11 @@ type CalloutFields = {
   content: Parameters<typeof RichText>[0]['data']
 }
 
-type LegacyCodeFields = {
+type CodeBlockFields = {
   blockType: 'Code'
   language?: string
-  content?: string
+  /** El `CodeBlock` premade de Payload guarda el código como string aquí. */
+  code?: string
 }
 
 type HeadingNode = {
@@ -60,9 +61,10 @@ function slugifyHeading(text: string): string {
 
 /**
  * Crea los converters del body. Recibe el mapa `texto → HTML resaltado` que la
- * página pre-calcula en servidor (ver `highlightLexicalCode`). El converter `code`
- * es síncrono y devuelve un Client Component con el HTML ya resaltado: Shiki queda
- * en servidor (ADR 0008) y solo el botón copiar viaja como cliente.
+ * página pre-calcula en servidor (ver `highlightLexicalCode`). El converter del
+ * bloque `Code` (premade de Payload) es síncrono y devuelve un Client Component
+ * con el HTML ya resaltado: Shiki queda en servidor (ADR 0008) y solo el botón
+ * copiar viaja como cliente.
  */
 export function makeBodyConverters(highlightMap: Map<string, string>): JSXConvertersFunction {
   return ({ defaultConverters }) => {
@@ -76,11 +78,6 @@ export function makeBodyConverters(highlightMap: Map<string, string>): JSXConver
         const id = text ? slugifyHeading(text) : undefined
         const children = args.nodesToJSX({ nodes: node.children ?? [] })
         return <Tag id={id}>{children}</Tag>
-      },
-      code: ({ node }: { node: { language?: string; children?: LexicalChildNode[] } }) => {
-        const text = extractCodeText(node.children ?? [])
-        const html = highlightMap.get(text) ?? escapeHtml(text)
-        return <CodeBlockClient lang={node.language} code={text} html={html} />
       },
       blocks: {
         ...defaultConverters.blocks,
@@ -99,9 +96,9 @@ export function makeBodyConverters(highlightMap: Map<string, string>): JSXConver
         },
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         Code: ({ node }: { node: SerializedBlockNode<any> }) => {
-          const typedNode = node as SerializedBlockNode<LegacyCodeFields>
+          const typedNode = node as SerializedBlockNode<CodeBlockFields>
           const fields = typedNode.fields ?? {}
-          const text = fields.content ?? ''
+          const text = fields.code ?? ''
           const html = highlightMap.get(text) ?? escapeHtml(text)
           return <CodeBlockClient lang={fields.language} code={text} html={html} />
         },

@@ -452,8 +452,11 @@ code, pre, .mono { font-family: var(--font-mono); }
 .ab-prose h3 { font-size: 20px; color: var(--ink); margin-top: 30px; }
 .ab-prose a { color: var(--blue); font-weight: 500; box-shadow: inset 0 -1px 0 rgba(37,99,235,.3); transition: box-shadow .15s; }
 .ab-prose a:hover { box-shadow: inset 0 -2px 0 rgba(37,99,235,.6); }
-.ab-prose ul, .ab-prose ol { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 8px; }
+.ab-prose ul, .ab-prose ol { margin: 0; padding-left: 22px; }
+.ab-prose ul { list-style: disc; }
+.ab-prose ol { list-style: decimal; }
 .ab-prose li { padding-left: 4px; }
+.ab-prose li + li { margin-top: 8px; }
 .ab-prose blockquote { margin: 0; padding: 4px 0 4px 22px; border-left: 3px solid var(--blue); color: var(--ink); font-size: 18.5px; font-style: italic; }
 .ab-prose strong { color: var(--ink); font-weight: 650; }
 

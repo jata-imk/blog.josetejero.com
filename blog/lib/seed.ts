@@ -182,8 +182,12 @@ function makeBody(topicA: string, topicB: string, rich: boolean): NonNullable<Po
         },
         {
           type: 'link' as const,
-          url: 'https://nextjs.org/docs',
-          version: 1,
+          version: 3,
+          fields: {
+            linkType: 'custom' as const,
+            url: 'https://nextjs.org/docs',
+            newTab: true,
+          },
           children: [
             {
               type: 'text' as const,
@@ -198,9 +202,6 @@ function makeBody(topicA: string, topicB: string, rich: boolean): NonNullable<Po
           direction: 'ltr' as const,
           format: '',
           indent: 0,
-          rel: null,
-          target: null,
-          title: null,
         },
         {
           type: 'text' as const,
@@ -256,50 +257,17 @@ function makeBody(topicA: string, topicB: string, rich: boolean): NonNullable<Po
       textFormat: 0,
     },
     {
-      type: 'code' as const,
-      language: 'typescript',
+      // Bloque de código premade de Payload (`CodeBlock`): guarda el código como
+      // string en `fields.code`. Shiki lo resalta en servidor a partir del string.
+      type: 'block' as const,
       version: 1,
-      children: [
-        {
-          type: 'line' as const,
-          version: 0,
-          children: [
-            { type: 'token' as const, text: 'interface ', version: 0, format: 0, style: '', mode: 'normal' as const, detail: 0 },
-            { type: 'token' as const, text: 'Config', version: 0, format: 2, style: '', mode: 'normal' as const, detail: 0 },
-            { type: 'token' as const, text: ' {', version: 0, format: 0, style: '', mode: 'normal' as const, detail: 0 },
-          ],
-        },
-        {
-          type: 'line' as const,
-          version: 0,
-          children: [
-            { type: 'token' as const, text: '  ', version: 0, format: 0, style: '', mode: 'normal' as const, detail: 0 },
-            { type: 'token' as const, text: 'name', version: 0, format: 8, style: '', mode: 'normal' as const, detail: 0 },
-            { type: 'token' as const, text: ': ', version: 0, format: 0, style: '', mode: 'normal' as const, detail: 0 },
-            { type: 'token' as const, text: 'string', version: 0, format: 2, style: '', mode: 'normal' as const, detail: 0 },
-          ],
-        },
-        {
-          type: 'line' as const,
-          version: 0,
-          children: [
-            { type: 'token' as const, text: '  ', version: 0, format: 0, style: '', mode: 'normal' as const, detail: 0 },
-            { type: 'token' as const, text: 'debug', version: 0, format: 8, style: '', mode: 'normal' as const, detail: 0 },
-            { type: 'token' as const, text: '?: ', version: 0, format: 0, style: '', mode: 'normal' as const, detail: 0 },
-            { type: 'token' as const, text: 'boolean', version: 0, format: 2, style: '', mode: 'normal' as const, detail: 0 },
-          ],
-        },
-        {
-          type: 'line' as const,
-          version: 0,
-          children: [
-            { type: 'token' as const, text: '}', version: 0, format: 0, style: '', mode: 'normal' as const, detail: 0 },
-          ],
-        },
-      ],
-      direction: 'ltr' as const,
-      format: '',
-      indent: 0,
+      fields: {
+        id: crypto.randomUUID ? crypto.randomUUID() : 'code-seed-1',
+        blockName: null,
+        blockType: 'Code',
+        language: 'typescript',
+        code: 'interface Config {\n  name: string\n  debug?: boolean\n}',
+      },
     },
   ]
 
@@ -354,8 +322,12 @@ function makeBody(topicA: string, topicB: string, rich: boolean): NonNullable<Po
                   },
                   {
                     type: 'link' as const,
-                    url: 'https://www.typescriptlang.org/tsconfig',
-                    version: 1,
+                    version: 3,
+                    fields: {
+                      linkType: 'custom' as const,
+                      url: 'https://www.typescriptlang.org/tsconfig',
+                      newTab: true,
+                    },
                     children: [
                       {
                         type: 'text' as const,
@@ -370,9 +342,6 @@ function makeBody(topicA: string, topicB: string, rich: boolean): NonNullable<Po
                     direction: 'ltr' as const,
                     format: '',
                     indent: 0,
-                    rel: null,
-                    target: null,
-                    title: null,
                   },
                   {
                     type: 'text' as const,
@@ -438,6 +407,9 @@ function makeBody(topicA: string, topicB: string, rich: boolean): NonNullable<Po
     {
       type: 'list' as const,
       listType: 'bullet' as const,
+      // `tag` es obligatorio para el converter JSX del body (hace `<NodeTag>`).
+      // ListNode.exportJSON lo emite siempre: 'ul' para bullet/check, 'ol' para number.
+      tag: 'ul' as const,
       start: 1,
       version: 1,
       children: [
@@ -658,24 +630,33 @@ async function seedPosts(payload: Payload): Promise<void> {
       : null
     const seriesId = seriesDoc?.id as number | undefined
 
-    await payload.create({
-      collection: 'posts',
-      data: {
-        title: post.title,
-        slug: post.slug,
-        excerpt: post.excerpt,
-        author: authorId,
-        status: 'published' as const,
-        publishedAt: new Date().toISOString(),
-        body: makeBody(...extractTopics(post.title), post.useRichLexical),
-        categories: categoryIds,
-        tags: tagIds,
-        series: seriesId,
-        seriesOrder: post.seriesOrder || undefined,
-      },
-    })
-
-    payload.logger.info(`[seed] Post: ${post.title}`)
+    try {
+      await payload.create({
+        collection: 'posts',
+        data: {
+          title: post.title,
+          slug: post.slug,
+          excerpt: post.excerpt,
+          author: authorId,
+          status: 'published' as const,
+          publishedAt: new Date().toISOString(),
+          body: makeBody(...extractTopics(post.title), post.useRichLexical),
+          categories: categoryIds,
+          tags: tagIds,
+          series: seriesId,
+          seriesOrder: post.seriesOrder || undefined,
+        },
+      })
+      payload.logger.info(`[seed] Post: ${post.title}`)
+    } catch (err) {
+      // No abortamos el resto del seed por un post inválido: logueamos el detalle
+      // por campo del ValidationError (`err.data.errors`), que de otro modo se
+      // pierde al convertir el error a string.
+      const data = (err as { data?: unknown })?.data
+      payload.logger.error(
+        `[seed] Post "${post.title}" inválido — ${JSON.stringify(data ?? String(err), null, 2)}`,
+      )
+    }
   }
 }
 

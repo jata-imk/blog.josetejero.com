@@ -48,7 +48,11 @@ export default buildConfig({
     try {
       await seedDev(payload)
     } catch (err) {
+      // `err.data` trae el detalle por campo de un ValidationError; `String(err)`
+      // solo lo aplasta. Logueamos ambos para no perder la causa real.
+      const data = (err as { data?: unknown })?.data
       payload.logger.warn(`[seed] Skipped — DB not ready or error: ${String(err)}`)
+      if (data) payload.logger.warn(`[seed] Detalle: ${JSON.stringify(data, null, 2)}`)
     }
   },
 })
