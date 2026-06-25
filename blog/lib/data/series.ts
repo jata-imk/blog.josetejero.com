@@ -24,7 +24,23 @@ export async function getSeriesList(): Promise<Series[]> {
   return docs
 }
 
-export async function getSeriesWithPosts(slug: string): Promise<{ series: Series; posts: Post[] } | null> {
+export type SeriesStepStatus = 'done' | 'current'
+
+export type SeriesPostWithStatus = Post & {
+  stepStatus: SeriesStepStatus
+}
+
+/**
+ * Recupera una serie con sus posts publicados y estado editorial.
+ * Retorna `null` si la serie no existe (llamador debe hacer `notFound()`).
+ * Si la serie existe pero no tiene posts, retorna `{ series, posts: [] }` (EmptyState).
+ *
+ * El estado editorial se calcula así (ADR 0014):
+ * - Posts anteriores al último publicado → `done`
+ * - Último post publicado → `current`
+ * - No hay estado `soon` (solo aparecería si el CMS persiste releases planeados)
+ */
+export async function getSeriesWithPosts(slug: string): Promise<{ series: Series; posts: SeriesPostWithStatus[] } | null> {
   const series = await getSeriesBySlug(slug)
   if (!series) return null
 
@@ -42,7 +58,12 @@ export async function getSeriesWithPosts(slug: string): Promise<{ series: Series
     sort: 'seriesOrder',
   })
 
-  return { series, posts }
+  const postsWithStatus: SeriesPostWithStatus[] = posts.map((post, index) => ({
+    ...post,
+    stepStatus: index === posts.length - 1 ? 'current' : 'done',
+  }))
+
+  return { series, posts: postsWithStatus }
 }
 
 export async function getPostsInSeries(
