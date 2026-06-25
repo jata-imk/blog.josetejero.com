@@ -56,22 +56,6 @@ export default function NotFound() {
             <Ic name="bookOpen" size={16} sw={2} />Ir al blog
           </a>
         </div>
-
-        <div
-          style={{
-            marginTop: 40,
-            display: 'flex',
-            gap: 6,
-            alignItems: 'center',
-            fontSize: 13,
-            color: 'var(--muted)',
-          }}
-        >
-          <Ic name="search" size={15} sw={2} />
-          {'¿Buscabas algo? Prueba la '}
-          <a href="/busqueda" style={{ color: 'var(--blue)', fontWeight: 600 }}>búsqueda</a>
-          .
-        </div>
       </section>
 
       <Footer />
