@@ -22,6 +22,7 @@
     "payload": "3.85.1",
     "react": "19.2.7",
     "react-dom": "19.2.7",
+    "react-pdf": "^10.4.1",
     "server-only": "^0.0.1",
     "sharp": "^0.33.5",
     "shiki": "^4.2.0"

@@ -3,6 +3,7 @@ import { Header } from '../../../components/layout/Header'
 import { Footer } from '../../../components/layout/Footer'
 import { Ic } from '../../../components/ui/Ic'
 import { SkillChip } from '../../../components/ui/Skill'
+import { PdfViewer } from '../../../components/about/PdfViewer'
 import { ABOUT, EXPERIENCE, SKILLS } from '../../../components/about/content'
 
 export const metadata: Metadata = {
@@ -242,36 +243,9 @@ export default function AboutPage() {
           </a>
         </div>
 
-        {/* embedded viewer */}
-        <div
-          style={{
-            marginTop: 16,
-            borderRadius: 'var(--r-lg)',
-            overflow: 'hidden',
-            border: '1px solid var(--line-2)',
-          }}
-        >
-          <object
-            data={ABOUT.cv.url}
-            type="application/pdf"
-            width="100%"
-            style={{ display: 'block', height: 640 }}
-            aria-label="Vista previa del CV"
-          >
-            <div
-              style={{
-                padding: '32px 24px',
-                textAlign: 'center',
-                color: 'var(--ink-3)',
-                fontSize: 14,
-              }}
-            >
-              Tu navegador no puede mostrar el PDF.{' '}
-              <a href={ABOUT.cv.url} download style={{ color: 'var(--blue)', fontWeight: 600 }}>
-                Descárgalo aquí.
-              </a>
-            </div>
-          </object>
+        {/* custom PDF viewer */}
+        <div style={{ marginTop: 16 }}>
+          <PdfViewer url={ABOUT.cv.url} fileName="cv-jose-tejero.pdf" />
         </div>
       </section>
 

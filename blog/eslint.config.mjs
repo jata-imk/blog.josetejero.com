@@ -5,6 +5,6 @@ export default tseslint.config(
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
-    ignores: ['.next/', 'node_modules/', 'dist/', '.qa-artifacts/', 'design/handoff/'],
+    ignores: ['.next/', 'node_modules/', 'dist/', '.qa-artifacts/', 'design/handoff/', 'public/'],
   },
 )

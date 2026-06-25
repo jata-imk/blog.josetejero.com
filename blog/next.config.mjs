@@ -16,6 +16,8 @@ const nextConfig = {
       '.js': ['.ts', '.tsx', '.js', '.jsx'],
       '.mjs': ['.mts', '.mjs'],
     }
+    // react-pdf uses canvas in Node env; the browser renders via PDF.js worker
+    webpackConfig.resolve.alias.canvas = false
     return webpackConfig
   },
 }
