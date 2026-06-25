@@ -34,6 +34,7 @@ interface SeedPost {
   tagNames: string[]
   seriesOrder: number
   useRichLexical: boolean
+  featured?: boolean
 }
 
 const USERS: SeedUser[] = [
@@ -83,6 +84,7 @@ const POSTS: SeedPost[] = [
     tagNames: ['opinion'],
     seriesOrder: 1,
     useRichLexical: true,
+    featured: true,
   },
   {
     title: 'App Router vs Pages Router: lo que necesitas saber',
@@ -103,6 +105,7 @@ const POSTS: SeedPost[] = [
     tagNames: ['advanced', 'tutorial'],
     seriesOrder: 3,
     useRichLexical: false,
+    featured: true,
   },
   {
     title: 'Deploy de Next.js con Docker, Caddy y PostgreSQL',
@@ -645,6 +648,7 @@ async function seedPosts(payload: Payload): Promise<void> {
           tags: tagIds,
           series: seriesId,
           seriesOrder: post.seriesOrder || undefined,
+          featured: post.featured ?? false,
         },
       })
       payload.logger.info(`[seed] Post: ${post.title}`)

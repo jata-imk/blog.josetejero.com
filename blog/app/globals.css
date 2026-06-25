@@ -578,3 +578,26 @@ code, pre, .mono { font-family: var(--font-mono); }
 
 /* 404 */
 .code-404 { font-family: var(--font-mono); font-weight: 600; font-size: 150px; line-height: 1; letter-spacing: -.04em; background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+/* chip (filtro de categoría / tag en /blog) */
+.ab-chip {
+  display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
+  font-size: 13px; font-weight: 500; color: var(--ink-2);
+  padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line-2); background: var(--bg);
+  transition: border-color .15s, background .15s, color .15s; white-space: nowrap;
+  text-decoration: none;
+}
+.ab-chip:hover { border-color: var(--line-3); background: var(--bg-soft); color: var(--ink); }
+.ab-chip.active { background: var(--ink); color: var(--on-accent); border-color: var(--ink); }
+
+/* select de ordenación en /blog */
+.blog-sort {
+  font-size: 13px; font-weight: 500; color: var(--ink-2);
+  padding: 6px 14px; border-radius: 999px; border: 1px solid var(--line-2); background: var(--bg);
+  cursor: pointer; font-family: inherit;
+  transition: border-color .15s, background .15s, color .15s;
+}
+.blog-sort:hover { border-color: var(--line-3); background: var(--bg-soft); color: var(--ink); }
+
+/* hover para tag-pill como enlace */
+a.tag-pill:hover { background: var(--bg-soft-2); color: var(--ink-2); }

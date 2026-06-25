@@ -106,5 +106,12 @@ export const Posts: CollectionConfig = {
       label: 'Tags',
       admin: { position: 'sidebar' },
     },
+    {
+      name: 'featured',
+      type: 'checkbox',
+      label: 'Destacado',
+      defaultValue: false,
+      admin: { position: 'sidebar' },
+    },
   ],
 }

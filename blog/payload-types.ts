@@ -233,6 +233,7 @@ export interface Post {
   seriesOrder?: number | null;
   categories?: (number | Category)[] | null;
   tags?: (number | Tag)[] | null;
+  featured?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -422,6 +423,7 @@ export interface PostsSelect<T extends boolean = true> {
   seriesOrder?: T;
   categories?: T;
   tags?: T;
+  featured?: T;
   updatedAt?: T;
   createdAt?: T;
 }
