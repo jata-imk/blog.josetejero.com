@@ -3,7 +3,7 @@ import { Header } from '../../../components/layout/Header'
 import { Footer } from '../../../components/layout/Footer'
 import { Ic } from '../../../components/ui/Ic'
 import { SkillChip } from '../../../components/ui/Skill'
-import { PdfViewer } from '../../../components/about/PdfViewer'
+import { PdfViewer } from '../../../components/about/PdfViewerClient'
 import { ABOUT, EXPERIENCE, SKILLS } from '../../../components/about/content'
 
 export const metadata: Metadata = {
