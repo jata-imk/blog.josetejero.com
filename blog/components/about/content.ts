@@ -9,9 +9,9 @@ export const ABOUT = {
     'Me adapto a lo que se necesite: desde el análisis inicial hasta la implementación final. También le meto a proyectos personales que van desde scrapers con IA hasta sistemas de rastreo vehicular en tiempo real.',
   ],
   social: {
-    github:   'https://github.com/josetejero',
-    twitter:  'https://x.com/josetejero',
-    linkedin: 'https://linkedin.com/in/josetejero',
+    github:   'https://github.com/jata-imk',
+    twitter:  'https://x.com/JoseTejero98',
+    linkedin: 'https://www.linkedin.com/in/jatejeroaguilar',
   },
   cv: {
     url:  '/documents/cv.pdf',

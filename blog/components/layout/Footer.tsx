@@ -15,9 +15,9 @@ const SITE_LINKS = [
 ]
 
 const SOCIAL_LINKS = [
-  { name: 'github',   label: 'GitHub',      href: 'https://github.com/josetejero' },
-  { name: 'twitter',  label: 'X / Twitter', href: 'https://x.com/josetejero' },
-  { name: 'linkedin', label: 'LinkedIn',    href: 'https://linkedin.com/in/josetejero' },
+  { name: 'github',   label: 'GitHub',      href: 'https://github.com/jata-imk' },
+  { name: 'twitter',  label: 'X / Twitter', href: 'https://x.com/JoseTejero98' },
+  { name: 'linkedin', label: 'LinkedIn',    href: 'https://www.linkedin.com/in/jatejeroaguilar' },
 ]
 
 export function Footer() {
