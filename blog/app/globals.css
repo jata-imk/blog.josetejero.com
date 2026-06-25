@@ -425,6 +425,7 @@ code, pre, .mono { font-family: var(--font-mono); }
   .post-wrap              { padding: 0 18px; }
   .post-comments          { padding: 0 18px 60px; }
   .post-toc-mobile        { display: block; margin-top: var(--sp-6); }
+  .about-hero-grid        { grid-template-columns: 1fr !important; }
 }
 
 /* ── component layer (ported from design handoff aleliz.css) ─── */

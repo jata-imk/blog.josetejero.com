@@ -12,15 +12,19 @@ export function SkillChip({
   label,
   icon,
   color = 'blue',
+  iconHex,
 }: {
   label: string
   icon?: string
   color?: SkillColor
+  /** Brand hex for external tech icons — overrides semantic color when provided */
+  iconHex?: string
 }) {
+  const iconBg = iconHex ?? COLOR_BG[color]
   return (
     <span className="ab-skill">
       {icon && (
-        <span className="si" style={{ background: COLOR_BG[color] }}>
+        <span className="si" style={{ background: iconBg }}>
           {icon}
         </span>
       )}
