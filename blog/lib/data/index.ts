@@ -4,7 +4,10 @@ export {
   getPosts,
   getPostsByCategory,
   getPostsByTag,
+  getFeaturedPost,
+  getPopularTags,
   type PaginatedPosts,
+  type GetPostsOptions,
 } from './posts'
 export {
   getCategoryBySlug,
@@ -28,3 +31,4 @@ export {
   type SeriesPostWithStatus,
 } from './series'
 export { getCommentsByPost, getPendingComments } from './comments'
+export { searchAll, type SearchResults, type SearchScope } from './search'
