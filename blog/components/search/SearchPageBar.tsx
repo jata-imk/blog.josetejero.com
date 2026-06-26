@@ -7,6 +7,7 @@ import { Ic } from '../ui/Ic'
 export function SearchPageBar() {
   const searchParams = useSearchParams()
   const q = searchParams.get('q') ?? ''
+  const scope = searchParams.get('scope') ?? ''
   const [value, setValue] = useState(q)
   const router = useRouter()
 
@@ -17,7 +18,13 @@ export function SearchPageBar() {
   function handleKey(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === 'Enter') {
       const v = value.trim()
-      router.push(v ? `/buscar?q=${encodeURIComponent(v)}` : '/buscar')
+      if (!v) {
+        router.push('/buscar')
+        return
+      }
+      const base = `/buscar?q=${encodeURIComponent(v)}`
+      const url = scope && scope !== 'all' ? `${base}&scope=${scope}` : base
+      router.push(url)
     }
   }
 
