@@ -4,8 +4,6 @@ import { RichText } from '@payloadcms/richtext-lexical/react'
 import { getPostBySlug, getPosts, getPostsInSeries, getCommentsByPost } from '@/lib/data'
 import { makeBodyConverters, extractToc } from '@/lib/lexical'
 import { highlightLexicalCode, type LexicalChildNode } from '@/lib/code-highlight'
-import { Header } from '@/components/layout/Header'
-import { Footer } from '@/components/layout/Footer'
 import { Breadcrumb } from '@/components/ui/Breadcrumb'
 import { Cat, type CatKey } from '@/components/ui/Cat'
 import { Tag, TagRow } from '@/components/ui/Tag'
@@ -95,8 +93,6 @@ export default async function PostPage({ params }: Props) {
 
   return (
     <>
-      <Header activePath="/blog" />
-
       {/* Cabecera del artículo — máx 820px (handoff) */}
       <div className="post-head">
         <Breadcrumb items={breadcrumbItems} />
@@ -230,7 +226,6 @@ export default async function PostPage({ params }: Props) {
         )}
       </div>
 
-      <Footer />
     </>
   )
 }

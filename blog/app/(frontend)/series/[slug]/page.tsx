@@ -1,6 +1,4 @@
 import { notFound } from 'next/navigation'
-import { Header } from '../../../../components/layout/Header'
-import { Footer } from '../../../../components/layout/Footer'
 import { SeriesStep, SeriesProgress } from '../../../../components/series/SeriesStep'
 import { EmptyState } from '../../../../components/ui/EmptyState'
 import { Badge } from '../../../../components/ui/Badge'
@@ -29,8 +27,6 @@ export default async function SeriesPage({
 
   return (
     <>
-      <Header activePath="/series" />
-
       <div className="wrap" style={{ paddingTop: 52, paddingBottom: 80 }}>
         <Breadcrumb items={breadcrumbItems} />
 
@@ -76,7 +72,6 @@ export default async function SeriesPage({
         )}
       </div>
 
-      <Footer />
     </>
   )
 }

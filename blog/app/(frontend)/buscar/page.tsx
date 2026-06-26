@@ -1,6 +1,4 @@
 import { Suspense } from 'react'
-import { Header } from '../../../components/layout/Header'
-import { Footer } from '../../../components/layout/Footer'
 import { SearchPageBar } from '../../../components/search/SearchPageBar'
 import { Cat } from '../../../components/ui/Cat'
 import { Tag } from '../../../components/ui/Tag'
@@ -242,8 +240,6 @@ export default async function BuscarPage({ searchParams }: { searchParams: Searc
 
   return (
     <>
-      <Header activePath="/buscar" />
-
       <div className="wrap" style={{ paddingTop: 56, paddingBottom: 96 }}>
         {/* ── hero search area ── */}
         <div style={{ maxWidth: 640, margin: '0 auto', textAlign: 'center' }}>
@@ -323,7 +319,6 @@ export default async function BuscarPage({ searchParams }: { searchParams: Searc
         </div>
       </div>
 
-      <Footer />
     </>
   )
 }

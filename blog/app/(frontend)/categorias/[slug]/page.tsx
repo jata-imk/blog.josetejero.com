@@ -1,6 +1,4 @@
 import { notFound } from 'next/navigation'
-import { Header } from '../../../../components/layout/Header'
-import { Footer } from '../../../../components/layout/Footer'
 import { PostCard } from '../../../../components/post/PostCard'
 import { EmptyState } from '../../../../components/ui/EmptyState'
 import { Cat } from '../../../../components/ui/Cat'
@@ -51,8 +49,6 @@ export default async function CategoriaPage({
 
   return (
     <>
-      <Header activePath="/blog" />
-
       <div className="wrap" style={{ paddingTop: 52, paddingBottom: 80 }}>
         <Breadcrumb items={breadcrumbItems} />
 
@@ -94,7 +90,6 @@ export default async function CategoriaPage({
         )}
       </div>
 
-      <Footer />
     </>
   )
 }

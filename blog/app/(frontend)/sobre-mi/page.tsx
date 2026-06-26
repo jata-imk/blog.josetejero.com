@@ -1,6 +1,4 @@
 import type { Metadata } from 'next'
-import { Header } from '../../../components/layout/Header'
-import { Footer } from '../../../components/layout/Footer'
 import { Ic } from '../../../components/ui/Ic'
 import { SkillChip } from '../../../components/ui/Skill'
 import { PdfViewer } from '../../../components/about/PdfViewerClient'
@@ -65,8 +63,6 @@ function TimelineItem({
 export default function AboutPage() {
   return (
     <>
-      <Header activePath="/sobre-mi" />
-
       {/* hero */}
       <section className="wrap" style={{ paddingTop: 56, paddingBottom: 12 }}>
         <div
@@ -283,7 +279,6 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <Footer />
     </>
   )
 }

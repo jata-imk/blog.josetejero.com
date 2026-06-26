@@ -1,5 +1,7 @@
 import '../globals.css'
 import { inter, jetbrainsMono } from '../fonts'
+import { Header } from '../../components/layout/Header'
+import { Footer } from '../../components/layout/Footer'
 
 export default function FrontendLayout({
   children,
@@ -8,7 +10,13 @@ export default function FrontendLayout({
 }) {
   return (
     <html lang="es" className={`${inter.variable} ${jetbrainsMono.variable}`}>
-      <body className="bg-bg text-ink font-sans">{children}</body>
+      <body className="bg-bg text-ink font-sans">
+        <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+          <Header />
+          <main style={{ flex: 1 }}>{children}</main>
+          <Footer />
+        </div>
+      </body>
     </html>
   )
 }

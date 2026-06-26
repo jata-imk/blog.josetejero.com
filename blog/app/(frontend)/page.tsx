@@ -1,5 +1,3 @@
-import { Header } from '../../components/layout/Header'
-import { Footer } from '../../components/layout/Footer'
 import { PostCard } from '../../components/post/PostCard'
 import { ListRow } from '../../components/post/ListRow'
 import { Cat } from '../../components/ui/Cat'
@@ -122,8 +120,6 @@ export default async function Home() {
 
   return (
     <>
-      <Header activePath="/" />
-
       {/* hero */}
       <section style={{ textAlign: 'center', padding: '92px 40px 70px', maxWidth: 760, margin: '0 auto' }}>
         <div className="eyebrow" style={{ marginBottom: 18 }}>Desarrollo · Automatización · IA</div>
@@ -210,7 +206,6 @@ export default async function Home() {
         </div>
       </section>
 
-      <Footer />
     </>
   )
 }

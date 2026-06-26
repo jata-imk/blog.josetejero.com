@@ -1,5 +1,6 @@
 'use client'
 
+import { usePathname } from 'next/navigation'
 import { Ic } from '../ui/Ic'
 import { CommandPalette } from '../search/CommandPalette'
 import { SearchTriggerBtn } from '../search/SearchTriggerBtn'
@@ -18,7 +19,14 @@ const SOCIAL_LINKS = [
   { name: 'linkedin', label: 'LinkedIn',    href: 'https://www.linkedin.com/in/jatejeroaguilar' },
 ]
 
-export function Header({ activePath = '/' }: { activePath?: string }) {
+function matchActive(pathname: string, href: string): boolean {
+  if (href === '/') return pathname === '/'
+  return pathname.startsWith(href)
+}
+
+export function Header() {
+  const pathname = usePathname()
+
   return (
     <header className="site-header">
       <div className="site-header-in">
@@ -32,7 +40,7 @@ export function Header({ activePath = '/' }: { activePath?: string }) {
             <a
               key={link.href}
               href={link.href}
-              className={activePath === link.href ? 'active' : ''}
+              className={matchActive(pathname, link.href) ? 'active' : ''}
             >
               {link.label}
             </a>

@@ -1,5 +1,3 @@
-import { Header } from '../../../components/layout/Header'
-import { Footer } from '../../../components/layout/Footer'
 import { Tag } from '../../../components/ui/Tag'
 import { EmptyState } from '../../../components/ui/EmptyState'
 import { Breadcrumb } from '../../../components/ui/Breadcrumb'
@@ -16,8 +14,6 @@ export default async function TagsPage() {
 
   return (
     <>
-      <Header activePath="/tags" />
-
       <div className="wrap" style={{ paddingTop: 52, paddingBottom: 80 }}>
         <Breadcrumb items={breadcrumbItems} />
 
@@ -55,7 +51,6 @@ export default async function TagsPage() {
         )}
       </div>
 
-      <Footer />
     </>
   )
 }

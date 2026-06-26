@@ -1,5 +1,3 @@
-import { Header } from '../../../components/layout/Header'
-import { Footer } from '../../../components/layout/Footer'
 import { PostCard } from '../../../components/post/PostCard'
 import { FeaturedCard } from '../../../components/post/FeaturedCard'
 import { Pagination } from '../../../components/ui/Pagination'
@@ -83,8 +81,6 @@ export default async function BlogPage({
 
   return (
     <>
-      <Header activePath="/blog" />
-
       {/* ── Hero: título + buscador + filtros ─────────── */}
       <section style={{ paddingTop: 52, paddingBottom: 28 }}>
         <div className="wrap">
@@ -254,7 +250,6 @@ export default async function BlogPage({
         </div>
       </section>
 
-      <Footer />
     </>
   )
 }
