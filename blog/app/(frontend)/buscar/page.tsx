@@ -9,19 +9,11 @@ import { Badge } from '../../../components/ui/Badge'
 import { Meta, MetaSep } from '../../../components/ui/Meta'
 import { Thumb } from '../../../components/ui/Thumb'
 import { EmptyState } from '../../../components/ui/EmptyState'
-import { searchAll, getPostsInSeries, type SearchScope } from '../../../lib/data'
+import { searchAll, getPostsInSeries, normalizeScope } from '../../../lib/data'
 import type { Post, Series, Tag as TagType, Category } from '../../../payload-types'
 import type { CatKey } from '../../../components/ui/Cat'
 
 type SearchParams = Promise<{ q?: string; scope?: string }>
-
-function resolveScope(raw?: string): SearchScope {
-  if (raw === 'posts')     return 'posts'
-  if (raw === 'series')    return 'series'
-  if (raw === 'tags')      return 'tags'
-  if (raw === 'categorias') return 'categories'
-  return 'all'
-}
 
 function fmtDate(iso?: string | null) {
   if (!iso) return '—'
@@ -205,41 +197,42 @@ function NoResults({ q }: { q: string }) {
 /* ── page ── */
 export default async function BuscarPage({ searchParams }: { searchParams: SearchParams }) {
   const { q = '', scope: rawScope } = await searchParams
-  const scope = resolveScope(rawScope)
-  const activeScope = rawScope ?? 'all'
+  const scope = normalizeScope(rawScope)
+  const activeScope = scope
 
   let posts: Post[] = []
   let series: Series[] = []
   let tags: TagType[] = []
   let categories: Category[] = []
   let seriesPostCounts: Record<number, number> = {}
+  let counts = { posts: 0, series: 0, categories: 0, tags: 0 }
 
   const hasQuery = q.trim().length >= 2
 
   if (hasQuery) {
     const results = await searchAll(q, scope)
-    posts = results.posts
-    series = results.series
-    tags = results.tags
-    categories = results.categories
+    posts = results.groups.posts
+    series = results.groups.series
+    tags = results.groups.tags
+    categories = results.groups.categories
+    counts = results.counts
 
-    // Count posts per series for the "N partes" display
     if (series.length > 0) {
-      const counts = await Promise.all(
+      const postCounts = await Promise.all(
         series.map((s) => getPostsInSeries(s.id).then((p) => ({ id: s.id, count: p.length })))
       )
-      seriesPostCounts = Object.fromEntries(counts.map((c) => [c.id, c.count]))
+      seriesPostCounts = Object.fromEntries(postCounts.map((c) => [c.id, c.count]))
     }
   }
 
-  const totalAll = posts.length + series.length + tags.length + categories.length
+  const totalAll = counts.posts + counts.series + counts.categories + counts.tags
 
   const tabs: Tab[] = [
-    { label: 'Todo',        scope: 'all',       count: totalAll },
-    { label: 'Posts',       scope: 'posts',     count: posts.length },
-    { label: 'Series',      scope: 'series',    count: series.length },
-    { label: 'Tags',        scope: 'tags',      count: tags.length },
-    { label: 'Categorías',  scope: 'categorias', count: categories.length },
+    { label: 'Todo',        scope: 'all',        count: totalAll },
+    { label: 'Posts',       scope: 'posts',      count: counts.posts },
+    { label: 'Series',      scope: 'series',     count: counts.series },
+    { label: 'Tags',        scope: 'tags',       count: counts.tags },
+    { label: 'Categorías',  scope: 'categories', count: counts.categories },
   ]
 
   const showPosts = (scope === 'all' || scope === 'posts') && posts.length > 0
@@ -281,7 +274,7 @@ export default async function BuscarPage({ searchParams }: { searchParams: Searc
 
               {showPosts && (
                 <section>
-                  <SectionHead label="Posts" count={posts.length} />
+                  <SectionHead label="Posts" count={counts.posts} />
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                     {posts.map((p) => <PostRow key={p.id} post={p} />)}
                   </div>
@@ -290,7 +283,7 @@ export default async function BuscarPage({ searchParams }: { searchParams: Searc
 
               {showSeries && (
                 <section>
-                  <SectionHead label="Series" count={series.length} />
+                  <SectionHead label="Series" count={counts.series} />
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                     {series.map((s) => (
                       <SeriesRow key={s.id} series={s} count={seriesPostCounts[s.id] ?? 0} />
@@ -301,7 +294,7 @@ export default async function BuscarPage({ searchParams }: { searchParams: Searc
 
               {showTags && (
                 <section>
-                  <SectionHead label="Tags" count={tags.length} />
+                  <SectionHead label="Tags" count={counts.tags} />
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                     {tags.map((t) => (
                       <a key={t.id} href={`/tags/${t.slug}`} style={{ textDecoration: 'none' }}>
@@ -314,7 +307,7 @@ export default async function BuscarPage({ searchParams }: { searchParams: Searc
 
               {showCats && (
                 <section>
-                  <SectionHead label="Categorías" count={categories.length} />
+                  <SectionHead label="Categorías" count={counts.categories} />
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                     {categories.map((c) => (
                       <a key={c.id} href={`/categorias/${c.slug}`} style={{ textDecoration: 'none' }}>

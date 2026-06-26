@@ -7,22 +7,25 @@ type Post       = { id: number; title: string; slug: string; excerpt?: string | 
 type Series     = { id: number; title: string; slug: string }
 type Category   = { id: number; name: string; slug: string }
 type Tag        = { id: number; name: string; slug: string }
-type SearchData = { posts: Post[]; series: Series[]; categories: Category[]; tags: Tag[] }
+type SearchData = {
+  groups: { posts: Post[]; series: Series[]; categories: Category[]; tags: Tag[] }
+  counts: { posts: number; series: number; categories: number; tags: number }
+}
 
 type HitEntry = { kind: 'post' | 'series' | 'category' | 'tag'; href: string; label: string; sub?: string }
 
 function flatten(data: SearchData): HitEntry[] {
   const hits: HitEntry[] = []
-  for (const p of data.posts) {
+  for (const p of data.groups.posts) {
     hits.push({ kind: 'post', href: `/blog/${p.slug}`, label: p.title, sub: p.excerpt ?? undefined })
   }
-  for (const s of data.series) {
+  for (const s of data.groups.series) {
     hits.push({ kind: 'series', href: `/series/${s.slug}`, label: s.title, sub: 'Serie' })
   }
-  for (const c of data.categories) {
+  for (const c of data.groups.categories) {
     hits.push({ kind: 'category', href: `/categorias/${c.slug}`, label: c.name, sub: 'Categoría' })
   }
-  for (const t of data.tags) {
+  for (const t of data.groups.tags) {
     hits.push({ kind: 'tag', href: `/tags/${t.slug}`, label: t.name, sub: 'Tag' })
   }
   return hits
@@ -122,7 +125,9 @@ export function CommandPalette() {
   }, [debouncedQ])
 
   const hits  = data ? flatten(data) : []
-  const total = data ? data.posts.length + data.series.length + data.categories.length + data.tags.length : 0
+  const total = data
+    ? data.groups.posts.length + data.groups.series.length + data.groups.categories.length + data.groups.tags.length
+    : 0
 
   /* keyboard nav in list */
   function onKeyDown(e: React.KeyboardEvent) {

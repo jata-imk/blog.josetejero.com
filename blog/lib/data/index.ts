@@ -31,4 +31,11 @@ export {
   type SeriesPostWithStatus,
 } from './series'
 export { getCommentsByPost, getPendingComments } from './comments'
-export { searchAll, type SearchResults, type SearchScope } from './search'
+export {
+  searchAll,
+  normalizeScope,
+  type SearchResultGroup,
+  type SearchCounts,
+  type SearchResults,
+  type SearchScope,
+} from './search'
