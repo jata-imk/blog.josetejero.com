@@ -1,4 +1,8 @@
+'use client'
+
 import { Ic } from '../ui/Ic'
+import { CommandPalette } from '../search/CommandPalette'
+import { SearchTriggerBtn } from '../search/SearchTriggerBtn'
 
 const NAV_LINKS = [
   { label: 'Inicio',      href: '/' },
@@ -36,6 +40,7 @@ export function Header({ activePath = '/' }: { activePath?: string }) {
         </nav>
 
         <div className="header-social">
+          <SearchTriggerBtn />
           {SOCIAL_LINKS.map((s) => (
             <a
               key={s.name}
@@ -50,6 +55,7 @@ export function Header({ activePath = '/' }: { activePath?: string }) {
           ))}
         </div>
       </div>
+      <CommandPalette />
     </header>
   )
 }

@@ -78,6 +78,19 @@ export function CommandPalette() {
     return () => window.removeEventListener('keydown', handler)
   }, [close, open])
 
+  /* Listen for explicit open signal from UI triggers */
+  useEffect(() => {
+    function handleOpenSignal(e: Event) {
+      const customEvent = e as CustomEvent<{ initialQuery?: string }>
+      setOpen(true)
+      if (customEvent.detail?.initialQuery) {
+        setQ(customEvent.detail.initialQuery)
+      }
+    }
+    window.addEventListener('openCommandPalette', handleOpenSignal)
+    return () => window.removeEventListener('openCommandPalette', handleOpenSignal)
+  }, [])
+
   /* focus input when modal opens */
   useEffect(() => {
     if (open) {

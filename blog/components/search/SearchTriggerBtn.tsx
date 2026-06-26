@@ -4,7 +4,7 @@ import { Ic } from '../ui/Ic'
 
 export function SearchTriggerBtn() {
   function openPalette() {
-    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true, bubbles: true }))
+    window.dispatchEvent(new CustomEvent('openCommandPalette'))
   }
 
   return (
