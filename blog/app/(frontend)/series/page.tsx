@@ -41,7 +41,9 @@ export default async function SeriesIndexPage() {
                 className="card card-hover"
                 style={{ padding: 22, display: 'flex', flexDirection: 'column', gap: 12, textDecoration: 'none', color: 'inherit' }}
               >
-                <Badge variant="series" />
+                <div style={{ alignSelf: 'flex-start' }}>
+                  <Badge variant="series" />
+                </div>
                 <h2 style={{ fontSize: 18, fontWeight: 700, letterSpacing: '-.02em', lineHeight: 1.3 }}>
                   {s.title}
                 </h2>

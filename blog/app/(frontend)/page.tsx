@@ -65,7 +65,9 @@ function SeriesCard({
           </span>
         )}
       </div>
-      <Cat cat={cat} />
+      <div style={{ alignSelf: 'flex-start' }}>
+        <Cat cat={cat} />
+      </div>
       <h3 style={{ fontSize: 18, fontWeight: 700, letterSpacing: '-.02em', lineHeight: 1.3 }}>{title}</h3>
       <p style={{ fontSize: 14, lineHeight: 1.55, color: 'var(--ink-3)' }}>{desc}</p>
       {progress != null && (
