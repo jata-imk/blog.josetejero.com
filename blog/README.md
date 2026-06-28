@@ -9,7 +9,8 @@ La app del blog/portafolio. Next.js App Router + Payload CMS v3 + Lexical + Tail
 - Cuerpo de posts = rich text **Lexical**
 - **Tailwind CSS v4** para estilos
 - Gestor: **pnpm**
-- Self-hosted en VPS (`output: 'standalone'`)
+- Producción self-hosted en **VPS Debian 12** con **Docker Compose app + PostgreSQL**
+- **CloudPanel/Nginx** como reverse proxy; Cloudflare queda pendiente
 
 ## Mapa
 
@@ -18,16 +19,21 @@ La app del blog/portafolio. Next.js App Router + Payload CMS v3 + Lexical + Tail
   - `(payload)/` — rutas de Payload (admin, API REST, GraphQL)
   - `(frontend)/` — sitio público
 - `payload.config.ts` — configuración de Payload (colecciones, editor, DB)
+- `docker-compose.yml` — Compose único: Postgres para dev y app+Postgres con profile `prod`
 - `docs/` — ADR, arquitectura, agent-notes y runbooks
 - `design/` — handoff visual (tokens, componentes, screenshots)
 
-## Cómo correr en local
+## Cómo correr en local sin Docker
 
 ### Requisitos
 
 - **Node.js** >= 20.9.0
 - **pnpm** >= 9
-- **Docker** (para Postgres en desarrollo)
+- Acceso SSH al VPS
+- Una base PostgreSQL de **desarrollo** en el VPS
+
+No uses la base de producción para desarrollo local. En `NODE_ENV !== 'production'`, Payload puede
+ejecutar lógica de seed/dev.
 
 ### 1. Instalar dependencias
 
@@ -36,16 +42,15 @@ cd blog
 pnpm install
 ```
 
-### 2. Levantar PostgreSQL
+### 2. Abrir túnel SSH a la BD de desarrollo
+
+Ejemplo si PostgreSQL dev escucha en el VPS en `127.0.0.1:5433`:
 
 ```bash
-docker compose up -d postgres
+ssh -N -L 5433:127.0.0.1:5433 usuario@tu-vps
 ```
 
-Esto arranca Postgres 17 en `localhost:5432` con:
-- Usuario: `blog`
-- Password: `blog_dev`
-- Base de datos: `blog_dev`
+Mantén esa terminal abierta mientras desarrollas.
 
 ### 3. Configurar variables de entorno
 
@@ -53,8 +58,12 @@ Esto arranca Postgres 17 en `localhost:5432` con:
 cp .env.example .env
 ```
 
-El `.env.example` ya contiene los valores de desarrollo. Para producción, cambia
-`PAYLOAD_SECRET` por un valor largo y aleatorio, y `DATABASE_URL` por tu conexión real.
+Configura `.env` para apuntar al puerto local del túnel:
+
+```env
+DATABASE_URL=postgresql://blog_dev:change_me_dev@localhost:5433/blog_dev
+PAYLOAD_SECRET=your-local-payload-secret-here
+```
 
 ### 4. Generar tipos e import map
 
@@ -70,13 +79,44 @@ pnpm dev
 ```
 
 Abre [http://localhost:3000](http://localhost:3000) para ver el frontend.
-Abre [http://localhost:3000/admin](http://localhost:3000/admin) para crear tu primer usuario de Payload.
+Abre [http://localhost:3000/admin](http://localhost:3000/admin) para crear tu usuario de Payload.
 
-### 6. Build de producción
+## Opción local con Docker solo para PostgreSQL
+
+En la máquina de desarrollo que sí tenga Docker, levanta solo PostgreSQL:
 
 ```bash
-pnpm build
-pnpm start
+docker compose up -d postgres
+```
+
+La app sigue corriendo fuera de Docker con `pnpm dev`.
+
+## Producción
+
+Producción usa el mismo `docker-compose.yml` con el profile `prod`. En el VPS, copia
+`.env.example` como `.env`, rellena secretos reales y activa:
+
+```env
+COMPOSE_PROJECT_NAME=jt_blog_prod
+COMPOSE_PROFILES=prod
+DATABASE_URL=postgresql://blog_prod:change_me_prod_db_password@postgres:5432/blog_prod
+```
+
+Resumen en el VPS cuando la imagen ya fue construida por GitHub Actions:
+
+```bash
+docker compose pull app
+docker compose up -d
+```
+
+CloudPanel/Nginx debe hacer reverse proxy hacia `127.0.0.1:3000` o el `APP_PORT` configurado.
+
+Para tener dev y prod en el mismo VPS sin mezclar volúmenes ni nombres de contenedores, usa clones
+separados:
+
+```bash
+/var/www/html/blog-dev
+/var/www/html/blog-prod
 ```
 
 ## Scripts
@@ -85,13 +125,9 @@ pnpm start
 |---|---|
 | `pnpm dev` | Servidor de desarrollo Next.js |
 | `pnpm build` | Build de producción (`output: standalone`) |
-| `pnpm start` | Arrancar build de producción |
+| `pnpm start` | Arrancar build de producción fuera de Docker |
 | `pnpm payload` | CLI de Payload |
-| `pnpm generate:types` | Generar payload-types.ts |
+| `pnpm migrate` | Ejecutar migraciones de Payload |
+| `pnpm migrate:create <name>` | Crear una migración de Payload |
+| `pnpm generate:types` | Generar `payload-types.ts` |
 | `pnpm generate:importmap` | Generar import map de Payload |
-
-## Docker
-
-El `docker-compose.yml` solo incluye Postgres para desarrollo local. La app en sí
-no está dockerizada todavía — el deploy usa `output: 'standalone'` de Next.js.
-Ver `docs/runbooks/deploy.md`.

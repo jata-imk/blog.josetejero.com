@@ -22,7 +22,8 @@
 - **Datos:** Postgres vía Payload. Contenido de posts = árbol Lexical (JSON).
 - **Presentación separada de datos:** Shiki (resaltado de código), tema oscuro y botón copiar son
   render en el frontend, no se almacenan.
-- **Deploy:** Docker (`output: 'standalone'`) detrás de Caddy + Cloudflare en un VPS. Ver `../runbooks/deploy.md`.
+- **Deploy:** Docker Compose (`app` + `postgres`) en VPS Debian 12 detrás de CloudPanel/Nginx.
+  Cloudflare queda pendiente. Ver `../runbooks/deploy.md`.
 
 ## Estructura del frontend
 

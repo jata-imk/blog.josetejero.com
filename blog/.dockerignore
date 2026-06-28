@@ -1,0 +1,11 @@
+node_modules
+.next
+.git
+.env
+.env.*
+!.env.example
+media
+docs/agent-notes
+design/handoff
+design/screenshots
+*.log

@@ -16,7 +16,9 @@ diagramas, código. El diseño viene de **Claude Design** y se entrega como bund
 - **Next.js (App Router)** + **Payload CMS v3** dentro de la misma app Next (admin en `/admin`).
 - **PostgreSQL** gestionada por Payload. La capa de datos es la de Payload. **PRISMA DESCARTADO.**
 - Cuerpo de los posts = **rich text Lexical**. **Tailwind CSS** para estilos. Gestor: **pnpm**.
-- Self-hosted en **VPS** (Docker + Caddy + Cloudflare, `output: 'standalone'`).
+- Self-hosted en **VPS Debian 12** con **Docker Compose para app + PostgreSQL** y
+  **CloudPanel/Nginx** como reverse proxy. **Caddy descartado** y **Cloudflare pendiente**.
+  La app mantiene `output: 'standalone'`.
 - Único **bloque custom = `Callout`** (variant `note|tip|warning|danger`, `title`, `content` richText anidado).
 - **Código** = nodo built-in de Lexical; **Shiki + botón copiar son RENDER** (frontend), no un bloque.
 - **Imágenes/SVG** = upload nativo de Lexical (colección `Media`). SVG como `<img>`, no inline.
@@ -47,4 +49,6 @@ Comments, Media). El post **NUNCA** almacena su posición en la serie — se der
 
 ## Cómo correr en local
 
-Ver `README.md` (se completa cuando el Engineer haga el scaffolding en la Fase 2).
+Ver `README.md`. La PC local no necesita Docker: corre `pnpm dev` y se conecta a una base
+PostgreSQL de desarrollo en el VPS, preferentemente por túnel SSH. **Nunca uses la BD de
+producción para desarrollo local**, porque `NODE_ENV !== 'production'` activa seed/dev behavior.

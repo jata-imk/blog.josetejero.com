@@ -1,8 +1,8 @@
 # Runbook: credenciales de prueba para QA
 
 > Usuarios sembrados automáticamente en desarrollo (`NODE_ENV !== 'production'`) al arrancar
-> `pnpm dev`. Si la DB no está lista (ej. `docker-compose up` no corriendo), el seed se salta
-> sin romper el arranque. Se reintenta en el siguiente `pnpm dev`.
+> `pnpm dev`. Si la DB no está lista (ej. túnel SSH caído o Postgres no disponible), el seed se
+> salta sin romper el arranque. Se reintenta en el siguiente `pnpm dev`.
 
 ## Credenciales de acceso a `/admin/login`
 
@@ -22,7 +22,7 @@
 
 Si necesitas recrear los usuarios desde cero (ej. cambiaste el hash o perdiste el acceso):
 
-1. Conéctate a la DB local y borra los usuarios de prueba:
+1. Conéctate a la DB de desarrollo y borra los usuarios de prueba:
    ```sql
    DELETE FROM users WHERE email IN ('admin@test.local', 'editor@test.local');
    ```

@@ -3,6 +3,8 @@ import { inter, jetbrainsMono } from '../fonts'
 import { Header } from '../../components/layout/Header'
 import { Footer } from '../../components/layout/Footer'
 
+export const revalidate = 3600
+
 export default function FrontendLayout({
   children,
 }: {

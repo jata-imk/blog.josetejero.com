@@ -19,6 +19,8 @@ import type { Category, Tag as TagType, Series, User } from '@/payload-types'
 
 type Props = { params: Promise<{ slug: string }> }
 
+export const dynamicParams = true
+
 export async function generateStaticParams() {
   const { docs: posts } = await getPosts(100)
   return posts.map((post) => ({ slug: post.slug }))

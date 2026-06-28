@@ -3,13 +3,45 @@ services:
     image: postgres:17-alpine
     restart: unless-stopped
     ports:
-      - '5432:5432'
+      - '${POSTGRES_BIND:-127.0.0.1}:${POSTGRES_PORT:-5432}:5432'
     environment:
-      POSTGRES_USER: blog
-      POSTGRES_PASSWORD: blog_dev
-      POSTGRES_DB: blog_dev
+      POSTGRES_USER: ${POSTGRES_USER:-blog_dev}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-blog_dev}
+      POSTGRES_DB: ${POSTGRES_DB:-blog_dev}
     volumes:
       - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    profiles: ['prod']
+    image: ${APP_IMAGE:-josetejero-blog:local}
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        DATABASE_URL: ${DATABASE_URL}
+        PAYLOAD_SECRET: ${PAYLOAD_SECRET}
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-https://josetejero.com}
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: ${DATABASE_URL}
+      PAYLOAD_SECRET: ${PAYLOAD_SECRET}
+      NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-https://josetejero.com}
+      PORT: 3000
+      HOSTNAME: 0.0.0.0
+    ports:
+      - '${APP_BIND:-127.0.0.1}:${APP_PORT:-3000}:3000'
+    volumes:
+      - payload_media:/app/media
 
 volumes:
   pgdata:
+  payload_media:

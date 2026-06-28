@@ -17,12 +17,15 @@ Frontend dentro de una tarea.
 
 ```bash
 cd blog
+ssh -N -L 5433:127.0.0.1:5432 usuario@tu-vps   # si usas la BD dev remota del VPS
 pnpm dev          # ⭐ recomendado en desarrollo: HMR refleja los cambios al instante,
                   #    así QA/Frontend siempre capturan lo último sin reconstruir.
 # si con `dev` aún hay presión de RAM (16 GB justos):
 pnpm build && pnpm start   # más ligero, pero es una foto estática: reconstruir tras cada cambio.
 ```
 Queda sirviendo en `http://localhost:3000` (admin de Payload en `/admin`). Déjalo abierto toda la sesión.
+Si usas la BD remota del VPS, deja abierto también el túnel SSH. Usa siempre una BD de desarrollo,
+nunca la BD de producción.
 
 ## Qué hacen los agentes (QA **y** Frontend)
 - Asumen el server **ya corriendo** en `http://localhost:3000` y solo apuntan ahí (Playwright en
