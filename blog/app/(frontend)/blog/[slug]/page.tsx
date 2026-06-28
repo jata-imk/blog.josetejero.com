@@ -140,7 +140,7 @@ export default async function PostPage({ params }: Props) {
           <div className="post-tags-row">
             <TagRow>
               {tags.map((tag) => (
-                <Tag key={tag.id}>{tag.name}</Tag>
+                <Tag key={tag.id} slug={tag.slug}>{tag.name}</Tag>
               ))}
             </TagRow>
           </div>

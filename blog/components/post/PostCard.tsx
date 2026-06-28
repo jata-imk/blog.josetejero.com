@@ -5,11 +5,13 @@ import { Tag, TagRow } from '../ui/Tag'
 import { Meta, MetaSep } from '../ui/Meta'
 import { Thumb } from '../ui/Thumb'
 
+export type PostCardTag = string | { name: string; slug?: string }
+
 export type PostCardProps = {
   cat: CatKey
   title: string
   excerpt: string
-  tags?: string[]
+  tags?: PostCardTag[]
   date: string
   readTime: string
   commentCount?: number
@@ -44,7 +46,11 @@ export function PostCard({
         <p className="post-card-excerpt">{excerpt}</p>
         {tags.length > 0 && (
           <TagRow>
-            {tags.map((t) => <Tag key={t}>{t}</Tag>)}
+            {tags.map((t) => {
+              const name = typeof t === 'string' ? t : t.name
+              const slug = typeof t === 'string' ? undefined : t.slug
+              return <Tag key={slug ?? name} slug={slug}>{name}</Tag>
+            })}
           </TagRow>
         )}
         <div className="post-card-foot">

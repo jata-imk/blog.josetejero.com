@@ -1,7 +1,8 @@
 import { notFound } from 'next/navigation'
-import { PostCard } from '../../../../components/post/PostCard'
+import { ListRow } from '../../../../components/post/ListRow'
 import { EmptyState } from '../../../../components/ui/EmptyState'
 import { Tag } from '../../../../components/ui/Tag'
+import { Cat } from '../../../../components/ui/Cat'
 import { Breadcrumb } from '../../../../components/ui/Breadcrumb'
 import { getTagWithPosts } from '../../../../lib/data'
 import type { Post, Category } from '../../../../payload-types'
@@ -14,19 +15,13 @@ function primaryCatSlug(post: Post): CatKey {
 }
 
 function fmtDate(iso?: string | null): string {
-  if (!iso) return '—'
+  if (!iso) return '--'
   return new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(iso))
 }
 
 function estimateReadTime(body: Post['body']): string {
   const raw = JSON.stringify(body ?? '')
   return `${Math.max(1, Math.round(raw.length / 1400))} min`
-}
-
-function postTags(post: Post): string[] {
-  return ((post.tags ?? []) as Array<number | { name: string }>)
-    .filter((t): t is { name: string } => typeof t === 'object' && t !== null)
-    .map((t) => t.name)
 }
 
 export default async function TagPage({
@@ -38,52 +33,82 @@ export default async function TagPage({
   const data = await getTagWithPosts(slug)
   if (!data) notFound()
 
-  const { tag, posts } = data
+  const { tag, posts, relatedTags, categories } = data
+  const description = tag.description?.trim() || `Posts etiquetados con #${tag.name}.`
 
   const breadcrumbItems = [
     { label: 'Inicio', href: '/' },
-    { label: 'Blog', href: '/blog' },
+    { label: 'Tags', href: '/tags' },
     { label: `#${tag.name}` },
   ]
 
   return (
     <>
-      <div className="wrap" style={{ paddingTop: 52, paddingBottom: 80 }}>
+      <div className="wrap tag-page" style={{ paddingTop: 52, paddingBottom: 80 }}>
         <Breadcrumb items={breadcrumbItems} />
 
-        <div style={{ marginTop: 32, marginBottom: 48 }}>
-          <Tag>{tag.name}</Tag>
-          <h1 style={{ fontSize: 40, fontWeight: 800, letterSpacing: '-.04em', lineHeight: 1.1, marginTop: 16 }}>
-            #{tag.name}
+        <section className="tag-page-hero">
+          <h1 className="tag-page-title">
+            <span>#</span>{tag.name}
           </h1>
-          <p style={{ fontSize: 14, color: 'var(--muted)', marginTop: 10 }}>
-            {posts.length} {posts.length === 1 ? 'artículo' : 'artículos'}
-          </p>
-        </div>
+          <p>{description}</p>
+          <strong>
+            {posts.length} {posts.length === 1 ? 'post etiquetado' : 'posts etiquetados'}
+          </strong>
+        </section>
 
         {posts.length === 0 ? (
           <EmptyState
-            title="Sin artículos todavía"
-            description="Esta etiqueta aún no tiene posts publicados."
+            title="Sin articulos todavia"
+            description="Esta etiqueta aun no tiene posts publicados."
           />
         ) : (
-          <div className="grid-posts">
-            {posts.map((p) => (
-              <PostCard
-                key={p.id}
-                cat={primaryCatSlug(p)}
-                title={p.title}
-                excerpt={p.excerpt ?? ''}
-                tags={postTags(p)}
-                date={fmtDate(p.publishedAt)}
-                readTime={estimateReadTime(p.body)}
-                href={`/blog/${p.slug}`}
-              />
-            ))}
-          </div>
+          <section className="tag-page-grid">
+            <div className="tag-page-list">
+              {posts.map((p) => (
+                <ListRow
+                  key={p.id}
+                  cat={primaryCatSlug(p)}
+                  title={p.title}
+                  excerpt={p.excerpt ?? undefined}
+                  date={fmtDate(p.publishedAt)}
+                  readTime={estimateReadTime(p.body)}
+                  inSeries={Boolean(p.series)}
+                  href={`/blog/${p.slug}`}
+                />
+              ))}
+            </div>
+
+            {(relatedTags.length > 0 || categories.length > 0) && (
+              <aside className="tag-page-aside" aria-label="Contexto del tag">
+                {relatedTags.length > 0 && (
+                  <div>
+                    <div className="ab-toc-title">Tags relacionados</div>
+                    <div className="tagrow">
+                      {relatedTags.map((related) => (
+                        <Tag key={related.id} slug={related.slug}>{related.name}</Tag>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {categories.length > 0 && (
+                  <div>
+                    <div className="ab-toc-title">Aparece en categorias</div>
+                    <div className="tag-page-cats">
+                      {categories.map((category) => (
+                        <a key={category.id} href={`/categorias/${category.slug}`}>
+                          <Cat cat={category.slug as CatKey} />
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </aside>
+            )}
+          </section>
         )}
       </div>
-
     </>
   )
 }

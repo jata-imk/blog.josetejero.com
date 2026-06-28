@@ -293,9 +293,7 @@ export default async function BuscarPage({ searchParams }: { searchParams: Searc
                   <SectionHead label="Tags" count={counts.tags} />
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                     {tags.map((t) => (
-                      <a key={t.id} href={`/tags/${t.slug}`} style={{ textDecoration: 'none' }}>
-                        <Tag>{t.name}</Tag>
-                      </a>
+                      <Tag key={t.id} slug={t.slug}>{t.name}</Tag>
                     ))}
                   </div>
                 </section>

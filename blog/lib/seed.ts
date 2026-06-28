@@ -17,6 +17,7 @@ interface SeedCategory {
 interface SeedTag {
   name: string
   slug: string
+  description: string
 }
 
 interface SeedSeries {
@@ -53,12 +54,12 @@ const CATEGORIES: SeedCategory[] = [
 ]
 
 const TAGS: SeedTag[] = [
-  { name: 'tutorial', slug: 'tutorial' },
-  { name: 'advanced', slug: 'advanced' },
-  { name: 'quick-tip', slug: 'quick-tip' },
-  { name: 'opinion', slug: 'opinion' },
-  { name: 'review', slug: 'review' },
-  { name: 'how-to', slug: 'how-to' },
+  { name: 'tutorial', slug: 'tutorial', description: 'Guias paso a paso para construir y entender piezas concretas de software.' },
+  { name: 'advanced', slug: 'advanced', description: 'Notas tecnicas de mayor profundidad sobre arquitectura, patrones y tradeoffs.' },
+  { name: 'quick-tip', slug: 'quick-tip', description: 'Apuntes cortos y accionables para resolver problemas comunes de desarrollo.' },
+  { name: 'opinion', slug: 'opinion', description: 'Reflexiones personales sobre herramientas, procesos y decisiones tecnicas.' },
+  { name: 'review', slug: 'review', description: 'Evaluaciones practicas de herramientas, librerias y flujos de trabajo.' },
+  { name: 'how-to', slug: 'how-to', description: 'Recetas concretas para configurar, depurar o desplegar proyectos.' },
 ]
 
 const SERIES: SeedSeries[] = [
