@@ -57,7 +57,6 @@ const TAGS: SeedTag[] = [
   { name: 'advanced', slug: 'advanced' },
   { name: 'quick-tip', slug: 'quick-tip' },
   { name: 'opinion', slug: 'opinion' },
-  { name: 'review', slug: 'review' },
   { name: 'how-to', slug: 'how-to' },
 ]
 
@@ -105,7 +104,6 @@ const POSTS: SeedPost[] = [
     tagNames: ['advanced', 'tutorial'],
     seriesOrder: 3,
     useRichLexical: false,
-    featured: true,
   },
   {
     title: 'Deploy de Next.js con Docker, Caddy y PostgreSQL',
@@ -612,7 +610,7 @@ async function seedPosts(payload: Payload): Promise<void> {
     return
   }
 
-  for (const post of POSTS) {
+  for (const [i, post] of POSTS.entries()) {
     const existing = await payload.find({
       collection: 'posts',
       where: { slug: { equals: post.slug } },
@@ -633,6 +631,10 @@ async function seedPosts(payload: Payload): Promise<void> {
       : null
     const seriesId = seriesDoc?.id as number | undefined
 
+    const daysAgo = 90 - i * 12
+    const publishedAt = new Date()
+    publishedAt.setDate(publishedAt.getDate() - daysAgo)
+
     try {
       await payload.create({
         collection: 'posts',
@@ -642,7 +644,7 @@ async function seedPosts(payload: Payload): Promise<void> {
           excerpt: post.excerpt,
           author: authorId,
           status: 'published' as const,
-          publishedAt: new Date().toISOString(),
+          publishedAt: publishedAt.toISOString(),
           body: makeBody(...extractTopics(post.title), post.useRichLexical),
           categories: categoryIds,
           tags: tagIds,
