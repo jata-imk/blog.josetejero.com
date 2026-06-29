@@ -26,7 +26,7 @@ La lista de posts y su numeración se **derivan** del join con Posts (no se guar
 Taxonomía amplia. `name`, `slug`, `description`.
 
 ### Tags
-Taxonomía fina. `name`, `slug`.
+Taxonomía fina. `name`, `slug`, `description`.
 
 ### Comments
 - `post` (rel), `authorName`, `authorEmail`, `body`, `createdAt`
