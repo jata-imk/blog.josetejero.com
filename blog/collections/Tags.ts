@@ -1,13 +1,13 @@
-import type { CollectionConfig } from 'payload'
+import type { CollectionConfig } from "payload";
 
-import { isAdmin, isAdminOrEditor } from '@/lib/access'
-import { autoSlug } from '@/lib/slug'
+import { isAdmin, isAdminOrEditor } from "@/lib/access";
+import { autoSlug } from "@/lib/slug";
 
 export const Tags: CollectionConfig = {
-  slug: 'tags',
+  slug: "tags",
   admin: {
-    useAsTitle: 'name',
-    group: 'Contenido',
+    useAsTitle: "name",
+    group: "Contenido",
   },
   access: {
     create: isAdminOrEditor,
@@ -15,11 +15,11 @@ export const Tags: CollectionConfig = {
     delete: isAdmin,
   },
   hooks: {
-    beforeValidate: [autoSlug('name')],
+    beforeValidate: [autoSlug("name")],
   },
   fields: [
-    { name: 'name', type: 'text', required: true, label: 'Nombre' },
-    { name: 'slug', type: 'text', required: true, unique: true, label: 'Slug' },
-    { name: 'description', type: 'textarea', label: 'Descripción' },
+    { name: "name", type: "text", required: true, label: "Nombre" },
+    { name: "slug", type: "text", required: true, unique: true, label: "Slug" },
+    { name: "description", type: "textarea", label: "Descripción" },
   ],
-}
+};

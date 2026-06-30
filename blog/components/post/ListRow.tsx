@@ -7,6 +7,7 @@ import { Thumb } from '../ui/Thumb'
 export function ListRow({
   cat,
   title,
+  excerpt,
   date,
   readTime,
   inSeries,
@@ -14,6 +15,7 @@ export function ListRow({
 }: {
   cat: CatKey
   title: string
+  excerpt?: string
   date: string
   readTime: string
   inSeries?: boolean
@@ -33,6 +35,11 @@ export function ListRow({
         <h3 style={{ fontSize: 16, fontWeight: 650, letterSpacing: '-.02em', lineHeight: 1.35 }}>
           {title}
         </h3>
+        {excerpt && (
+          <p style={{ fontSize: 14, color: 'var(--ink-3)', lineHeight: 1.45 }}>
+            {excerpt}
+          </p>
+        )}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <Meta icon="calendar">{date}</Meta>
           <MetaSep />

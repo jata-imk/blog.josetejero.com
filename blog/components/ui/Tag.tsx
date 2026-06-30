@@ -1,9 +1,34 @@
 import type { ReactNode } from 'react'
 
-export function Tag({ children, hash = true }: { children: ReactNode; hash?: boolean }) {
+export function Tag({
+  children,
+  hash = true,
+  href,
+  slug,
+}: {
+  children: ReactNode
+  hash?: boolean
+  href?: string
+  slug?: string
+}) {
+  const content = (
+    <>
+      {hash && '#'}{children}
+    </>
+  )
+  const target = href ?? (slug ? `/tags/${slug}` : undefined)
+
+  if (target) {
+    return (
+      <a className="tag-pill" href={target}>
+        {content}
+      </a>
+    )
+  }
+
   return (
     <span className="tag-pill">
-      {hash && '#'}{children}
+      {content}
     </span>
   )
 }

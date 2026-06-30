@@ -2,7 +2,6 @@
 
 import { usePathname } from 'next/navigation'
 import { Ic } from '../ui/Ic'
-import { CommandPalette } from '../search/CommandPalette'
 import { SearchTriggerBtn } from '../search/SearchTriggerBtn'
 
 const NAV_LINKS = [
@@ -63,7 +62,6 @@ export function Header() {
           ))}
         </div>
       </div>
-      <CommandPalette />
     </header>
   )
 }

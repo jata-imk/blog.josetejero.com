@@ -5,7 +5,7 @@ import { Badge } from '../../components/ui/Badge'
 import { Ic } from '../../components/ui/Ic'
 import type { CatKey } from '../../components/ui/Cat'
 import { getPosts, getCategories, getSeriesList } from '../../lib/data'
-import type { Post, Category } from '../../payload-types'
+import type { Post, Category, Tag as TagType } from '../../payload-types'
 
 /* ── section head helper ──────────────────────────────────────── */
 function SectionHead({
@@ -65,7 +65,9 @@ function SeriesCard({
           </span>
         )}
       </div>
-      <Cat cat={cat} />
+      <div style={{ alignSelf: 'flex-start' }}>
+        <Cat cat={cat} />
+      </div>
       <h3 style={{ fontSize: 18, fontWeight: 700, letterSpacing: '-.02em', lineHeight: 1.3 }}>{title}</h3>
       <p style={{ fontSize: 14, lineHeight: 1.55, color: 'var(--ink-3)' }}>{desc}</p>
       {progress != null && (
@@ -101,10 +103,10 @@ function estimateReadTime(body: Post['body']): string {
   return `${Math.max(1, Math.round(raw.length / 1400))} min`
 }
 
-function postTags(post: Post): string[] {
-  return ((post.tags ?? []) as Array<number | { name: string }>)
-    .filter((t): t is { name: string } => typeof t === 'object' && t !== null)
-    .map((t) => t.name)
+function postTags(post: Post): Array<{ name: string; slug: string }> {
+  return ((post.tags ?? []) as Array<number | TagType>)
+    .filter((t): t is TagType => typeof t === 'object' && t !== null)
+    .map((t) => ({ name: t.name, slug: t.slug }))
 }
 
 /* ── page ─────────────────────────────────────────────────────── */

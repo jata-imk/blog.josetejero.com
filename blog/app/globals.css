@@ -345,6 +345,58 @@ code, pre, .mono { font-family: var(--font-mono); }
 .tag-pill { font-size: 12px; color: var(--ink-3); background: var(--bg-soft); padding: 3px 9px; border-radius: 7px; font-weight: 500; }
 .tagrow   { display: flex; flex-wrap: wrap; gap: 6px; }
 
+/* tag detail page */
+.tag-page-hero {
+  padding-top: 26px;
+  padding-bottom: 54px;
+}
+.tag-page-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 42px;
+  font-weight: 800;
+  letter-spacing: -.04em;
+  line-height: 1.1;
+}
+.tag-page-title span { color: var(--cyan); }
+.tag-page-hero p {
+  margin-top: 12px;
+  max-width: 600px;
+  color: var(--ink-3);
+  font-size: 17px;
+  line-height: 1.6;
+}
+.tag-page-hero strong {
+  display: inline-block;
+  margin-top: 14px;
+  color: var(--ink-2);
+  font-size: 14px;
+  font-weight: 600;
+}
+.tag-page-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.7fr) minmax(220px, 1fr);
+  gap: 48px;
+  align-items: start;
+  padding-bottom: 40px;
+}
+.tag-page-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.tag-page-aside {
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+}
+.tag-page-cats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 /* ── section head ────────────────────────────────────────────── */
 .section-head { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 24px; gap: 16px; }
 
@@ -426,6 +478,12 @@ code, pre, .mono { font-family: var(--font-mono); }
   .post-comments          { padding: 0 18px 60px; }
   .post-toc-mobile        { display: block; margin-top: var(--sp-6); }
   .about-hero-grid        { grid-template-columns: 1fr !important; }
+  .tag-page-hero          { padding-top: 24px; padding-bottom: 34px; }
+  .tag-page-title         { font-size: 36px; }
+  .tag-page-grid          { grid-template-columns: 1fr; gap: 32px; }
+  .tag-page-aside         { gap: 22px; }
+  .tag-page .list-row     { padding-inline: 0; }
+  .tag-page .list-row .thumb { width: 88px; height: 64px; }
 }
 
 /* ── component layer (ported from design handoff aleliz.css) ─── */
