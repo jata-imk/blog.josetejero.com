@@ -50,20 +50,39 @@ export function TableOfContents({ items }: { items: TocItem[] }) {
   }, [items])
 
   return (
-    <nav className="ab-toc" aria-label="Tabla de contenidos">
-      <div className="ab-toc-title">En esta página</div>
-      {items.map((item) => (
-        <a
-          key={item.id}
-          href={`#${item.id}`}
-          className={[
-            item.level === 3 ? 'sub' : '',
-            activeId === item.id ? 'active' : '',
-          ].filter(Boolean).join(' ')}
-        >
-          {item.label}
-        </a>
-      ))}
+    <nav className="ab-toc ab-toc-rail" aria-label="Tabla de contenidos">
+      {/* Capa colapsada: solo marcas, decorativa */}
+      <ul className="ab-toc-marks" aria-hidden="true">
+        {items.map((item) => (
+          <li key={item.id}>
+            <span
+              className={[
+                'ab-toc-mark',
+                item.level === 3 ? 'sub' : '',
+                activeId === item.id ? 'active' : '',
+              ].filter(Boolean).join(' ')}
+            />
+          </li>
+        ))}
+      </ul>
+
+      {/* Capa expandida: panel flotante con los links reales */}
+      <div className="ab-toc-panel">
+        <div className="ab-toc-title">En esta página</div>
+        {items.map((item) => (
+          <a
+            key={item.id}
+            href={`#${item.id}`}
+            aria-current={activeId === item.id ? 'location' : undefined}
+            className={[
+              item.level === 3 ? 'sub' : '',
+              activeId === item.id ? 'active' : '',
+            ].filter(Boolean).join(' ')}
+          >
+            <span className="ab-toc-label">{item.label}</span>
+          </a>
+        ))}
+      </div>
     </nav>
   )
 }

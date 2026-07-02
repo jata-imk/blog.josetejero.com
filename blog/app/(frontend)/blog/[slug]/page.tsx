@@ -152,7 +152,7 @@ export default async function PostPage({ params }: Props) {
 
       {/* Cuerpo: artículo (izquierda) + TOC sticky (derecha, solo desktop) */}
       <div className="post-body">
-        <article style={{ maxWidth: 720 }}>
+        <article className="post-article">
           <Prose>
             {post.body ? (
               <RichText data={post.body} converters={makeBodyConverters(highlightMap)} />
