@@ -1,8 +1,12 @@
 # 0026 — Pausar registro de migraciones durante desarrollo activo
 
-- Estado: aceptada
+- Estado: reemplazada parcialmente por [0027](./0027-migraciones-y-seed-para-produccion.md)
 - Fecha: 2026-06-29
 - Decidido por: José Tejero
+
+> **Actualización (2026-07-02):** la política de "sin migraciones" sigue vigente **solo para
+> desarrollo local**. Para producción se reactivan las migraciones — ver
+> [ADR 0027](./0027-migraciones-y-seed-para-produccion.md).
 
 ## Contexto
 El proyecto sigue en desarrollo activo y el modelo de datos está cambiando con frecuencia. Mantener

@@ -129,5 +129,13 @@ separados:
 | `pnpm payload` | CLI de Payload |
 | `pnpm migrate` | Ejecutar migraciones de Payload |
 | `pnpm migrate:create <name>` | Crear una migración de Payload |
+| `pnpm seed:catalog` | Sembrar catálogos (categorías, tags, series) — idempotente |
 | `pnpm generate:types` | Generar `payload-types.ts` |
 | `pnpm generate:importmap` | Generar import map de Payload |
+
+## Primer arranque de la app
+
+Para poner en marcha una base de datos nueva (schema + primer admin + catálogos), sigue la sección
+**"Primer arranque de la app"** del runbook [`docs/runbooks/deploy.md`](docs/runbooks/deploy.md).
+En dev el schema se crea solo por `push`; en producción se aplican migraciones y se corre
+`pnpm seed:catalog`.

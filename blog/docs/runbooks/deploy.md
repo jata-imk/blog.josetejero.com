@@ -8,13 +8,23 @@ CloudPanel/Nginx solo publica HTTP/TLS y hace reverse proxy al contenedor de la 
 
 ## Entornos
 
-- Dev A, PC con Docker: `docker compose up -d postgres` y la app corre con `pnpm dev`.
-- Dev B, PC sin Docker: la app corre con `pnpm dev` y la BD llega por túnel SSH al VPS.
-- Dev en VPS: el mismo Compose levanta solo `postgres`; no necesita CloudPanel/Nginx.
-- Prod, VPS: `COMPOSE_PROFILES=prod docker compose up -d` levanta app + PostgreSQL.
+Hay **tres entornos**:
+
+1. **Local completo** — todo en tu PC. `docker compose up -d postgres` levanta PostgreSQL en Docker
+   y la app corre con `pnpm dev` (recomendado por el HMR). Si quisieras validar la imagen de prod en
+   local, puedes levantar además el servicio `app` con el profile `prod`.
+2. **Híbrido** — Next.js corre en tu PC con `pnpm dev` y la BD PostgreSQL vive en Docker en el VPS,
+   accesible por **túnel SSH**. Es el flujo de desarrollo habitual desde Windows.
+3. **Producción** — app + PostgreSQL, **ambos en Docker en el VPS** con el profile `prod`.
+   CloudPanel/Nginx hace reverse proxy al contenedor de la app.
 
 No existe un profile `dev`: el modo dev es el comportamiento por defecto del Compose, porque el
 servicio `app` solo se activa con el profile `prod`.
+
+> **Schema por entorno.** En local completo e híbrido (dev, `NODE_ENV !== 'production'`) el schema se
+> sincroniza solo por el `push` del adaptador Postgres al arrancar `pnpm dev` — **no migres en dev**.
+> En producción `push` está desactivado: el schema se crea aplicando migraciones (ver ADR
+> [0027](../adr/0027-migraciones-y-seed-para-produccion.md)).
 
 ## Esquema de producción
 
@@ -226,17 +236,86 @@ Luego:
 pnpm dev
 ```
 
-## Migraciones
+## Primer arranque de la app (schema + admin + catálogos)
 
-En desarrollo, crea migraciones con:
+Una **base de datos nueva** necesita tres cosas antes de tener un blog usable: el **schema** (tablas),
+el **primer usuario admin** y los **catálogos** (categorías, tags, series). El cómo cambia según el
+entorno.
+
+### Local completo e híbrido (dev)
+
+No hay que migrar: el `push` de dev crea el schema al arrancar `pnpm dev`. Además, el seed de dev
+(`lib/seed.ts`, vía `onInit`) crea automáticamente usuarios de prueba (`admin@test.local`) y posts de
+ejemplo — solo en `NODE_ENV !== 'production'`. Si además quieres los **catálogos reales**:
+
+```bash
+pnpm seed:catalog   # idempotente: se puede correr varias veces sin duplicar
+```
+
+### Producción (todo en Docker)
+
+En prod `push` está desactivado y el seed de dev **no** corre. La imagen de la app es `standalone`
+(Next empaqueta solo lo justo para correr `server.js`): **no incluye `pnpm` ni el CLI de Payload**, así
+que `pnpm payload migrate` y `pnpm seed:catalog` **no se pueden ejecutar dentro del contenedor `app`**.
+
+Conviene tener claro que en el VPS hay **dos copias del código**, y no se pisan:
+
+- **La imagen Docker** — trae el código "horneado" en el build; es lo que *corre* la app. `docker
+  compose up` solo la enciende, no copia nada del disco del VPS.
+- **El repo clonado** (`/var/www/html/blog-prod/blog`) — aporta `docker-compose.yml` y `.env`, y si le
+  haces `pnpm install`, además te da el CLI de Payload. Solo comparte con el contenedor la **base de
+  datos**, nada más.
+
+**Decisión (ADR [0027](../adr/0027-migraciones-y-seed-para-produccion.md)): las migraciones y el seed se
+corren desde el repo clonado en el VPS.** Requisito: **Node ≥ 20.9 y pnpm instalados en el host** del
+VPS (fuera de Docker), y `pnpm install` hecho en el checkout.
+
+> **Ojo con la `DATABASE_URL` del CLI.** El contenedor `app` habla con la BD por el nombre de servicio
+> Docker (`@postgres:5432`), pero **desde el host** ese nombre no existe: PostgreSQL está publicado en
+> `127.0.0.1:5432`. Por eso el CLI usa un host distinto. Lo más limpio es pasar la `DATABASE_URL` en
+> línea al comando, sin depender del `.env` (que apunta a `postgres:5432` para el contenedor).
+
+Secuencia sobre una BD de prod vacía. Es **un solo** `docker-compose.yml` con dos servicios
+(`postgres` + `app`); aquí se levantan por pasos solo para migrar antes de exponer la app:
+
+```bash
+# 1. Levanta solo PostgreSQL (el otro servicio, app, arranca en el paso 3)
+docker compose up -d postgres
+
+# 2. Desde el repo clonado, con el CLI y la DATABASE_URL del HOST (localhost, no "postgres"):
+DATABASE_URL=postgresql://blog_prod:TU_PASSWORD@localhost:5432/blog_prod pnpm payload migrate
+
+# 3. Arranca la app (app + postgres con profile prod). El compose ya espera a que la BD esté sana.
+docker compose up -d
+
+# 4. Abre /admin en el navegador → crea el PRIMER usuario admin (flujo first-user de Payload)
+
+# 5. Siembra los catálogos (misma DATABASE_URL del host)
+DATABASE_URL=postgresql://blog_prod:TU_PASSWORD@localhost:5432/blog_prod pnpm seed:catalog
+```
+
+> También sirve un único `docker compose up -d` (levanta ambos servicios; la app espera a la BD por su
+> `depends_on`). En ese caso la app puede loguear "tabla no existe" hasta que corras el paso 2; en un
+> primer deploy, sin tráfico aún, es solo cosmético.
+
+A partir de aquí ya puedes importar/redactar posts y asociarlos a los catálogos.
+
+## Migraciones (cambios de schema posteriores)
+
+En desarrollo, cuando el cambio de schema esté destinado a producción, genera su migración:
 
 ```bash
 pnpm migrate:create nombre-de-cambio
-pnpm migrate
 ```
 
-En producción, aplica migraciones antes de considerar completo el deploy. No dependas de seed ni
-auto-push en producción: el seed es solo para `NODE_ENV !== 'production'`.
+Revisa el SQL generado y, en producción, aplica **antes** de dar por completo el deploy:
+
+```bash
+pnpm payload migrate
+```
+
+No dependas de seed ni auto-push en producción: el seed de dev es solo para `NODE_ENV !== 'production'`
+y `push` está desactivado en prod.
 
 ## Backups
 
