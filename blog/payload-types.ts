@@ -231,6 +231,10 @@ export interface Post {
   } | null;
   series?: (number | null) | Series;
   seriesOrder?: number | null;
+  /**
+   * 0 = raíz, 1 = sub-artículo (indentación visual)
+   */
+  seriesDepth?: number | null;
   categories?: (number | Category)[] | null;
   tags?: (number | Tag)[] | null;
   featured?: boolean | null;
@@ -246,6 +250,21 @@ export interface Series {
   title: string;
   slug: string;
   description?: string | null;
+  body?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   coverImage?: (number | null) | Media;
   updatedAt: string;
   createdAt: string;
@@ -422,6 +441,7 @@ export interface PostsSelect<T extends boolean = true> {
   body?: T;
   series?: T;
   seriesOrder?: T;
+  seriesDepth?: T;
   categories?: T;
   tags?: T;
   featured?: T;
@@ -436,6 +456,7 @@ export interface SeriesSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
   description?: T;
+  body?: T;
   coverImage?: T;
   updatedAt?: T;
   createdAt?: T;

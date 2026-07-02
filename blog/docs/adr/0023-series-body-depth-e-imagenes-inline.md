@@ -1,6 +1,6 @@
 # 0023 — Descripción de serie, nivel de anidamiento y nodo de imagen inline
 
-- Estado: propuesta
+- Estado: aceptada
 - Fecha: 2026-06-29
 - Decidido por: board (José)
 
@@ -46,6 +46,18 @@ Render asociado:
 - `seriesDepth` se pasa a `components/series/SeriesStep.tsx` para indentar visualmente. La query de
   `getSeriesWithPosts` (`lib/data/series.ts`) ya propaga el post completo ordenado por `seriesOrder`,
   así que no cambia.
+
+## Ajuste en implementación (2026-06-29)
+
+**Punto #3 (UploadFeature + converter upload) resultó no-op:** `defaultEditorFeatures` de
+Payload ya incluye `UploadFeature`, `BlockquoteFeature` y `HorizontalRuleFeature`. Como
+`Posts.body` hace `...defaultFeatures`, los nodos `upload`, `blockquote` y `horizontalrule`
+ya validan y ya renderizan vía `defaultConverters`. No se añadió UploadFeature ni converter
+custom. Ver `docs/agent-notes/2026-06-29-engineer-import-md-ui.md` §1.
+
+**`Series.body` coexiste con `description`** (la decisión de "reemplazar" se revirtió).
+`description` (textarea) sigue siendo el blurb corto para las cards; `body` (richText) es la
+portada rich en el detalle de la serie.
 
 ## Consecuencias
 - Más fácil: las series tienen una portada/directorio rico; la jerarquía de 3 niveles se ve como

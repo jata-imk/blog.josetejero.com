@@ -1,6 +1,6 @@
 # 0024 — Contrato del importador Astro/MD → Lexical
 
-- Estado: propuesta
+- Estado: aceptada (con ajuste de mecanismo — ver abajo)
 - Fecha: 2026-06-29
 - Decidido por: board (José)
 
@@ -36,6 +36,7 @@ Script nuevo `blog/scripts/import-astro.ts`, ejecutado vía Payload Local API. D
 | code fences | bloque `Code` (`code` string + `language`) |
 | `<aside class="bg-*">` | bloque `Callout` (variant por color; emoji y headings internos preservados) |
 | `![](...)` | upload a `Media` (dedupe por filename) + nodo `upload` inline |
+| tablas GFM (`\| a \| b \|`) | `table`/`tablerow`/`tablecell` nativos de `EXPERIMENTAL_TableFeature` |
 
 **Color de aside → variant:** `bg-blue-*` (📖/🎯) → `note`; `bg-emerald-*` (✅) → `tip`;
 `bg-amber-*` (🧠/⚠️) → `warning`; rojo → `danger`.
@@ -54,6 +55,40 @@ Script nuevo `blog/scripts/import-astro.ts`, ejecutado vía Payload Local API. D
 - Salta `*.backup`. Reporta links colgantes (ej. `ejemplos-creacion-pr-mr`, que no existe en origen)
   degradándolos a texto u omitiéndolos.
 - Reporte final: posts/series creados, imágenes subidas, archivos saltados y por qué.
+
+## Ajuste de mecanismo en implementación (2026-06-29)
+
+El flujo del usuario es **recurrente** (Notion → MD → import), no una migración one-shot.
+Por eso el mecanismo cambió: en lugar de un script CLI `import-astro.ts`, el converter se
+expone como **botón "Importar Markdown" en el editor de Posts** (`/admin`).
+
+- El converter MD→Lexical vive en `lib/import/mdToLexical.ts` (misma lógica del ADR).
+- La subida de imágenes vive en `lib/import/uploadImage.ts`.
+- Un endpoint custom `POST /api/posts/:id/import-md` llama al converter y actualiza el `body`.
+- Un componente `ui` en el editor (`ImportMarkdownField.tsx`) expone el modal.
+- Los 19 posts del blog viejo se migran uno a uno con esta UI.
+
+El mapeo de nodos y el contrato de idempotencia (por slug) siguen vigentes; solo cambia el
+punto de entrada (UI vs script). Ver `docs/agent-notes/2026-06-29-engineer-import-md-ui.md`.
+
+## Ajuste — soporte de tablas (2026-07-01)
+
+Al importar un post real (`conectar-api-notion-openclaw.md`) se detectó que las tablas GFM
+no se parseaban (`remark-parse` sin `remark-gfm` las trata como texto plano) ni había nodo
+Lexical destino. Payload ya trae la pieza faltante: `EXPERIMENTAL_TableFeature` (envuelve
+`@lexical/table`), habilitada en `lib/lexical/bodyEditor.ts`. No se construyó un bloque
+custom — se usa el nodo nativo `table`/`tablerow`/`tablecell`, editable en `/admin` y
+renderizado en el front vía `TableJSXConverter` (parte de `defaultJSXConverters`), con
+override de estilos en `lib/lexical/converters.tsx` (clases `.ab-table-*`, tokens en
+`app/globals.css`) para no depender del CSS inline por defecto del paquete.
+
+Se añadió `remark-gfm` al parse (`mdToLexicalBody` y `asideToCallout`), lo que también
+activa `~~strikethrough~~` (el código en `walkInline` ya lo soportaba pero estaba muerto
+sin GFM). La primera fila de toda tabla GFM se mapea a `headerState: COLUMN(2)`.
+
+**Limitación conocida:** el `calloutBlock.content` usa `lexicalEditor()` bare (sin
+`EXPERIMENTAL_TableFeature`), así que una tabla dentro de un `<aside>` se dropea (reportada
+en `nodesDropped`), igual que ya pasaba con code fences dentro de asides.
 
 ## Consecuencias
 - Más fácil: contenido real en el blog con fidelidad; re-correr la migración es seguro.

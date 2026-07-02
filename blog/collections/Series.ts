@@ -2,6 +2,7 @@ import type { CollectionConfig } from 'payload'
 
 import { isAdmin, isAdminOrEditor } from '@/lib/access'
 import { autoSlug } from '@/lib/slug'
+import { makeBodyEditor } from '@/lib/lexical/bodyEditor'
 
 export const Series: CollectionConfig = {
   slug: 'series',
@@ -20,7 +21,13 @@ export const Series: CollectionConfig = {
   fields: [
     { name: 'title', type: 'text', required: true, label: 'Título' },
     { name: 'slug', type: 'text', required: true, unique: true, label: 'Slug' },
-    { name: 'description', type: 'textarea', label: 'Descripción' },
+    { name: 'description', type: 'textarea', label: 'Descripción corta (tarjetas)' },
+    {
+      name: 'body',
+      type: 'richText',
+      label: 'Portada / directorio (rich)',
+      editor: makeBodyEditor(),
+    },
     {
       name: 'coverImage',
       type: 'upload',

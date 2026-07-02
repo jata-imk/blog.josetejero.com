@@ -519,6 +519,14 @@ code, pre, .mono { font-family: var(--font-mono); }
 .ab-prose blockquote { margin: 0; padding: 4px 0 4px 22px; border-left: 3px solid var(--blue); color: var(--ink); font-size: 18.5px; font-style: italic; }
 .ab-prose strong { color: var(--ink); font-weight: 650; }
 
+/* tables */
+.ab-table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--r); }
+.ab-table { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+.ab-table th, .ab-table td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--line); }
+.ab-table tr:last-child td { border-bottom: none; }
+.ab-table th { background: var(--bg-soft); color: var(--ink); font-weight: 650; }
+.ab-table td { color: var(--ink-2); }
+
 /* code block */
 .ab-code { border-radius: var(--r); overflow: hidden; border: 1px solid var(--code-border); background: var(--code-bg); box-shadow: var(--sh-2); }
 .ab-code-bar { display: flex; align-items: center; gap: 8px; padding: 9px 14px; background: var(--code-bar); border-bottom: 1px solid var(--code-border); }

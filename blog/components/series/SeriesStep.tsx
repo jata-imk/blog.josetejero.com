@@ -5,14 +5,20 @@ export function SeriesStep({
   title,
   state,
   href,
+  depth = 0,
 }: {
   number: number
   title: string
   state: StepState
   href?: string
+  /** Nivel de indentación dentro de la serie (0 = raíz, 1 = sub-artículo). ADR 0023. */
+  depth?: number
 }) {
+  // 24px por nivel — token de spacing coherente con el diseño (1.5rem)
+  const marginLeft = depth > 0 ? depth * 24 : 0
+
   const inner = (
-    <div className={`ab-step ${state}`}>
+    <div className={`ab-step ${state}`} style={marginLeft > 0 ? { marginLeft } : undefined}>
       <div className="ab-step-num">{number}</div>
       <div>
         <div style={{ fontWeight: 650, fontSize: 15, lineHeight: 1.3 }}>{title}</div>

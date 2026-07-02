@@ -1,9 +1,7 @@
-import { BlocksFeature, CodeBlock, lexicalEditor } from '@payloadcms/richtext-lexical'
 import type { CollectionConfig } from 'payload'
-import { calloutBlock } from '@/lib/lexical/calloutBlock'
-
 import { isAdmin, isAdminOrEditor } from '@/lib/access'
 import { autoSlug } from '@/lib/slug'
+import { makeBodyEditor } from '@/lib/lexical/bodyEditor'
 
 export const Posts: CollectionConfig = {
   slug: 'posts',
@@ -20,6 +18,69 @@ export const Posts: CollectionConfig = {
   hooks: {
     beforeValidate: [autoSlug('title')],
   },
+  endpoints: [
+    {
+      path: '/:id/import-md',
+      method: 'post',
+      handler: async (req) => {
+        // Guard — solo admin/editor autenticado
+        if (!req.user) {
+          return new Response(JSON.stringify({ error: 'No autenticado' }), {
+            status: 401,
+            headers: { 'Content-Type': 'application/json' },
+          })
+        }
+
+        const id = (req.routeParams as Record<string, string>)?.id
+        if (!id) {
+          return new Response(JSON.stringify({ error: 'Falta el id del post' }), {
+            status: 400,
+            headers: { 'Content-Type': 'application/json' },
+          })
+        }
+
+        let md: string
+        try {
+          const body = await req.json?.() as { md?: string } | undefined
+          md = body?.md ?? ''
+        } catch {
+          return new Response(JSON.stringify({ error: 'Body inválido (espera JSON { md: string })' }), {
+            status: 400,
+            headers: { 'Content-Type': 'application/json' },
+          })
+        }
+
+        if (!md.trim()) {
+          return new Response(JSON.stringify({ error: 'El campo md está vacío' }), {
+            status: 400,
+            headers: { 'Content-Type': 'application/json' },
+          })
+        }
+
+        // Import dinámico para evitar cargar el converter en el bundle del cliente
+        const { mdToLexicalBody } = await import('@/lib/import/mdToLexical')
+        const { uploadImageFromUrl } = await import('@/lib/import/uploadImage')
+
+        const result = await mdToLexicalBody(md, {
+          uploadImage: (src) => uploadImageFromUrl(req.payload, src),
+        })
+
+        await req.payload.update({
+          collection: 'posts',
+          id: Number(id),
+          data: { body: result.body },
+          // Evitar disparar hooks de slug/validación innecesarios
+          overrideAccess: false,
+          user: req.user,
+        })
+
+        return new Response(JSON.stringify({ ok: true, report: result.report }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        })
+      },
+    },
+  ],
   fields: [
     { name: 'title', type: 'text', required: true, label: 'Título' },
     {
@@ -70,12 +131,17 @@ export const Posts: CollectionConfig = {
       name: 'body',
       type: 'richText',
       label: 'Cuerpo',
-      editor: lexicalEditor({
-        features: ({ defaultFeatures }) => [
-          ...defaultFeatures,
-          BlocksFeature({ blocks: [calloutBlock, CodeBlock()] }),
-        ],
-      }),
+      editor: makeBodyEditor(),
+    },
+    {
+      // Campo UI: muestra el botón "Importar Markdown" junto al campo body
+      name: 'importMarkdown',
+      type: 'ui',
+      admin: {
+        components: {
+          Field: '@/components/admin/ImportMarkdownField#ImportMarkdownField',
+        },
+      },
     },
     {
       name: 'series',
@@ -89,6 +155,13 @@ export const Posts: CollectionConfig = {
       type: 'number',
       label: 'Orden en la serie',
       admin: { position: 'sidebar' },
+    },
+    {
+      name: 'seriesDepth',
+      type: 'number',
+      label: 'Nivel en la serie',
+      defaultValue: 0,
+      admin: { position: 'sidebar', description: '0 = raíz, 1 = sub-artículo (indentación visual)' },
     },
     {
       name: 'categories',

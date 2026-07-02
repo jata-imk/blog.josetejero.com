@@ -28,6 +28,13 @@ type HeadingNode = {
   children?: LexicalChildNode[]
 }
 
+type TableCellNode = {
+  headerState?: number
+  colSpan?: number
+  rowSpan?: number
+  children?: LexicalChildNode[]
+}
+
 /**
  * Extrae el texto plano de un heading para generar su ID.
  */
@@ -78,6 +85,37 @@ export function makeBodyConverters(highlightMap: Map<string, string>): JSXConver
         const id = text ? slugifyHeading(text) : undefined
         const children = args.nodesToJSX({ nodes: node.children ?? [] })
         return <Tag id={id}>{children}</Tag>
+      },
+      // Override de la tabla default de @payloadcms/richtext-lexical: usa
+      // estilos inline (#ccc, padding fijo) que no siguen los design tokens
+      // del blog. Reemplazamos por clases .ab-table-* (app/globals.css).
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      table: (args: any) => {
+        const children = args.nodesToJSX({ nodes: args.node.children ?? [] })
+        return (
+          <div className="ab-table-wrap">
+            <table className="ab-table">
+              <tbody>{children}</tbody>
+            </table>
+          </div>
+        )
+      },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      tablerow: (args: any) => {
+        const children = args.nodesToJSX({ nodes: args.node.children ?? [] })
+        return <tr>{children}</tr>
+      },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      tablecell: (args: any) => {
+        const node = args.node as TableCellNode
+        const children = args.nodesToJSX({ nodes: node.children ?? [] })
+        const Tag = (node.headerState ?? 0) > 0 ? 'th' : 'td'
+        return (
+          <Tag colSpan={node.colSpan && node.colSpan > 1 ? node.colSpan : undefined}
+            rowSpan={node.rowSpan && node.rowSpan > 1 ? node.rowSpan : undefined}>
+            {children}
+          </Tag>
+        )
       },
       blocks: {
         ...defaultConverters.blocks,

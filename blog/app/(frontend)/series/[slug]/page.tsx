@@ -1,9 +1,13 @@
 import { notFound } from 'next/navigation'
+import { RichText } from '@payloadcms/richtext-lexical/react'
 import { SeriesStep, SeriesProgress } from '../../../../components/series/SeriesStep'
 import { EmptyState } from '../../../../components/ui/EmptyState'
 import { Badge } from '../../../../components/ui/Badge'
 import { Breadcrumb } from '../../../../components/ui/Breadcrumb'
+import { Prose } from '../../../../components/blocks/Prose'
 import { getSeriesWithPosts } from '../../../../lib/data'
+import { makeBodyConverters } from '../../../../lib/lexical'
+import { highlightLexicalCode, type LexicalChildNode } from '../../../../lib/code-highlight'
 
 export default async function SeriesPage({
   params,
@@ -15,6 +19,12 @@ export default async function SeriesPage({
   if (!data) notFound()
 
   const { series, posts } = data
+
+  // Pre-resaltar código del body de la serie (mismo pipeline que posts)
+  const seriesBody = (series as { body?: unknown }).body as Parameters<typeof highlightLexicalCode>[0] | undefined
+  const highlightMap = await highlightLexicalCode(
+    seriesBody ? (seriesBody as { root?: { children?: LexicalChildNode[] } }).root : undefined,
+  )
 
   const doneCount = posts.filter((p) => p.stepStatus === 'done').length
   const progressPct = posts.length > 0 ? Math.round((doneCount / posts.length) * 100) : 0
@@ -45,6 +55,16 @@ export default async function SeriesPage({
               {series.description}
             </p>
           )}
+          {seriesBody && (
+            <div style={{ marginTop: 24 }}>
+              <Prose>
+                <RichText
+                  data={seriesBody as Parameters<typeof RichText>[0]['data']}
+                  converters={makeBodyConverters(highlightMap)}
+                />
+              </Prose>
+            </div>
+          )}
           {posts.length > 0 && (
             <div style={{ marginTop: 28 }}>
               <SeriesProgress value={progressPct} />
@@ -66,6 +86,7 @@ export default async function SeriesPage({
                 title={post.title}
                 state={post.stepStatus}
                 href={`/blog/${post.slug}`}
+                depth={(post as { seriesDepth?: number }).seriesDepth ?? 0}
               />
             ))}
           </div>

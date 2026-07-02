@@ -19,12 +19,14 @@
     "@payloadcms/db-postgres": "3.85.1",
     "@payloadcms/next": "3.85.1",
     "@payloadcms/richtext-lexical": "3.85.1",
+    "@payloadcms/ui": "3.85.1",
     "graphql": "^16.8.1",
     "next": "16.2.9",
     "payload": "3.85.1",
     "react": "19.2.7",
     "react-dom": "19.2.7",
     "react-pdf": "^10.4.1",
+    "remark-gfm": "^4.0.1",
     "server-only": "^0.0.1",
     "sharp": "^0.33.5",
     "shiki": "^4.2.0"
@@ -32,13 +34,17 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@tailwindcss/postcss": "^4.0.0",
+    "@types/mdast": "^4.0.4",
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "eslint": "^10.5.0",
+    "gray-matter": "^4.0.3",
+    "remark-parse": "^11.0.0",
     "tailwindcss": "^4.0.0",
     "typescript": "^5.5.0",
-    "typescript-eslint": "^8.61.1"
+    "typescript-eslint": "^8.61.1",
+    "unified": "^11.0.5"
   },
   "engines": {
     "node": ">=20.9.0"
