@@ -164,6 +164,64 @@ Si el build se ejecuta dentro de Docker, asegúrate de que el contenedor de buil
 puerto local del túnel SSH. En runners Linux normalmente se resuelve con build network `host` o una
 configuración equivalente del action de Docker.
 
+## Build en el VPS (alternativa sin CI)
+
+El ADR [0021](../adr/0021-deploy-vps-cloudpanel-docker-compose.md) marca CI/GHCR como camino
+**preferente**, pero no lo obliga. Si no quieres montar GitHub Actions ni un registry, puedes
+construir la imagen **en el mismo VPS**, porque ahí PostgreSQL ya está a mano (publicado en
+`127.0.0.1:5432`).
+
+> **`docker build` con host `postgres` falla en el VPS.** Durante el build no existe la red de
+> Compose, así que el nombre de servicio `postgres` no se resuelve (`getaddrinfo ENOTFOUND
+> postgres`). La solución es construir con `--network host` y una `DATABASE_URL` que apunte a
+> `localhost:5432` (el puerto publicado en el host). `--network host` **solo funciona en Linux**
+> (el VPS), no en Docker Desktop de Windows/Mac.
+
+> **`docker build` no arranca nada.** Solo *crea la imagen*. Si después de construir haces
+> `docker compose ps` y solo ves `postgres`, es normal: falta `docker compose up -d` para
+> **arrancar** la app.
+
+> **Cuida el tag (`APP_IMAGE`).** Si construyes con `-t josetejero-blog:local` pero el `.env`
+> tiene `APP_IMAGE=ghcr.io/...`, `docker compose up -d` intentará hacer *pull* de esa imagen
+> (inexistente) en vez de usar la local. Comenta `APP_IMAGE` (usa el default
+> `josetejero-blog:local`) o construye con `-t` igual al valor de `APP_IMAGE`.
+
+Secuencia completa desde `blog/` en el VPS:
+
+```bash
+cd /var/www/html/blog-prod/blog
+
+# 1. Levanta solo PostgreSQL
+docker compose up -d postgres
+
+# 2. Migra primero (las tablas deben existir para que generateStaticParams prerenderice)
+DATABASE_URL='postgresql://USUARIO:PASS@localhost:5432/DB' pnpm payload migrate
+
+# 3. Construye la imagen con red host y DATABASE_URL a localhost (NO "postgres")
+docker build --network host \
+  --build-arg 'DATABASE_URL=postgresql://USUARIO:PASS@localhost:5432/DB' \
+  --build-arg 'PAYLOAD_SECRET=TU_SECRET' \
+  --build-arg 'NEXT_PUBLIC_SITE_URL=https://josetejero.com' \
+  -t josetejero-blog:local .
+
+# 4. Arranca la app (usa la imagen recién construida)
+docker compose up -d
+```
+
+> **Gotcha de shell: contraseñas con `&`, `*`, `$`.** En bash, `&` significa "ejecuta en segundo
+> plano" y `*` es comodín, así que una contraseña sin comillas **parte el comando** y produce el
+> engañoso `docker: 'docker buildx build' requires 1 argument` (se pierde el `.` del contexto).
+> **Entrecomilla siempre con comillas simples** toda `DATABASE_URL` y todo `--build-arg` que lleve
+> la contraseña, tal como se muestra arriba.
+
+> **El build NO debe sembrar datos de prueba en la BD.** El `onInit` de `payload.config.ts` corre
+> `seedDev()` (usuarios `*@test.local`, posts de ejemplo, catálogos) salvo que
+> `NODE_ENV === 'production'`. Por eso la etapa `builder` del `Dockerfile` **define
+> `ENV NODE_ENV=production`**: sin eso, construir contra la BD de prod (ISR) la contamina con datos
+> de prueba. Tras un build contra prod, revisa que en los logs **no** aparezcan líneas `[seed] ...`.
+> Si ves datos de prueba en prod, resetea: `docker compose down -v` → `up -d postgres` → `migrate`
+> → rebuild → `up -d`.
+
 ## Primer deploy en el VPS
 
 Desde `blog/` en el VPS:
@@ -283,7 +341,7 @@ Secuencia sobre una BD de prod vacía. Es **un solo** `docker-compose.yml` con d
 docker compose up -d postgres
 
 # 2. Desde el repo clonado, con el CLI y la DATABASE_URL del HOST (localhost, no "postgres"):
-DATABASE_URL=postgresql://blog_prod:TU_PASSWORD@localhost:5432/blog_prod pnpm payload migrate
+DATABASE_URL='postgresql://blog_prod:TU_PASSWORD@localhost:5432/blog_prod' pnpm payload migrate
 
 # 3. Arranca la app (app + postgres con profile prod). El compose ya espera a que la BD esté sana.
 docker compose up -d
@@ -291,8 +349,12 @@ docker compose up -d
 # 4. Abre /admin en el navegador → crea el PRIMER usuario admin (flujo first-user de Payload)
 
 # 5. Siembra los catálogos (misma DATABASE_URL del host)
-DATABASE_URL=postgresql://blog_prod:TU_PASSWORD@localhost:5432/blog_prod pnpm seed:catalog
+DATABASE_URL='postgresql://blog_prod:TU_PASSWORD@localhost:5432/blog_prod' pnpm seed:catalog
 ```
+
+> **Entrecomilla la `DATABASE_URL`.** Si la contraseña lleva caracteres especiales (`&`, `*`, `$`),
+> sin comillas simples bash rompe el comando (`&` = segundo plano, `*` = comodín). Usa siempre
+> `DATABASE_URL='...'` como en los ejemplos.
 
 > También sirve un único `docker compose up -d` (levanta ambos servicios; la app espera a la BD por su
 > `depends_on`). En ese caso la app puede loguear "tabla no existe" hasta que corras el paso 2; en un

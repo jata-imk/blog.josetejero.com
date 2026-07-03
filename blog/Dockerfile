@@ -10,6 +10,10 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN pnpm install --frozen-lockfile
 
 FROM deps AS builder
+# NODE_ENV=production es CRÍTICO: sin él, el onInit de payload.config.ts corre el
+# seed de desarrollo (seedDev) durante el build y contamina la BD a la que apunte
+# DATABASE_URL — incluida producción si se construye contra ella (ISR prerender).
+ENV NODE_ENV=production
 ARG DATABASE_URL
 ARG PAYLOAD_SECRET
 ARG NEXT_PUBLIC_SITE_URL
