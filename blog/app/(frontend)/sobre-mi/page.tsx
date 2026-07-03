@@ -34,7 +34,7 @@ function TimelineItem({
             width: 14,
             height: 14,
             borderRadius: '50%',
-            background: active ? 'var(--grad)' : '#fff',
+            background: active ? 'var(--grad)' : 'var(--bg)',
             border: active ? 'none' : '2px solid var(--line-2)',
             marginTop: 4,
             boxShadow: active ? '0 0 0 4px var(--blue-tint)' : 'none',
@@ -125,10 +125,10 @@ export default function AboutPage() {
                 background: 'var(--grad)',
                 display: 'grid',
                 placeItems: 'center',
-                color: '#fff',
+                color: 'var(--on-accent)',
                 fontSize: 34,
                 fontWeight: 800,
-                boxShadow: '0 8px 24px rgba(76,71,237,.3)',
+                boxShadow: 'var(--sh-btn-grad)',
               }}
             >
               {ABOUT.initials}
@@ -217,7 +217,7 @@ export default function AboutPage() {
               width: 52,
               height: 64,
               borderRadius: 9,
-              background: '#fff',
+              background: 'var(--bg)',
               border: '1px solid var(--line-2)',
               display: 'grid',
               placeItems: 'center',

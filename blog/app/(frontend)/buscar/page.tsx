@@ -68,9 +68,9 @@ function ScopeTabs({
               borderRadius: 999,
               fontSize: 14, fontWeight: 600,
               textDecoration: 'none',
-              background: active ? 'var(--ink)' : 'transparent',
-              color: active ? 'var(--on-accent)' : 'var(--ink-3)',
-              border: `1px solid ${active ? 'var(--ink)' : 'var(--line-2)'}`,
+              background: active ? 'var(--bg-invert)' : 'transparent',
+              color: active ? 'var(--ink-invert)' : 'var(--ink-3)',
+              border: `1px solid ${active ? 'var(--bg-invert)' : 'var(--line-2)'}`,
               transition: 'all .15s',
             }}
           >
@@ -78,8 +78,8 @@ function ScopeTabs({
             {t.count > 0 && (
               <span style={{
                 fontSize: 11.5, fontWeight: 700,
-                background: active ? 'rgba(255,255,255,.2)' : 'var(--bg-soft-2)',
-                color: active ? 'var(--on-accent)' : 'var(--muted)',
+                background: active ? 'var(--bg-invert-soft)' : 'var(--bg-soft-2)',
+                color: active ? 'var(--ink-invert)' : 'var(--muted)',
                 padding: '1px 7px', borderRadius: 999,
                 minWidth: 22, textAlign: 'center',
               }}>

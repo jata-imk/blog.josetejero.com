@@ -1,7 +1,6 @@
 'use client'
 
 import { useCallback, useEffect, useId, useMemo, useRef, useState, type CSSProperties } from 'react'
-import { createPortal } from 'react-dom'
 import type { SearchResults } from '../../lib/data/search'
 import { Ic } from '../ui/Ic'
 
@@ -266,7 +265,7 @@ export function CommandPalette({ open, initialQuery = '', onClose }: CommandPale
 
   const status = renderStatus()
 
-  return createPortal(
+  return (
     <div
       role="dialog"
       aria-modal="true"
@@ -363,8 +362,7 @@ export function CommandPalette({ open, initialQuery = '', onClose }: CommandPale
           </div>
         )}
       </div>
-    </div>,
-    document.body,
+    </div>
   )
 }
 
@@ -401,6 +399,10 @@ const overlayStyle: CSSProperties = {
   alignItems: 'flex-start',
   justifyContent: 'center',
   padding: 'clamp(52px, 9vh, 104px) 18px 28px',
+  background: 'var(--overlay)',
+  WebkitBackdropFilter: 'blur(5px)',
+  backdropFilter: 'blur(5px)',
+  isolation: 'isolate',
 }
 
 const backdropStyle: CSSProperties = {
@@ -409,8 +411,7 @@ const backdropStyle: CSSProperties = {
   border: 0,
   padding: 0,
   cursor: 'default',
-  background: 'rgba(15, 23, 42, .46)',
-  backdropFilter: 'blur(5px)',
+  background: 'transparent',
 }
 
 const panelStyle: CSSProperties = {
@@ -424,7 +425,7 @@ const panelStyle: CSSProperties = {
   background: 'var(--bg)',
   border: '1px solid var(--line-2)',
   borderRadius: 'var(--r-xl)',
-  boxShadow: '0 24px 64px rgba(15, 23, 42, .22), var(--sh-3)',
+  boxShadow: 'var(--sh-panel)',
 }
 
 const headerStyle: CSSProperties = {

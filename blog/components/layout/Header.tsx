@@ -3,6 +3,7 @@
 import { usePathname } from 'next/navigation'
 import { Ic } from '../ui/Ic'
 import { SearchTriggerBtn } from '../search/SearchTriggerBtn'
+import { useTheme } from '../../lib/use-theme'
 
 const NAV_LINKS = [
   { label: 'Inicio',      href: '/' },
@@ -25,6 +26,7 @@ function matchActive(pathname: string, href: string): boolean {
 
 export function Header() {
   const pathname = usePathname()
+  const { theme, toggle } = useTheme()
 
   return (
     <header className="site-header">
@@ -61,6 +63,15 @@ export function Header() {
             </a>
           ))}
         </div>
+
+        <button
+          className="icon-btn theme-toggle"
+          aria-label={theme === 'dark' ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro'}
+          title={theme === 'dark' ? 'Tema claro' : 'Tema oscuro'}
+          onClick={toggle}
+        >
+          <Ic name={theme === 'dark' ? 'sun' : 'moon'} size={18} sw={1.8} />
+        </button>
       </div>
     </header>
   )

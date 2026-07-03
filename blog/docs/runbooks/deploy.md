@@ -240,21 +240,51 @@ docker compose logs -f app
 
 ## CloudPanel / Nginx
 
-En CloudPanel, crea o edita el sitio de `josetejero.com` y configura el vhost para proxy al puerto
-local de la app:
+CloudPanel/Nginx solo publica HTTP/TLS y hace reverse proxy al contenedor de la app (que corre en
+Docker, **no** bajo el runtime Node de CloudPanel).
 
-```nginx
-location / {
-  proxy_pass http://127.0.0.1:3000;
-  proxy_http_version 1.1;
-  proxy_set_header Host $host;
-  proxy_set_header X-Real-IP $remote_addr;
-  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-  proxy_set_header X-Forwarded-Proto $scheme;
-}
-```
+### Paso a paso
 
-Si cambias `APP_PORT`, actualiza también el `proxy_pass`.
+1. **DNS.** Antes de nada, apunta el registro `A` de `josetejero.com` (y `www` si lo usas) a la IP
+   pública del VPS. Sin esto, ni el acceso por dominio ni Let's Encrypt funcionan.
+
+2. **Verifica que la app escuche en el host.** Con `APP_BIND=127.0.0.1` y `APP_PORT=3000`, el
+   contenedor publica en `127.0.0.1:3000`. Confírmalo antes de montar el proxy:
+
+   ```bash
+   curl -I http://127.0.0.1:3000    # debe responder 200/307/308
+   ```
+
+3. **Crea el sitio en CloudPanel.** Sites → **Add Site → "Create a Reverse Proxy"**:
+   - **Domain name:** `josetejero.com` (añade también `www.josetejero.com` si aplica).
+   - **Reverse Proxy URL:** `http://127.0.0.1:3000`.
+   - CloudPanel genera el vhost Nginx con el `proxy_pass` y las cabeceras. Usa la plantilla
+     **Reverse Proxy**, no la de Node.js (la app vive en Docker).
+
+4. **Confirma las cabeceras del vhost.** Si editas el vhost, verifica que el bloque incluya:
+
+   ```nginx
+   location / {
+     proxy_pass http://127.0.0.1:3000;
+     proxy_http_version 1.1;
+     proxy_set_header Host $host;
+     proxy_set_header X-Real-IP $remote_addr;
+     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+     proxy_set_header X-Forwarded-Proto $scheme;
+   }
+   ```
+
+   `X-Forwarded-Proto` es clave para que Payload sepa que la petición llegó por HTTPS. Si cambias
+   `APP_PORT`, actualiza también el `proxy_pass`.
+
+5. **SSL/TLS.** En el sitio → **SSL/TLS → New Let's Encrypt Certificate**. CloudPanel emite el
+   certificado y fuerza HTTPS. (Requiere que el DNS del paso 1 ya resuelva a la IP del VPS).
+
+6. **Prueba.** Abre `https://josetejero.com` (home) y `https://josetejero.com/admin` (crear el
+   primer usuario admin de Payload).
+
+> **No expongas Postgres.** El proxy solo toca el `:3000` de la app; PostgreSQL sigue en la red
+> interna de Docker / `127.0.0.1` y no acepta conexiones públicas.
 
 ## ISR
 

@@ -1,9 +1,10 @@
 /* ============================================================
-   Aleliz Blog — Token layer (light only)
+   Aleliz Blog — Token layer (light + dark)
    Implementación del design system del handoff (design/handoff/).
    Destino: fusionar en app/globals.css (junto al `@import 'tailwindcss';` existente). Fase 2.
    Fuente de verdad visual: design/handoff/sistema-de-pantallas/project/aleliz.css
    Regla dura: los componentes referencian estas variables, nunca valores crudos.
+   Tema oscuro: véase ADR 0028. Los tokens dark se definen en app/globals.css bajo [data-theme="dark"].
    ============================================================ */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');

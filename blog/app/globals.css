@@ -1,11 +1,12 @@
 @import 'tailwindcss';
 
 /* ============================================================
-   José Tejero Blog — Token layer (light only)
+   José Tejero Blog — Token layer (light + dark)
    Fuente visual: design/handoff/sistema-de-pantallas/project/aleliz.css
    Fuente ejecutable: design/globals.css (fusionada aquí en Fase 2)
    Regla dura: los componentes referencian estas variables, nunca valores crudos.
    next/font inyecta --font-inter y --font-jetbrains vía className en layout.tsx.
+   Tema: data-theme="light" (default) | data-theme="dark" — ADR 0028
    ============================================================ */
 
 @theme {
@@ -33,6 +34,9 @@
   --color-green-tint:  var(--green-tint);
   --color-amber-tint:  var(--amber-tint);
   --color-slate-tint:  var(--slate-tint);
+  --color-bg-invert:       var(--bg-invert);
+  --color-bg-invert-soft:  var(--bg-invert-soft);
+  --color-ink-invert:      var(--ink-invert);
 
   /* tipografía → utilidades font-sans, font-mono
      Fallbacks estáticos; :root (unlayered) los sobreescribe con las vars de next/font */
@@ -48,6 +52,9 @@
 }
 
 :root {
+  /* color-scheme tells the browser to use native dark/light controls */
+  color-scheme: light;
+
   /* superficies */
   --bg:        #ffffff;
   --bg-soft:   #f8fafc;
@@ -100,6 +107,7 @@
   --sh-1: 0 1px 2px rgba(15, 23, 42, .04), 0 1px 3px rgba(15, 23, 42, .05);
   --sh-2: 0 2px 4px rgba(15, 23, 42, .04), 0 6px 18px rgba(15, 23, 42, .06);
   --sh-3: 0 10px 30px rgba(15, 23, 42, .08), 0 2px 6px rgba(15, 23, 42, .05);
+  --sh-panel: 0 24px 64px rgba(15, 23, 42, .22), var(--sh-3);
   --ring:      0 0 0 3px rgba(37, 99, 235, .16);
   --ring-dark: 0 0 0 2px rgba(255, 255, 255, .28);
 
@@ -107,6 +115,7 @@
   --bg-glass:       rgba(255,255,255,.82);
   --bg-glass-label: rgba(255,255,255,.7);
   --bg-selection:   rgba(37,99,235,.16);
+  --overlay:        rgba(15,23,42,.46);
 
   /* glow shadows */
   --sh-logo-glow:      0 2px 8px rgba(124,58,237,.32);
@@ -125,7 +134,13 @@
   --thumb-stripe: rgba(37,99,235,.05);
 
   /* on-accent — texto blanco sobre fondos oscuros o acentuados */
-  --on-accent: #ffffff;
+  --on-accent:       #ffffff;
+  --on-accent-soft:  rgba(255,255,255,.2);
+
+  /* inversión — fondo oscuro fijo + texto claro para estados active/select (ADR 0028) */
+  --bg-invert:        #0f172a;
+  --bg-invert-soft:   rgba(255,255,255,.18);
+  --ink-invert:       #ffffff;
 
   /* escala de categorías */
   --cyan-700:   #0891b2;
@@ -169,6 +184,107 @@
   --wrap:        1120px;
   --wrap-narrow: 760px;
   --header-h:    64px;
+}
+
+/* ============================================================
+   Dark theme overrides — ADR 0028
+   ============================================================ */
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  /* superficies */
+  --bg:        #0f172a;
+  --bg-soft:   #1e293b;
+  --bg-soft-2: #334155;
+
+  /* tinta */
+  --ink:   #f1f5f9;
+  --ink-2: #cbd5e1;
+  --ink-3: #94a3b8;
+  --muted: #64748b;
+
+  /* líneas */
+  --line:   #1e293b;
+  --line-2: #334155;
+  --line-3: #475569;
+
+  /* acentos — ligeramente más brillantes sobre fondo oscuro */
+  --blue:     #3b82f6;
+  --blue-700: #60a5fa;
+  --violet:   #8b5cf6;
+  --cyan:     #22d3ee;
+  --green:    #34d399;
+  --amber:    #fbbf24;
+  --rose:     #fb7185;
+
+  /* tints — fondos oscuros con un toque de acento */
+  --blue-tint:   #17234a;
+  --violet-tint: #241d4a;
+  --cyan-tint:   #0f2830;
+  --green-tint:  #132a27;
+  --amber-tint:  #2d2414;
+  --slate-tint:  #1e2838;
+
+  /* gradiente */
+  --grad:      linear-gradient(115deg, #3b82f6 0%, #8b5cf6 55%, #8b5cf6 100%);
+  --grad-soft: linear-gradient(115deg, #17234a 0%, #241d4a 100%);
+
+  /* sombras — más marcadas con negro puro para destacar en fondo oscuro */
+  --sh-1: 0 1px 2px rgba(0,0,0,.25), 0 1px 3px rgba(0,0,0,.3);
+  --sh-2: 0 2px 4px rgba(0,0,0,.3), 0 6px 18px rgba(0,0,0,.4);
+  --sh-3: 0 10px 30px rgba(0,0,0,.45), 0 2px 6px rgba(0,0,0,.35);
+  --sh-panel: 0 24px 64px rgba(0,0,0,.55), var(--sh-3);
+  --ring:      0 0 0 3px rgba(59,130,246,.3);
+  --ring-dark: 0 0 0 2px rgba(255,255,255,.28);
+
+  /* alpha surfaces — vidrio oscuro */
+  --bg-glass:       rgba(15,23,42,.82);
+  --bg-glass-label: rgba(15,23,42,.7);
+  --bg-selection:   rgba(59,130,246,.28);
+  --overlay:        rgba(0,0,0,.58);
+
+  /* glow shadows */
+  --sh-logo-glow:      0 2px 8px rgba(139,92,246,.4);
+  --sh-btn-grad:       0 4px 14px rgba(94,94,240,.35);
+  --sh-btn-grad-hover: 0 8px 22px rgba(94,94,240,.42);
+  --sh-badge-grad:     0 2px 8px rgba(94,94,240,.35);
+
+  /* thumb tint backgrounds */
+  --thumb-bg-blue:   linear-gradient(120deg,#1a2640,#1e2f4a);
+  --thumb-bg-violet: linear-gradient(120deg,#251f42,#2d264a);
+  --thumb-bg-cyan:   linear-gradient(120deg,#142e36,#18343c);
+  --thumb-bg-green:  linear-gradient(120deg,#162e2a,#1a332e);
+  --thumb-bg-amber:  linear-gradient(120deg,#2d2418,#362b1c);
+
+  /* thumb stripe */
+  --thumb-stripe: rgba(255,255,255,.03);
+
+  /* on-accent se mantiene blanco */
+  --on-accent:       #ffffff;
+  --on-accent-soft:  rgba(255,255,255,.08);
+
+  /* inversión — en dark mode: fondo claro + texto oscuro para destacar contra bg oscuro */
+  --bg-invert:        #f1f5f9;
+  --bg-invert-soft:   rgba(15,23,42,.1);
+  --ink-invert:       #0f172a;
+
+  /* escala de categorías */
+  --cyan-700:   #22d3ee;
+  --green-600:  #34d399;
+  --amber-700:  #fcd34d;
+  --slate-600:  #94a3b8;
+
+  /* escala de estados */
+  --amber-800:  #fbbf24;
+  --green-700:  #34d399;
+  --rose-tint:  #2d1520;
+  --rose-700:   #fda4af;
+
+  /* bordes de callout */
+  --blue-border:   #1e3a6e;
+  --green-border:  #1a4a35;
+  --amber-border:  #3d3418;
+  --rose-border:   #3d1a26;
 }
 
 /* mapeo categoría → acento + tint (usar con data-cat="…") */
@@ -257,6 +373,9 @@ code, pre, .mono { font-family: var(--font-mono); }
   cursor: pointer; border: 0; background: transparent;
 }
 .icon-btn:hover { color: var(--ink); background: var(--bg-soft); }
+
+/* ── theme toggle — visible en desktop y móvil (ADR 0028) ── */
+.theme-toggle { margin-left: auto; }
 
 /* ── buttons ─────────────────────────────────────────────────── */
 .btn {
@@ -772,7 +891,7 @@ code, pre, .mono { font-family: var(--font-mono); }
 .ab-step { display: flex; gap: 16px; padding: 18px; border-radius: var(--r); border: 1px solid var(--line); background: var(--bg); transition: border-color .15s, box-shadow .15s, background .15s; }
 .ab-step:hover { border-color: var(--line-2); box-shadow: var(--sh-1); }
 .ab-step-num { flex: 0 0 auto; width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; font-weight: 700; font-size: 15px; }
-.ab-step.done .ab-step-num { background: var(--ink); color: var(--on-accent); }
+.ab-step.done .ab-step-num { background: var(--bg-invert); color: var(--ink-invert); }
 .ab-step.current { border-color: var(--blue-border); background: var(--blue-tint); }
 .ab-step.current .ab-step-num { background: var(--grad); color: var(--on-accent); }
 .ab-step.soon { opacity: .72; }
@@ -788,7 +907,7 @@ code, pre, .mono { font-family: var(--font-mono); }
 .ab-pager { display: flex; align-items: center; gap: 6px; }
 .ab-pager button { min-width: 38px; height: 38px; padding: 0 10px; border-radius: 10px; border: 1px solid var(--line-2); background: var(--bg); font-family: inherit; font-size: 14px; font-weight: 500; color: var(--ink-2); cursor: pointer; transition: all .15s; }
 .ab-pager button:hover { border-color: var(--line-3); background: var(--bg-soft); }
-.ab-pager button.active { background: var(--ink); color: var(--on-accent); border-color: var(--ink); }
+.ab-pager button.active { background: var(--bg-invert); color: var(--ink-invert); border-color: var(--bg-invert); }
 .ab-pager button:disabled { opacity: .4; cursor: not-allowed; }
 
 /* prev/next */
@@ -821,7 +940,7 @@ code, pre, .mono { font-family: var(--font-mono); }
   text-decoration: none;
 }
 .ab-chip:hover { border-color: var(--line-3); background: var(--bg-soft); color: var(--ink); }
-.ab-chip.active { background: var(--ink); color: var(--on-accent); border-color: var(--ink); }
+.ab-chip.active { background: var(--bg-invert); color: var(--ink-invert); border-color: var(--bg-invert); }
 
 /* select de ordenación en /blog */
 .blog-sort {
