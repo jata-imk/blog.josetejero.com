@@ -67,6 +67,7 @@ export function Header() {
         <button
           className="icon-btn theme-toggle"
           aria-label={theme === 'dark' ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro'}
+          aria-pressed={theme === 'dark'}
           title={theme === 'dark' ? 'Tema claro' : 'Tema oscuro'}
           onClick={toggle}
         >

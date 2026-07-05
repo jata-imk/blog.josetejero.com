@@ -4,6 +4,7 @@ import { Badge } from '../ui/Badge'
 import { Meta, MetaSep } from '../ui/Meta'
 import { Thumb } from '../ui/Thumb'
 import { Ic } from '../ui/Ic'
+import type { CoverImage } from '@/lib/media'
 
 export function FeaturedCard({
   category,
@@ -12,6 +13,7 @@ export function FeaturedCard({
   date,
   readTime,
   href = '#',
+  image,
 }: {
   category?: CatInfo | null
   title: string
@@ -19,10 +21,11 @@ export function FeaturedCard({
   date: string
   readTime: string
   href?: string
+  image?: CoverImage | null
 }) {
   return (
     <article className="card card-hover ab-feat">
-      <Thumb slug={category?.slug} glow style={{ minHeight: 340 }} />
+      <Thumb slug={category?.slug} glow image={image} sizes="(max-width: 768px) 100vw, 700px" priority />
       <div className="ab-feat-body">
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <Badge variant="grad">Destacado</Badge>

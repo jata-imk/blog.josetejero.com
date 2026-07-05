@@ -4,6 +4,7 @@ import { Badge } from '../ui/Badge'
 import { Tag, TagRow } from '../ui/Tag'
 import { Meta, MetaSep } from '../ui/Meta'
 import { Thumb } from '../ui/Thumb'
+import type { CoverImage } from '@/lib/media'
 
 export type PostCardTag = string | { name: string; slug?: string }
 
@@ -17,6 +18,9 @@ export type PostCardProps = {
   commentCount?: number
   inSeries?: boolean
   href?: string
+  image?: CoverImage | null
+  /** Marca la imagen como LCP candidate — usar solo en la primera tarjeta above the fold. */
+  priority?: boolean
 }
 
 export function PostCard({
@@ -29,11 +33,13 @@ export function PostCard({
   commentCount,
   inSeries,
   href = '#',
+  image,
+  priority,
 }: PostCardProps) {
   return (
     <article className="card card-hover post-card">
       <a href={href} tabIndex={-1} aria-hidden="true">
-        <Thumb slug={category?.slug} />
+        <Thumb slug={category?.slug} image={image} sizes="(max-width: 768px) 100vw, 400px" priority={priority} />
       </a>
       <div className="post-card-body">
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>

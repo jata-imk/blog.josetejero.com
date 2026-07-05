@@ -3,6 +3,7 @@ import { Cat } from '../ui/Cat'
 import { Badge } from '../ui/Badge'
 import { Meta, MetaSep } from '../ui/Meta'
 import { Thumb } from '../ui/Thumb'
+import type { CoverImage } from '@/lib/media'
 
 export function ListRow({
   category,
@@ -12,6 +13,7 @@ export function ListRow({
   readTime,
   inSeries,
   href = '#',
+  image,
 }: {
   category?: CatInfo | null
   title: string
@@ -20,11 +22,14 @@ export function ListRow({
   readTime: string
   inSeries?: boolean
   href?: string
+  image?: CoverImage | null
 }) {
   return (
     <a className="list-row" href={href}>
       <Thumb
         slug={category?.slug}
+        image={image}
+        sizes="120px"
         style={{ width: 120, height: 80, flexShrink: 0, borderRadius: 'var(--r)', border: 0 }}
       />
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>

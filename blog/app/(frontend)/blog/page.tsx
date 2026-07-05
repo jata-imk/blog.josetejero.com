@@ -12,6 +12,7 @@ import {
   getCategories,
   getPopularTags,
 } from '../../../lib/data'
+import { coverImageOf } from '../../../lib/media'
 import type { Post, Category, Tag as TagType } from '../../../payload-types'
 import type { CatInfo } from '../../../components/ui/Cat'
 
@@ -186,6 +187,7 @@ export default async function BlogPage({
               date={fmtDate(featuredPost.publishedAt)}
               readTime={estimateReadTime(featuredPost.body)}
               href={`/blog/${featuredPost.slug}`}
+              image={coverImageOf(featuredPost, 'card')}
             />
           </div>
         </section>
@@ -222,7 +224,7 @@ export default async function BlogPage({
             />
           ) : (
             <div className="grid-posts">
-              {posts.map((p) => (
+              {posts.map((p, i) => (
                 <PostCard
                   key={p.id}
                   category={primaryCategory(p)}
@@ -233,6 +235,8 @@ export default async function BlogPage({
                   readTime={estimateReadTime(p.body)}
                   inSeries={Boolean(p.series)}
                   href={`/blog/${p.slug}`}
+                  image={coverImageOf(p, 'card')}
+                  priority={i === 0}
                 />
               ))}
             </div>

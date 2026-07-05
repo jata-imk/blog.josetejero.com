@@ -5,6 +5,7 @@ import { Tag } from '../../../../components/ui/Tag'
 import { Cat } from '../../../../components/ui/Cat'
 import { Breadcrumb } from '../../../../components/ui/Breadcrumb'
 import { getTagWithPosts } from '../../../../lib/data'
+import { coverImageOf } from '../../../../lib/media'
 import type { Post, Category } from '../../../../payload-types'
 import type { CatInfo } from '../../../../components/ui/Cat'
 
@@ -75,6 +76,7 @@ export default async function TagPage({
                   readTime={estimateReadTime(p.body)}
                   inSeries={Boolean(p.series)}
                   href={`/blog/${p.slug}`}
+                  image={coverImageOf(p, 'thumbnail')}
                 />
               ))}
             </div>

@@ -4,6 +4,7 @@ import { EmptyState } from '../../../../components/ui/EmptyState'
 import { Cat } from '../../../../components/ui/Cat'
 import { Breadcrumb } from '../../../../components/ui/Breadcrumb'
 import { getCategoryWithPosts } from '../../../../lib/data'
+import { coverImageOf } from '../../../../lib/media'
 import type { Post, Category, Tag as TagType } from '../../../../payload-types'
 import type { CatInfo } from '../../../../components/ui/Cat'
 
@@ -73,7 +74,7 @@ export default async function CategoriaPage({
           />
         ) : (
           <div className="grid-posts">
-            {posts.map((p) => (
+            {posts.map((p, i) => (
               <PostCard
                 key={p.id}
                 category={primaryCategory(p)}
@@ -83,6 +84,8 @@ export default async function CategoriaPage({
                 date={fmtDate(p.publishedAt)}
                 readTime={estimateReadTime(p.body)}
                 href={`/blog/${p.slug}`}
+                image={coverImageOf(p, 'card')}
+                priority={i === 0}
               />
             ))}
           </div>

@@ -5,6 +5,7 @@ import { Badge } from '../../components/ui/Badge'
 import { Ic } from '../../components/ui/Ic'
 import type { CatInfo } from '../../components/ui/Cat'
 import { getPosts, getCategories, getSeriesList } from '../../lib/data'
+import { coverImageOf } from '../../lib/media'
 import type { Post, Category, Tag as TagType } from '../../payload-types'
 
 /* ── section head helper ──────────────────────────────────────── */
@@ -141,7 +142,7 @@ export default async function Home() {
       <section className="wrap" style={{ paddingBottom: 70 }}>
         <SectionHead eyebrow="Lo más reciente" title="Posts destacados" link="Ver todo" linkHref="/blog" />
         <div className="grid-posts">
-          {featuredPosts.map((p) => (
+          {featuredPosts.map((p, i) => (
             <PostCard
               key={p.id}
               category={primaryCategory(p)}
@@ -151,6 +152,8 @@ export default async function Home() {
               date={fmtDate(p.publishedAt)}
               readTime={estimateReadTime(p.body)}
               href={`/blog/${p.slug}`}
+              image={coverImageOf(p, 'card')}
+              priority={i === 0}
             />
           ))}
         </div>
@@ -169,6 +172,7 @@ export default async function Home() {
                 date={fmtDate(p.publishedAt)}
                 readTime={estimateReadTime(p.body)}
                 href={`/blog/${p.slug}`}
+                image={coverImageOf(p, 'thumbnail')}
               />
             ))}
           </div>

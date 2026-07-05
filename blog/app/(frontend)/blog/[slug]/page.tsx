@@ -2,7 +2,9 @@ import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { RichText } from '@payloadcms/richtext-lexical/react'
 import { getPostBySlug, getPosts, getPostsInSeries, getCommentsByPost } from '@/lib/data'
+import { coverImageOf } from '@/lib/media'
 import { makeBodyConverters, extractToc } from '@/lib/lexical'
+import { Thumb } from '@/components/ui/Thumb'
 import { highlightLexicalCode, type LexicalChildNode } from '@/lib/code-highlight'
 import { Breadcrumb } from '@/components/ui/Breadcrumb'
 import { Cat } from '@/components/ui/Cat'
@@ -84,6 +86,8 @@ export default async function PostPage({ params }: Props) {
 
   const primaryCategory = categories[0] ?? null
 
+  const heroImage = coverImageOf(post, 'hero')
+
   const breadcrumbItems = [
     { label: 'Inicio', href: '/' },
     { label: 'Blog', href: '/blog' },
@@ -149,6 +153,13 @@ export default async function PostPage({ params }: Props) {
         {/* Mobile TOC — colapsado por defecto, oculto en desktop */}
         <MobileToc items={toc} />
       </div>
+
+      {/* Portada del post, si el autor cargó una (ver lib/media.ts) */}
+      {heroImage && (
+        <div className="post-hero">
+          <Thumb slug={primaryCategory?.slug} image={heroImage} sizes="(max-width: 820px) 100vw, 820px" priority />
+        </div>
+      )}
 
       {/* Cuerpo: artículo (izquierda) + TOC sticky (derecha, solo desktop) */}
       <div className="post-body">
