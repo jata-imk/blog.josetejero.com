@@ -1,4 +1,4 @@
-import type { CatKey } from '../ui/Cat'
+import type { CatInfo } from '../ui/Cat'
 import { Cat } from '../ui/Cat'
 import { Badge } from '../ui/Badge'
 import { Meta, MetaSep } from '../ui/Meta'
@@ -6,14 +6,14 @@ import { Thumb } from '../ui/Thumb'
 import { Ic } from '../ui/Ic'
 
 export function FeaturedCard({
-  cat,
+  category,
   title,
   excerpt,
   date,
   readTime,
   href = '#',
 }: {
-  cat: CatKey
+  category?: CatInfo | null
   title: string
   excerpt: string
   date: string
@@ -22,11 +22,11 @@ export function FeaturedCard({
 }) {
   return (
     <article className="card card-hover ab-feat">
-      <Thumb cat={cat} glow style={{ minHeight: 340 }} />
+      <Thumb slug={category?.slug} glow style={{ minHeight: 340 }} />
       <div className="ab-feat-body">
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <Badge variant="grad">Destacado</Badge>
-          <Cat cat={cat} />
+          {category && <Cat name={category.name} slug={category.slug} />}
         </div>
         <h3 className="ab-feat-title">{title}</h3>
         <p style={{ fontSize: 15, color: 'var(--ink-3)', lineHeight: 1.6 }}>{excerpt}</p>

@@ -3,7 +3,7 @@ import { ListRow } from '../../components/post/ListRow'
 import { Cat } from '../../components/ui/Cat'
 import { Badge } from '../../components/ui/Badge'
 import { Ic } from '../../components/ui/Ic'
-import type { CatKey } from '../../components/ui/Cat'
+import type { CatInfo } from '../../components/ui/Cat'
 import { getPosts, getCategories, getSeriesList } from '../../lib/data'
 import type { Post, Category, Tag as TagType } from '../../payload-types'
 
@@ -43,7 +43,6 @@ function SeriesCard({
   desc,
   count,
   level,
-  cat = 'frontend',
   progress,
   href = '#',
 }: {
@@ -51,7 +50,6 @@ function SeriesCard({
   desc: string
   count?: number
   level?: string
-  cat?: CatKey
   progress?: number
   href?: string
 }) {
@@ -64,9 +62,6 @@ function SeriesCard({
             {count} partes · {level}
           </span>
         )}
-      </div>
-      <div style={{ alignSelf: 'flex-start' }}>
-        <Cat cat={cat} />
       </div>
       <h3 style={{ fontSize: 18, fontWeight: 700, letterSpacing: '-.02em', lineHeight: 1.3 }}>{title}</h3>
       <p style={{ fontSize: 14, lineHeight: 1.55, color: 'var(--ink-3)' }}>{desc}</p>
@@ -87,10 +82,10 @@ function SeriesCard({
 }
 
 /* ── helpers ──────────────────────────────────────────────────── */
-function primaryCatSlug(post: Post): CatKey {
+function primaryCategory(post: Post): CatInfo | null {
   const cats = (post.categories ?? []) as Array<number | Category>
   const obj = cats.find((c): c is Category => typeof c === 'object' && c !== null)
-  return (obj?.slug as CatKey | undefined) ?? 'tutoriales'
+  return obj ? { name: obj.name, slug: obj.slug } : null
 }
 
 function fmtDate(iso?: string | null): string {
@@ -149,7 +144,7 @@ export default async function Home() {
           {featuredPosts.map((p) => (
             <PostCard
               key={p.id}
-              cat={primaryCatSlug(p)}
+              category={primaryCategory(p)}
               title={p.title}
               excerpt={p.excerpt ?? ''}
               tags={postTags(p)}
@@ -169,7 +164,7 @@ export default async function Home() {
             {latestPosts.map((p) => (
               <ListRow
                 key={p.id}
-                cat={primaryCatSlug(p)}
+                category={primaryCategory(p)}
                 title={p.title}
                 date={fmtDate(p.publishedAt)}
                 readTime={estimateReadTime(p.body)}
@@ -184,7 +179,7 @@ export default async function Home() {
             {categories.map((cat) => (
               <a key={cat.id} className="card card-hover" href={`/categorias/${cat.slug}`}
                 style={{ padding: '13px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <Cat cat={cat.slug as CatKey} lg />
+                <Cat name={cat.name} slug={cat.slug} lg />
               </a>
             ))}
           </div>

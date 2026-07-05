@@ -287,14 +287,14 @@
   --rose-border:   #3d1a26;
 }
 
-/* mapeo categoría → acento + tint (usar con data-cat="…") */
-[data-cat="frontend"]       { --c: var(--blue);      --tint: var(--blue-tint); }
-[data-cat="backend"]        { --c: var(--violet);    --tint: var(--violet-tint); }
-[data-cat="bases-de-datos"] { --c: var(--cyan-700);  --tint: var(--cyan-tint); }
-[data-cat="ia"]             { --c: var(--violet);    --tint: var(--violet-tint); }
-[data-cat="devops"]         { --c: var(--green-600); --tint: var(--green-tint); }
-[data-cat="tutoriales"]     { --c: var(--amber-700); --tint: var(--amber-tint); }
-[data-cat="opinion"]        { --c: var(--slate-600); --tint: var(--slate-tint); }
+/* mapeo categoría → acento + tint (usar con data-cat="…"). Slugs = catálogo real
+   sembrado por lib/seed-catalog.ts. Sin match → fallback a blue (ver .cat-pill). */
+[data-cat="ia-y-agentes"]               { --c: var(--violet);    --tint: var(--violet-tint); }
+[data-cat="devops-e-infraestructura"]   { --c: var(--green-600); --tint: var(--green-tint); }
+[data-cat="linux-y-sysadmin"]           { --c: var(--cyan-700);  --tint: var(--cyan-tint); }
+[data-cat="git-y-control-de-versiones"] { --c: var(--amber-700); --tint: var(--amber-tint); }
+[data-cat="desarrollo-web"]             { --c: var(--blue);      --tint: var(--blue-tint); }
+[data-cat="seguridad"]                  { --c: var(--slate-600); --tint: var(--slate-tint); }
 
 /* ---------- base reset ---------- */
 *, *::before, *::after { box-sizing: border-box; }

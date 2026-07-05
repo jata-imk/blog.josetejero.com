@@ -9,7 +9,7 @@ import { Thumb } from '../../../components/ui/Thumb'
 import { EmptyState } from '../../../components/ui/EmptyState'
 import { searchAll, getPostsInSeries, normalizeScope } from '../../../lib/data'
 import type { Post, Series, Tag as TagType, Category } from '../../../payload-types'
-import type { CatKey } from '../../../components/ui/Cat'
+import type { CatInfo } from '../../../components/ui/Cat'
 
 type SearchParams = Promise<{ q?: string; scope?: string }>
 
@@ -23,10 +23,10 @@ function estimateRead(body: Post['body']): string {
   return `${Math.max(1, Math.round(raw.length / 1400))} min`
 }
 
-function primaryCat(post: Post): CatKey {
+function primaryCategory(post: Post): CatInfo | null {
   const cats = (post.categories ?? []) as Array<number | Category>
   const obj = cats.find((c): c is Category => typeof c === 'object' && c !== null)
-  return (obj?.slug as CatKey | undefined) ?? 'tutoriales'
+  return obj ? { name: obj.name, slug: obj.slug } : null
 }
 
 function inSeries(post: Post): boolean {
@@ -114,13 +114,13 @@ function SectionHead({ label, count }: { label: string; count: number }) {
 
 /* ── post list row (adapted to /buscar layout) ── */
 function PostRow({ post }: { post: Post }) {
-  const cat = primaryCat(post)
+  const category = primaryCategory(post)
   return (
     <a className="list-row" href={`/blog/${post.slug}`} style={{ borderRadius: 'var(--r)' }}>
-      <Thumb cat={cat} style={{ width: 96, height: 64, flexShrink: 0, borderRadius: 'var(--r)', border: 0 }} />
+      <Thumb slug={category?.slug} style={{ width: 96, height: 64, flexShrink: 0, borderRadius: 'var(--r)', border: 0 }} />
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 5 }}>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-          <Cat cat={cat} />
+          {category && <Cat name={category.name} slug={category.slug} />}
           {inSeries(post) && <Badge variant="series" />}
         </div>
         <h3 style={{ fontSize: 15.5, fontWeight: 650, letterSpacing: '-.02em', lineHeight: 1.35, margin: 0 }}>
@@ -305,7 +305,7 @@ export default async function BuscarPage({ searchParams }: { searchParams: Searc
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                     {categories.map((c) => (
                       <a key={c.id} href={`/categorias/${c.slug}`} style={{ textDecoration: 'none' }}>
-                        <Cat cat={c.slug as CatKey} />
+                        <Cat name={c.name} slug={c.slug} />
                       </a>
                     ))}
                   </div>

@@ -3,7 +3,6 @@ import { EmptyState } from '../../../components/ui/EmptyState'
 import { Breadcrumb } from '../../../components/ui/Breadcrumb'
 import { Ic } from '../../../components/ui/Ic'
 import { getCategories } from '../../../lib/data'
-import type { CatKey } from '../../../components/ui/Cat'
 
 const breadcrumbItems = [
   { label: 'Inicio', href: '/' },
@@ -42,7 +41,7 @@ export default async function CategoriasPage() {
                 className="card card-hover"
                 style={{ padding: '14px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', textDecoration: 'none', color: 'inherit' }}
               >
-                <Cat cat={cat.slug as CatKey} lg />
+                <Cat name={cat.name} slug={cat.slug} lg />
                 <span style={{ color: 'var(--muted)', flexShrink: 0, display: 'flex' }}>
                   <Ic name="arrowRight" size={16} sw={2} />
                 </span>

@@ -5,12 +5,12 @@ import { Cat } from '../../../../components/ui/Cat'
 import { Breadcrumb } from '../../../../components/ui/Breadcrumb'
 import { getCategoryWithPosts } from '../../../../lib/data'
 import type { Post, Category, Tag as TagType } from '../../../../payload-types'
-import type { CatKey } from '../../../../components/ui/Cat'
+import type { CatInfo } from '../../../../components/ui/Cat'
 
-function primaryCatSlug(post: Post): CatKey {
+function primaryCategory(post: Post): CatInfo | null {
   const cats = (post.categories ?? []) as Array<number | Category>
   const obj = cats.find((c): c is Category => typeof c === 'object' && c !== null)
-  return (obj?.slug as CatKey | undefined) ?? 'tutoriales'
+  return obj ? { name: obj.name, slug: obj.slug } : null
 }
 
 function fmtDate(iso?: string | null): string {
@@ -39,7 +39,6 @@ export default async function CategoriaPage({
   if (!data) notFound()
 
   const { category, posts } = data
-  const catKey = category.slug as CatKey
 
   const breadcrumbItems = [
     { label: 'Inicio', href: '/' },
@@ -53,7 +52,7 @@ export default async function CategoriaPage({
         <Breadcrumb items={breadcrumbItems} />
 
         <div style={{ marginTop: 32, marginBottom: 48 }}>
-          <Cat cat={catKey} lg />
+          <Cat name={category.name} slug={category.slug} lg />
           <h1 style={{ fontSize: 40, fontWeight: 800, letterSpacing: '-.04em', lineHeight: 1.1, marginTop: 16 }}>
             {category.name}
           </h1>
@@ -77,7 +76,7 @@ export default async function CategoriaPage({
             {posts.map((p) => (
               <PostCard
                 key={p.id}
-                cat={primaryCatSlug(p)}
+                category={primaryCategory(p)}
                 title={p.title}
                 excerpt={p.excerpt ?? ''}
                 tags={postTags(p)}

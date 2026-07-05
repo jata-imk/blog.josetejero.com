@@ -13,14 +13,14 @@ import {
   getPopularTags,
 } from '../../../lib/data'
 import type { Post, Category, Tag as TagType } from '../../../payload-types'
-import type { CatKey } from '../../../components/ui/Cat'
+import type { CatInfo } from '../../../components/ui/Cat'
 
 const POSTS_PER_PAGE = 12
 
-function primaryCatSlug(post: Post): CatKey {
+function primaryCategory(post: Post): CatInfo | null {
   const cats = (post.categories ?? []) as Array<number | Category>
   const obj = cats.find((c): c is Category => typeof c === 'object' && c !== null)
-  return (obj?.slug as CatKey | undefined) ?? 'tutoriales'
+  return obj ? { name: obj.name, slug: obj.slug } : null
 }
 
 function fmtDate(iso?: string | null): string {
@@ -180,7 +180,7 @@ export default async function BlogPage({
         <section style={{ paddingBottom: 28 }}>
           <div className="wrap">
             <FeaturedCard
-              cat={primaryCatSlug(featuredPost)}
+              category={primaryCategory(featuredPost)}
               title={featuredPost.title}
               excerpt={featuredPost.excerpt ?? ''}
               date={fmtDate(featuredPost.publishedAt)}
@@ -225,7 +225,7 @@ export default async function BlogPage({
               {posts.map((p) => (
                 <PostCard
                   key={p.id}
-                  cat={primaryCatSlug(p)}
+                  category={primaryCategory(p)}
                   title={p.title}
                   excerpt={p.excerpt ?? ''}
                   tags={postTags(p)}

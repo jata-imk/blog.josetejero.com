@@ -5,7 +5,7 @@ import { getPostBySlug, getPosts, getPostsInSeries, getCommentsByPost } from '@/
 import { makeBodyConverters, extractToc } from '@/lib/lexical'
 import { highlightLexicalCode, type LexicalChildNode } from '@/lib/code-highlight'
 import { Breadcrumb } from '@/components/ui/Breadcrumb'
-import { Cat, type CatKey } from '@/components/ui/Cat'
+import { Cat } from '@/components/ui/Cat'
 import { Tag, TagRow } from '@/components/ui/Tag'
 import { Meta, MetaSep } from '@/components/ui/Meta'
 import { TableOfContents, MobileToc } from '@/components/blocks/TableOfContents'
@@ -101,7 +101,7 @@ export default async function PostPage({ params }: Props) {
 
         {primaryCategory && (
           <div style={{ marginTop: 20 }}>
-            <Cat cat={primaryCategory.slug as CatKey} lg />
+            <Cat name={primaryCategory.name} slug={primaryCategory.slug} lg />
           </div>
         )}
 

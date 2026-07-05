@@ -6,12 +6,12 @@ import { Cat } from '../../../../components/ui/Cat'
 import { Breadcrumb } from '../../../../components/ui/Breadcrumb'
 import { getTagWithPosts } from '../../../../lib/data'
 import type { Post, Category } from '../../../../payload-types'
-import type { CatKey } from '../../../../components/ui/Cat'
+import type { CatInfo } from '../../../../components/ui/Cat'
 
-function primaryCatSlug(post: Post): CatKey {
+function primaryCategory(post: Post): CatInfo | null {
   const cats = (post.categories ?? []) as Array<number | Category>
   const obj = cats.find((c): c is Category => typeof c === 'object' && c !== null)
-  return (obj?.slug as CatKey | undefined) ?? 'tutoriales'
+  return obj ? { name: obj.name, slug: obj.slug } : null
 }
 
 function fmtDate(iso?: string | null): string {
@@ -68,7 +68,7 @@ export default async function TagPage({
               {posts.map((p) => (
                 <ListRow
                   key={p.id}
-                  cat={primaryCatSlug(p)}
+                  category={primaryCategory(p)}
                   title={p.title}
                   excerpt={p.excerpt ?? undefined}
                   date={fmtDate(p.publishedAt)}
@@ -98,7 +98,7 @@ export default async function TagPage({
                     <div className="tag-page-cats">
                       {categories.map((category) => (
                         <a key={category.id} href={`/categorias/${category.slug}`}>
-                          <Cat cat={category.slug as CatKey} />
+                          <Cat name={category.name} slug={category.slug} />
                         </a>
                       ))}
                     </div>

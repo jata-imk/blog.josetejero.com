@@ -42,9 +42,12 @@ credenciales.
    `pnpm payload migrate:create initial_schema` y en producción el deploy corre `pnpm payload migrate`.
    En desarrollo local se mantiene el `push` (las migraciones no afectan a dev), así que el flujo de
    trabajo local no cambia. Como la imagen de la app es `standalone` (no incluye el CLI de Payload),
-   `migrate` y `seed:catalog` **se ejecutan desde el repo clonado en el host del VPS** (con Node+pnpm y
-   `pnpm install`), usando una `DATABASE_URL` que apunta a la BD publicada en `localhost:5432` —no al
-   nombre de servicio Docker `postgres`, que solo resuelve dentro de la red del contenedor.
+   `migrate` y `seed:catalog` se ejecutan con el CLI de Payload corrido **desde el repo clonado en el
+   host del VPS (con Node+pnpm y `pnpm install`), o desde la PC del desarrollador vía túnel SSH si el
+   VPS no tiene Node instalado** — el CLI solo necesita alcanzar la BD por red, da igual desde qué
+   máquina. En ambos casos la `DATABASE_URL` apunta a PostgreSQL publicado en `localhost:PUERTO` (el
+   puerto del host o del túnel, según el caso) —no al nombre de servicio Docker `postgres`, que solo
+   resuelve dentro de la red del contenedor.
 2. **Seed de catálogos como script `pnpm` dedicado.** Nuevo `lib/seed-catalog.ts` (`seedCatalog`)
    siembra **solo** categorías, tags y series reales, idempotente por `slug`. Se ejecuta a mano con
    `pnpm seed:catalog` (`payload run scripts/seed-catalog.ts`). El seed de dev (`lib/seed.ts`) queda
@@ -58,9 +61,13 @@ entradas pendientes en Notion. Resumen: 6 categorías, 26 tags y 3 series (dos d
 
 ## Secuencia de deploy
 1. `pnpm payload migrate` → crea el schema en la BD de prod (vacía).
-2. Entrar a `/admin` → crear el primer usuario admin (first-user).
-3. `pnpm seed:catalog` → siembra catálogos.
-4. Importar/redactar posts y asociarlos a los catálogos.
+2. Build + arranque de la app en Docker; DNS + reverse proxy + SSL en CloudPanel.
+3. Entrar a `/admin` (ya por HTTPS) → crear el primer usuario admin (first-user).
+4. `pnpm seed:catalog` → siembra catálogos.
+5. Importar/redactar posts y asociarlos a los catálogos.
+
+> El primer admin se crea **después** de tener el reverse proxy y SSL montados, no antes: el first-user
+> valida `X-Forwarded-Proto`/cookies asumiendo HTTPS (ver runbook de deploy).
 
 ## Consecuencias
 - Más fácil: despliegue reproducible y auditable; catálogos poblados de forma repetible sin duplicar.

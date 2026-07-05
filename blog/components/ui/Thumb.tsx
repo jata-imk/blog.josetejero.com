@@ -1,30 +1,29 @@
 import type { CSSProperties } from 'react'
-import type { CatKey } from './Cat'
 
-const TONE: Record<CatKey, string> = {
-  'frontend':       'thumb-blue',
-  'backend':        'thumb-violet',
-  'bases-de-datos': 'thumb-cyan',
-  'ia':             'thumb-violet',
-  'devops':         'thumb-green',
-  'tutoriales':     'thumb-amber',
-  'opinion':        'thumb-blue',
+const TONE: Record<string, string> = {
+  'ia-y-agentes':               'thumb-violet',
+  'devops-e-infraestructura':   'thumb-green',
+  'linux-y-sysadmin':           'thumb-cyan',
+  'git-y-control-de-versiones': 'thumb-amber',
+  'desarrollo-web':             'thumb-blue',
+  'seguridad':                  'thumb-violet',
 }
+const DEFAULT_TONE = 'thumb-blue'
 
 export function Thumb({
-  cat,
+  slug,
   label,
   glow,
   style,
   className,
 }: {
-  cat: CatKey
+  slug?: string | null
   label?: string
   glow?: boolean
   style?: CSSProperties
   className?: string
 }) {
-  const tone = TONE[cat]
+  const tone = (slug && TONE[slug]) || DEFAULT_TONE
   return (
     <div className={`thumb ${tone}${className ? ` ${className}` : ''}`} style={style}>
       <div

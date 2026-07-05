@@ -1,4 +1,4 @@
-import type { CatKey } from '../ui/Cat'
+import type { CatInfo } from '../ui/Cat'
 import { Cat } from '../ui/Cat'
 import { Badge } from '../ui/Badge'
 import { Tag, TagRow } from '../ui/Tag'
@@ -8,7 +8,7 @@ import { Thumb } from '../ui/Thumb'
 export type PostCardTag = string | { name: string; slug?: string }
 
 export type PostCardProps = {
-  cat: CatKey
+  category?: CatInfo | null
   title: string
   excerpt: string
   tags?: PostCardTag[]
@@ -20,7 +20,7 @@ export type PostCardProps = {
 }
 
 export function PostCard({
-  cat,
+  category,
   title,
   excerpt,
   tags = [],
@@ -33,11 +33,11 @@ export function PostCard({
   return (
     <article className="card card-hover post-card">
       <a href={href} tabIndex={-1} aria-hidden="true">
-        <Thumb cat={cat} />
+        <Thumb slug={category?.slug} />
       </a>
       <div className="post-card-body">
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-          <Cat cat={cat} />
+          {category && <Cat name={category.name} slug={category.slug} />}
           {inSeries && <Badge variant="series" />}
         </div>
         <a href={href}>

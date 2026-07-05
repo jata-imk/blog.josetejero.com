@@ -1,11 +1,11 @@
-import type { CatKey } from '../ui/Cat'
+import type { CatInfo } from '../ui/Cat'
 import { Cat } from '../ui/Cat'
 import { Badge } from '../ui/Badge'
 import { Meta, MetaSep } from '../ui/Meta'
 import { Thumb } from '../ui/Thumb'
 
 export function ListRow({
-  cat,
+  category,
   title,
   excerpt,
   date,
@@ -13,7 +13,7 @@ export function ListRow({
   inSeries,
   href = '#',
 }: {
-  cat: CatKey
+  category?: CatInfo | null
   title: string
   excerpt?: string
   date: string
@@ -24,12 +24,12 @@ export function ListRow({
   return (
     <a className="list-row" href={href}>
       <Thumb
-        cat={cat}
+        slug={category?.slug}
         style={{ width: 120, height: 80, flexShrink: 0, borderRadius: 'var(--r)', border: 0 }}
       />
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-          <Cat cat={cat} />
+          {category && <Cat name={category.name} slug={category.slug} />}
           {inSeries && <Badge variant="series" />}
         </div>
         <h3 style={{ fontSize: 16, fontWeight: 650, letterSpacing: '-.02em', lineHeight: 1.35 }}>
