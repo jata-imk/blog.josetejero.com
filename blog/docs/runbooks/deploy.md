@@ -501,6 +501,74 @@ docker compose logs -f app
 - **`docker compose down -v` ⚠️ destruye los volúmenes** (BD y media). Úsalo solo si de verdad quieres
   borrar los datos y empezar de cero — no es parte del flujo normal de redeploy.
 
+## Limpieza y mantenimiento de Docker
+
+Cada `docker build` (sobre todo con `--no-cache`, que ahora es rutina — ver gotcha arriba) dispara la
+imagen anterior con el mismo tag a **dangling** (`<none>:<none>`): pierde el tag pero el layer sigue
+ocupando disco en el VPS. Sin limpieza periódica, se acumula.
+
+### Inspeccionar antes de borrar
+
+```bash
+docker system df    # resumen: cuánto pesa cada categoría (imágenes, contenedores, volúmenes, build cache)
+docker images        # imágenes, incluidas las <none>
+docker ps -a          # contenedores, incluidos los parados
+docker volume ls      # volúmenes
+df -h                 # espacio real en disco del VPS
+```
+
+### Limpieza segura — correr después de cada rebuild
+
+```bash
+docker image prune -f       # borra SOLO imágenes dangling (<none>); nunca toca imágenes con tag/uso activo
+docker builder prune -f     # limpia el cache de build acumulado
+docker container prune -f   # borra contenedores parados; no toca los que están corriendo
+```
+Ninguno de los tres toca datos — son seguros de correr siempre.
+
+### Volúmenes — cómo funcionan en este proyecto
+
+`docker-compose.yml` declara **named volumes**: `pgdata` y `payload_media`. Viven en
+`/var/lib/docker/volumes/...` en el VPS, **independientes del ciclo de vida de imágenes y contenedores**:
+
+- Reconstruir la imagen (`docker build`, con o sin `--no-cache`) → no los toca.
+- `docker compose up -d --force-recreate` → recrea contenedores, monta los MISMOS volúmenes, datos intactos.
+- `docker compose down` → borra contenedores, **conserva** volúmenes.
+- `docker compose down -v` → **destruye** los volúmenes del proyecto (única operación normal que los borra).
+- `docker volume prune` → borra volúmenes **no referenciados por ningún contenedor** (ni corriendo ni
+  parado). Mientras existan los contenedores `app`/`postgres` (aunque estén parados), `pgdata` y
+  `payload_media` siguen "en uso" y no se tocan. Seguro correrlo, aunque normalmente no libera nada en
+  este proyecto.
+
+> ⚠️ **Nunca combines `--volumes` con un prune sin revisar `docker volume ls` antes.**
+> `docker system prune -a --volumes` o `docker volume prune -a` **sí pueden borrar datos reales** si en
+> ese momento los contenedores están abajo. Siempre confirma que `pgdata`/`payload_media` no aparecen
+> como huérfanos antes de correr cualquier prune con `--volumes`.
+
+### Rutina recomendada tras cada deploy/rebuild
+
+```bash
+docker image prune -f
+docker builder prune -f
+docker container prune -f
+docker system df   # confirma que bajó el uso
+```
+
+Backup **antes** de cualquier operación que toque volúmenes (ver sección Backups más abajo):
+```bash
+docker compose exec postgres pg_dump -U "$POSTGRES_USER" "$POSTGRES_DB" > backup.sql
+```
+
+Si los logs de `docker compose logs app` empiezan a pesar mucho (sin rotación por defecto con el driver
+`json-file`), agrega rotación al servicio `app` en `docker-compose.yml`:
+```yaml
+logging:
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+```
+
 ## Migraciones (cambios de schema posteriores)
 
 En desarrollo, cuando el cambio de schema esté destinado a producción, genera su migración:
