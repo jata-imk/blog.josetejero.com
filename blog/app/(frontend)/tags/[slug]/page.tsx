@@ -4,7 +4,9 @@ import { EmptyState } from '../../../../components/ui/EmptyState'
 import { Tag } from '../../../../components/ui/Tag'
 import { Cat } from '../../../../components/ui/Cat'
 import { Breadcrumb } from '../../../../components/ui/Breadcrumb'
-import { getTagWithPosts } from '../../../../lib/data'
+import type { Metadata } from 'next'
+import { getTagWithPosts, getTagBySlug } from '../../../../lib/data'
+import { alternatesFor } from '../../../../lib/seo'
 import { coverImageOf } from '../../../../lib/media'
 import type { Post, Category } from '../../../../payload-types'
 import type { CatInfo } from '../../../../components/ui/Cat'
@@ -23,6 +25,23 @@ function fmtDate(iso?: string | null): string {
 function estimateReadTime(body: Post['body']): string {
   const raw = JSON.stringify(body ?? '')
   return `${Math.max(1, Math.round(raw.length / 1400))} min`
+}
+
+// Metadata dinámica del tag (ADR 0029): nombre y descripción salen
+// del CMS; la canonical es la ruta oficial de la taxonomía.
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}): Promise<Metadata> {
+  const { slug } = await params
+  const tag = await getTagBySlug(slug)
+  if (!tag) return {}
+  return {
+    title: `#${tag.name}`,
+    description: tag.description?.trim() || `Posts etiquetados con #${tag.name}.`,
+    alternates: alternatesFor(`/tags/${tag.slug}`),
+  }
 }
 
 export default async function TagPage({

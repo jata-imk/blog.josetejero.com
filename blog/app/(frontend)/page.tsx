@@ -4,9 +4,17 @@ import { Cat } from '../../components/ui/Cat'
 import { Badge } from '../../components/ui/Badge'
 import { Ic } from '../../components/ui/Ic'
 import type { CatInfo } from '../../components/ui/Cat'
+import type { Metadata } from 'next'
 import { getPosts, getCategories, getSeriesList } from '../../lib/data'
 import { coverImageOf } from '../../lib/media'
+import { alternatesFor } from '../../lib/seo'
 import type { Post, Category, Tag as TagType } from '../../payload-types'
+
+// La home hereda título/descripción/OG del layout; solo declara su
+// canonical. "/" se resuelve contra metadataBase → https://josetejero.com/
+export const metadata: Metadata = {
+  alternates: alternatesFor('/'),
+}
 
 /* ── section head helper ──────────────────────────────────────── */
 function SectionHead({

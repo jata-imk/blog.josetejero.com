@@ -6,6 +6,7 @@ import { EmptyState } from '../../../components/ui/EmptyState'
 import { Ic } from '../../../components/ui/Ic'
 import { BlogSearchForm } from '../../../components/search/BlogSearchForm'
 import { SortSelect } from '../../../components/blog/SortSelect'
+import type { Metadata } from 'next'
 import {
   getPosts,
   getFeaturedPost,
@@ -13,10 +14,41 @@ import {
   getPopularTags,
 } from '../../../lib/data'
 import { coverImageOf } from '../../../lib/media'
+import { alternatesFor } from '../../../lib/seo'
 import type { Post, Category, Tag as TagType } from '../../../payload-types'
 import type { CatInfo } from '../../../components/ui/Cat'
 
 const POSTS_PER_PAGE = 12
+
+/* ============================================================
+   Metadata del listado (ADR 0029) — el caso con paginación/filtros.
+
+   Estrategia de canonicals:
+   - Cada página de paginación es SU PROPIA canonical (/blog?page=2
+     → canonical /blog?page=2). Es la recomendación de Google: cada
+     página del listado tiene contenido distinto, no son duplicados.
+   - Los filtros (?cat=, ?tag=, ?sort=) NO entran a la canonical:
+     una vista filtrada muestra un subconjunto que ya existe en
+     /categorias/[slug] y /tags/[slug] — esas son las URLs oficiales
+     de ese contenido, y así el crédito de búsqueda no se fragmenta.
+   ============================================================ */
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>
+}): Promise<Metadata> {
+  const { page: pageParam } = await searchParams
+  const page = Math.max(1, Number(pageParam ?? 1))
+
+  return {
+    // "Página N" distingue los títulos en resultados de búsqueda y
+    // evita que Google vea títulos idénticos en URLs distintas
+    title: page > 1 ? `Blog — Página ${page}` : 'Blog',
+    description:
+      'Artículos sobre desarrollo web, bases de datos, IA y las cosas que voy aprendiendo al construir software.',
+    alternates: alternatesFor(page > 1 ? `/blog?page=${page}` : '/blog'),
+  }
+}
 
 function primaryCategory(post: Post): CatInfo | null {
   const cats = (post.categories ?? []) as Array<number | Category>

@@ -5,9 +5,28 @@ import { EmptyState } from '../../../../components/ui/EmptyState'
 import { Badge } from '../../../../components/ui/Badge'
 import { Breadcrumb } from '../../../../components/ui/Breadcrumb'
 import { Prose } from '../../../../components/blocks/Prose'
-import { getSeriesWithPosts } from '../../../../lib/data'
+import type { Metadata } from 'next'
+import { getSeriesWithPosts, getSeriesBySlug } from '../../../../lib/data'
+import { alternatesFor } from '../../../../lib/seo'
 import { makeBodyConverters } from '../../../../lib/lexical'
 import { highlightLexicalCode, type LexicalChildNode } from '../../../../lib/code-highlight'
+
+// Metadata dinámica de la serie (ADR 0029): título y descripción salen
+// del CMS; la canonical es la ruta oficial de la taxonomía.
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}): Promise<Metadata> {
+  const { slug } = await params
+  const series = await getSeriesBySlug(slug)
+  if (!series) return {}
+  return {
+    title: series.title,
+    description: series.description ?? `Serie: ${series.title}.`,
+    alternates: alternatesFor(`/series/${series.slug}`),
+  }
+}
 
 export default async function SeriesPage({
   params,

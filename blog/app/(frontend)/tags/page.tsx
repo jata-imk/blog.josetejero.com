@@ -2,7 +2,17 @@ import { Tag } from '../../../components/ui/Tag'
 import { EmptyState } from '../../../components/ui/EmptyState'
 import { Breadcrumb } from '../../../components/ui/Breadcrumb'
 import { Ic } from '../../../components/ui/Ic'
+import type { Metadata } from 'next'
 import { getTags } from '../../../lib/data'
+import { alternatesFor } from '../../../lib/seo'
+
+// Metadata del listado (ADR 0029): título propio (el layout le añade
+// "· José Tejero"), descripción para resultados de búsqueda y canonical.
+export const metadata: Metadata = {
+  title: 'Tags',
+  description: 'Explora los artículos del blog por etiqueta.',
+  alternates: alternatesFor('/tags'),
+}
 
 const breadcrumbItems = [
   { label: 'Inicio', href: '/' },

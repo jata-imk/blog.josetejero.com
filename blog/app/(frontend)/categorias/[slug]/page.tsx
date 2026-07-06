@@ -1,4 +1,7 @@
 import { notFound } from 'next/navigation'
+import type { Metadata } from 'next'
+import { getCategoryBySlug } from '../../../../lib/data'
+import { alternatesFor } from '../../../../lib/seo'
 import { PostCard } from '../../../../components/post/PostCard'
 import { EmptyState } from '../../../../components/ui/EmptyState'
 import { Cat } from '../../../../components/ui/Cat'
@@ -28,6 +31,23 @@ function postTags(post: Post): Array<{ name: string; slug: string }> {
   return ((post.tags ?? []) as Array<number | TagType>)
     .filter((t): t is TagType => typeof t === 'object' && t !== null)
     .map((t) => ({ name: t.name, slug: t.slug }))
+}
+
+// Metadata dinámica de la categoría (ADR 0029): nombre y descripción
+// salen del CMS; la canonical es la ruta oficial de la taxonomía.
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}): Promise<Metadata> {
+  const { slug } = await params
+  const category = await getCategoryBySlug(slug)
+  if (!category) return {}
+  return {
+    title: category.name,
+    description: category.description ?? `Artículos de la categoría ${category.name}.`,
+    alternates: alternatesFor(`/categorias/${category.slug}`),
+  }
 }
 
 export default async function CategoriaPage({

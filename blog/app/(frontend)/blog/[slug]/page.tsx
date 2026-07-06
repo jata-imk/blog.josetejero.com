@@ -17,6 +17,8 @@ import { PrevNext } from '@/components/post/PrevNext'
 import { SeriesNav } from '@/components/series/SeriesNav'
 import { CommentForm } from '@/components/comments/CommentForm'
 import { Comment } from '@/components/comments/Comment'
+import { JsonLd } from '@/components/seo/JsonLd'
+import { blogPostingJsonLd, postBreadcrumbJsonLd, alternatesFor, SITE_NAME, SITE_LOCALE } from '@/lib/seo'
 import type { Category, Tag as TagType, Series, User } from '@/payload-types'
 
 type Props = { params: Promise<{ slug: string }> }
@@ -28,13 +30,64 @@ export async function generateStaticParams() {
   return posts.map((post) => ({ slug: post.slug }))
 }
 
+/* ============================================================
+   Metadata de la entrada (ADR 0029)
+
+   Se fusiona con el default del layout: aquí solo se declara lo
+   específico del post (título, descripción, canonical, OG article,
+   portada); siteName, locale, template de título, etc. se heredan.
+   ============================================================ */
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const post = await getPostBySlug(slug)
   if (!post) return {}
+
+  // Portada en tamaño hero (1920×1080, 16:9) — supera de sobra el
+  // mínimo recomendado de og:image (1200×630) y ya existe en Media
+  const cover = coverImageOf(post, 'hero')
+
+  const author =
+    typeof post.author === 'object' && post.author !== null ? (post.author as User) : null
+
   return {
+    // El layout lo convierte en "Mi post · José Tejero" vía title.template
     title: post.title,
     description: post.excerpt ?? undefined,
+
+    // URL canónica: la ruta editorial oficial del post (ADR 0009).
+    // Si el post llegara a ser accesible por más de una URL (filtros,
+    // UTM, etc.), este tag le dice a Google cuál es LA original y
+    // evita que el "crédito" de búsqueda se reparta entre duplicados.
+    // (alternatesFor también re-declara el autodiscovery del RSS,
+    // porque Next reemplaza — no fusiona — el objeto del layout.)
+    alternates: alternatesFor(`/blog/${post.slug}`),
+
+    openGraph: {
+      // OJO: cuando una página define `openGraph`, Next REEMPLAZA el
+      // objeto completo del layout (no lo fusiona campo a campo), así
+      // que siteName y locale deben repetirse aquí
+      siteName: SITE_NAME,
+      locale: SITE_LOCALE,
+      // type article activa los campos específicos de artículo en OG
+      type: 'article',
+      title: post.title,
+      description: post.excerpt ?? undefined,
+      url: `/blog/${post.slug}`,
+      // Fechas en ISO 8601: redes y buscadores muestran "publicado el…"
+      publishedTime: post.publishedAt ?? undefined,
+      modifiedTime: post.updatedAt,
+      authors: author?.name ? [author.name] : undefined,
+      // Con imagen propia sobreescribimos la og:image default del sitio;
+      // sin portada, Next mantiene la default (opengraph-image.tsx)
+      ...(cover ? { images: [{ url: cover.url, alt: cover.alt || post.title }] } : {}),
+    },
+
+    twitter: {
+      card: 'summary_large_image',
+      title: post.title,
+      description: post.excerpt ?? undefined,
+      ...(cover ? { images: [cover.url] } : {}),
+    },
   }
 }
 
@@ -99,6 +152,13 @@ export default async function PostPage({ params }: Props) {
 
   return (
     <>
+      {/* JSON-LD del artículo: BlogPosting (habilita resultados
+          enriquecidos con autor/fecha/portada) + BreadcrumbList
+          (Google puede mostrar la ruta en vez de la URL cruda).
+          Reutilizan los mismos datos del post que el metadata. */}
+      <JsonLd data={blogPostingJsonLd(post)} />
+      <JsonLd data={postBreadcrumbJsonLd(post, primaryCategory)} />
+
       {/* Cabecera del artículo — máx 820px (handoff) */}
       <div className="post-head">
         <Breadcrumb items={breadcrumbItems} />

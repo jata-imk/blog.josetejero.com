@@ -1,4 +1,5 @@
 import { Suspense } from 'react'
+import type { Metadata } from 'next'
 import { SearchPageBar } from '../../../components/search/SearchPageBar'
 import { Cat } from '../../../components/ui/Cat'
 import { Tag } from '../../../components/ui/Tag'
@@ -10,6 +11,16 @@ import { EmptyState } from '../../../components/ui/EmptyState'
 import { searchAll, getPostsInSeries, normalizeScope } from '../../../lib/data'
 import type { Post, Series, Tag as TagType, Category } from '../../../payload-types'
 import type { CatInfo } from '../../../components/ui/Cat'
+
+// Metadata del buscador (ADR 0029). `noindex`: las páginas de
+// resultados son combinaciones infinitas del mismo contenido —
+// indexarlas diluiría el sitio en Google. `follow: true` deja que
+// el crawler sí siga los enlaces hacia los posts.
+export const metadata: Metadata = {
+  title: 'Buscar',
+  description: 'Busca artículos, series y tags en el blog.',
+  robots: { index: false, follow: true },
+}
 
 type SearchParams = Promise<{ q?: string; scope?: string }>
 

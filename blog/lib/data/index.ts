@@ -6,6 +6,7 @@ export {
   getPostsByTag,
   getFeaturedPost,
   getPopularTags,
+  getPostsForSitemap,
   type PaginatedPosts,
   type GetPostsOptions,
 } from './posts'

@@ -1,12 +1,27 @@
 import type { Metadata } from 'next'
+import { SITE_NAME, SITE_LOCALE, alternatesFor } from '../../../lib/seo'
 import { Ic } from '../../../components/ui/Ic'
 import { SkillChip } from '../../../components/ui/Skill'
 import { PdfViewer } from '../../../components/about/PdfViewerClient'
 import { ABOUT, EXPERIENCE, SKILLS } from '../../../components/about/content'
 
+// Metadata de la página (ADR 0029). El título es solo "Sobre mí":
+// el layout le añade la marca vía title.template ("Sobre mí · José
+// Tejero") — antes duplicaba el sufijo a mano.
 export const metadata: Metadata = {
-  title: 'Sobre mí | josetejero.com',
+  title: 'Sobre mí',
   description: ABOUT.lead,
+  alternates: alternatesFor('/sobre-mi'),
+  // type "profile" de OG: esta página describe a una persona.
+  // siteName/locale se repiten porque definir openGraph aquí
+  // reemplaza (no fusiona) el objeto del layout.
+  openGraph: {
+    type: 'profile',
+    siteName: SITE_NAME,
+    locale: SITE_LOCALE,
+    title: 'Sobre mí',
+    description: ABOUT.lead,
+  },
 }
 
 /* ── inline helpers ────────────────────────────────────────────── */

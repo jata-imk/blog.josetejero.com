@@ -113,6 +113,25 @@ export async function getPostsByTag(slug: string): Promise<Post[]> {
   return docs
 }
 
+/**
+ * Entradas publicadas para el sitemap (ADR 0029): solo slug y fecha
+ * de última modificación de TODOS los posts publicados, sin paginar.
+ * `depth: 0` evita poblar relaciones (no las necesitamos) y `select`
+ * trae solo las dos columnas — la consulta más barata posible.
+ */
+export async function getPostsForSitemap(): Promise<Array<{ slug: string; updatedAt: string }>> {
+  const payload = await getPayload()
+  const { docs } = await payload.find({
+    collection: 'posts',
+    where: { status: { equals: 'published' } },
+    depth: 0,
+    limit: 1000,
+    sort: '-publishedAt',
+    select: { slug: true, updatedAt: true },
+  })
+  return docs.map((post) => ({ slug: post.slug, updatedAt: post.updatedAt }))
+}
+
 export async function getFeaturedPost(): Promise<Post | null> {
   const payload = await getPayload()
   const { docs } = await payload.find({

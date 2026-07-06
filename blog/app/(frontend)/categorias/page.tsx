@@ -2,7 +2,17 @@ import { Cat } from '../../../components/ui/Cat'
 import { EmptyState } from '../../../components/ui/EmptyState'
 import { Breadcrumb } from '../../../components/ui/Breadcrumb'
 import { Ic } from '../../../components/ui/Ic'
+import type { Metadata } from 'next'
 import { getCategories } from '../../../lib/data'
+import { alternatesFor } from '../../../lib/seo'
+
+// Metadata del listado (ADR 0029): título propio (el layout le añade
+// "· José Tejero"), descripción para resultados de búsqueda y canonical.
+export const metadata: Metadata = {
+  title: 'Categorías',
+  description: 'Navega los artículos del blog por tema: desarrollo web, bases de datos, IA y más.',
+  alternates: alternatesFor('/categorias'),
+}
 
 const breadcrumbItems = [
   { label: 'Inicio', href: '/' },
