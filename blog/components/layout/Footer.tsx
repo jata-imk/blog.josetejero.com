@@ -12,6 +12,7 @@ const SITE_LINKS = [
   { label: 'RSS',        href: '/rss.xml' },
   { label: 'Sitemap',    href: '/sitemap.xml' },
   { label: 'Contacto',   href: '/contacto' },
+  { label: 'Privacidad', href: '/privacidad' },
 ]
 
 const SOCIAL_LINKS = [

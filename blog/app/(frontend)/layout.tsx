@@ -5,7 +5,10 @@ import { Header } from '../../components/layout/Header'
 import { Footer } from '../../components/layout/Footer'
 import { GlobalSearchProvider } from '../../components/search/GlobalSearchProvider'
 import { THEME_BOOTSTRAP_SCRIPT } from '../../lib/theme-bootstrap'
+import { CONSENT_BOOTSTRAP_SCRIPT } from '../../lib/analytics'
 import { JsonLd } from '../../components/seo/JsonLd'
+import { GoogleAnalytics } from '../../components/analytics/GoogleAnalytics'
+import { CookieConsent } from '../../components/analytics/CookieConsent'
 import {
   SITE_URL,
   SITE_NAME,
@@ -97,11 +100,18 @@ export default function FrontendLayout({
         <script
           dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP_SCRIPT }}
         />
+        {/* Consentimiento por defecto ANTES de gtag.js (ADR 0030): Consent
+            Mode v2 exige que este script corra primero, o GA4 podría
+            escribir cookies antes de que exista una decisión del visitante. */}
+        <script
+          dangerouslySetInnerHTML={{ __html: CONSENT_BOOTSTRAP_SCRIPT }}
+        />
       </head>
       <body className="bg-bg text-ink font-sans">
         {/* JSON-LD WebSite: se emite UNA vez para todo el sitio; le da a
             Google el nombre canónico del sitio y la entidad del autor */}
         <JsonLd data={websiteJsonLd()} />
+        <GoogleAnalytics />
         <GlobalSearchProvider>
           <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
             <Header />
@@ -109,6 +119,7 @@ export default function FrontendLayout({
             <Footer />
           </div>
         </GlobalSearchProvider>
+        <CookieConsent />
       </body>
     </html>
   )

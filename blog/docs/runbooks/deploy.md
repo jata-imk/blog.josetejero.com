@@ -158,6 +158,7 @@ Variables necesarias durante el build:
 DATABASE_URL=postgresql://blog_prod:...@localhost:5433/blog_prod
 PAYLOAD_SECRET=...
 NEXT_PUBLIC_SITE_URL=https://josetejero.com
+NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
 ```
 
 Si el build se ejecuta dentro de Docker, asegúrate de que el contenedor de build pueda alcanzar el
@@ -202,6 +203,7 @@ docker build --network host \
   --build-arg 'DATABASE_URL=postgresql://USUARIO:PASS@localhost:5432/DB' \
   --build-arg 'PAYLOAD_SECRET=TU_SECRET' \
   --build-arg 'NEXT_PUBLIC_SITE_URL=https://josetejero.com' \
+  --build-arg 'NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX' \
   -t josetejero-blog:local .
 
 # 4. Arranca la app (usa la imagen recién construida)
@@ -225,7 +227,7 @@ docker compose up -d
 > **Rebuild "exitoso" pero las páginas siguen con datos viejos → caché de capas de Docker.**
 > `docker build` cachea la capa `RUN pnpm build` (`Dockerfile` línea ~24) según el código copiado
 > (`COPY . .`) y los valores de `ARG`/`ENV` (`DATABASE_URL`, `PAYLOAD_SECRET`,
-> `NEXT_PUBLIC_SITE_URL`). Si el código no cambió y pasas los **mismos** `--build-arg` de siempre,
+> `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_GA_ID`). Si el código no cambió y pasas los **mismos** `--build-arg` de siempre,
 > Docker reutiliza la capa cacheada y **`next build` nunca se vuelve a ejecutar**, aunque el comando
 > `docker build` termine "bien". El contenido de la BD en vivo (categorías/tags/series/posts nuevos)
 > no es un input que Docker pueda ver — solo mira archivos y argumentos, así que agregar contenido
@@ -237,6 +239,7 @@ docker compose up -d
 > docker build --no-cache --network host \
 >   --build-arg 'DATABASE_URL=...' --build-arg 'PAYLOAD_SECRET=...' \
 >   --build-arg 'NEXT_PUBLIC_SITE_URL=https://josetejero.com' \
+>   --build-arg 'NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX' \
 >   -t josetejero-blog:local .
 > docker compose up -d --force-recreate
 > ```
@@ -488,6 +491,7 @@ docker build --network host \
   --build-arg 'DATABASE_URL=postgresql://blog_prod:TU_PASSWORD@localhost:5432/blog_prod' \
   --build-arg 'PAYLOAD_SECRET=TU_SECRET' \
   --build-arg 'NEXT_PUBLIC_SITE_URL=https://josetejero.com' \
+  --build-arg 'NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX' \
   -t josetejero-blog:local .
 docker compose up -d                  # recrea el contenedor app con la imagen nueva
 docker compose logs -f app
