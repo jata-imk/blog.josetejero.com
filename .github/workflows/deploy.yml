@@ -1,0 +1,125 @@
+# Pipeline CI/CD del blog (ADR 0031). Documentación completa y didáctica:
+# blog/docs/runbooks/ci-cd.md
+#
+# push a main → lint → build hermético + push a GHCR → deploy SSH al VPS → warm-up.
+# Las migraciones de BD NO las corre el pipeline: son manuales y ANTES del merge
+# (ver runbook, sección "Migraciones").
+
+name: Build & Deploy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'blog/**'
+      - '.github/workflows/deploy.yml'
+  # Permite relanzar el pipeline a mano desde la pestaña Actions
+  # (p. ej. para un rollback: Run workflow sobre un commit anterior).
+  workflow_dispatch: {}
+
+# Un solo deploy a la vez; los siguientes se encolan, nunca se cancela uno a medias.
+concurrency:
+  group: deploy-prod
+  cancel-in-progress: false
+
+env:
+  IMAGE: ghcr.io/${{ github.repository_owner }}/josetejero-blog
+  SITE_URL: https://josetejero.com
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: blog
+    steps:
+      - uses: actions/checkout@v4
+      # Lee la versión de pnpm del campo packageManager de blog/package.json
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: blog/package.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: blog/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+
+  build-push:
+    needs: lint
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      # Build hermético: sin túnel SSH ni DATABASE_URL — el Dockerfile define
+      # BUILD_WITHOUT_DB=1 y placeholders. Solo llegan los NEXT_PUBLIC_* (públicos).
+      - uses: docker/build-push-action@v6
+        with:
+          context: ./blog
+          file: ./blog/Dockerfile
+          push: true
+          tags: |
+            ${{ env.IMAGE }}:${{ github.sha }}
+            ${{ env.IMAGE }}:latest
+          build-args: |
+            NEXT_PUBLIC_SITE_URL=${{ env.SITE_URL }}
+            NEXT_PUBLIC_GA_ID=${{ vars.NEXT_PUBLIC_GA_ID }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy:
+    needs: build-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            set -e
+            cd /var/www/html/blog-prod/blog
+            # Deploy por SHA exacto (no :latest): el rollback es redesplegar
+            # un SHA anterior. APP_IMAGE exportado prevalece sobre el .env.
+            export APP_IMAGE=ghcr.io/${{ github.repository_owner }}/josetejero-blog:${{ github.sha }}
+            docker compose pull app
+            docker compose up -d
+            docker image prune -f
+
+  # La imagen hermética nace con home/listados/sitemap/RSS vacíos. Este job
+  # los regenera con datos reales segundos después del deploy.
+  warm-up:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Esperar a que la app responda
+        run: |
+          for i in $(seq 1 30); do
+            curl -sf -o /dev/null "$SITE_URL/" && exit 0
+            sleep 5
+          done
+          echo "La app no respondió tras 150s" >&2
+          exit 1
+      - name: Revalidar caché ISR
+        run: |
+          curl -sf -X POST "$SITE_URL/api/revalidate" \
+            -H "Authorization: Bearer ${{ secrets.REVALIDATE_SECRET }}"
+      - name: Calentar páginas críticas
+        run: |
+          for p in / /blog /categorias /tags /series /sitemap.xml /rss.xml; do
+            curl -sf -o /dev/null "$SITE_URL$p" || echo "warn: fallo al calentar $p" >&2
+          done
+          # Pre-generar cada entrada leyendo el sitemap ya regenerado
+          curl -s "$SITE_URL/sitemap.xml" \
+            | grep -oP '(?<=<loc>)[^<]+' | grep '/blog/' | head -50 \
+            | xargs -r -n1 curl -sf -o /dev/null || true

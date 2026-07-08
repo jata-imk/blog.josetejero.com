@@ -2,6 +2,7 @@ import 'server-only'
 import type { Where } from 'payload'
 import type { Post } from '@/payload-types'
 import { getPayload } from './getPayload'
+import { BUILD_WITHOUT_DB } from './build-guard'
 
 export async function getPostBySlug(slug: string): Promise<Post | null> {
   const payload = await getPayload()
@@ -60,6 +61,21 @@ export async function getPosts(
     limit = 10,
     page: optionsPage = 1,
   } = options
+
+  // Build hermético: home, RSS y generateStaticParams consumen esta función
+  // durante el prerender; sin BD devuelven vacío y el warm-up post-deploy
+  // regenera el contenido real.
+  if (BUILD_WITHOUT_DB) {
+    return {
+      docs: [],
+      totalDocs: 0,
+      limit,
+      totalPages: 1,
+      pagingCounter: 0,
+      hasPrevPage: false,
+      hasNextPage: false,
+    }
+  }
 
   const payload = await getPayload()
   const conditions: Where[] = [{ status: { equals: 'published' } }]
@@ -120,6 +136,7 @@ export async function getPostsByTag(slug: string): Promise<Post[]> {
  * trae solo las dos columnas — la consulta más barata posible.
  */
 export async function getPostsForSitemap(): Promise<Array<{ slug: string; updatedAt: string }>> {
+  if (BUILD_WITHOUT_DB) return []
   const payload = await getPayload()
   const { docs } = await payload.find({
     collection: 'posts',

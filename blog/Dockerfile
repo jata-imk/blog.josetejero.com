@@ -3,6 +3,7 @@
 FROM node:22-alpine AS base
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
 RUN corepack enable
 
 FROM base AS deps
@@ -14,12 +15,16 @@ FROM deps AS builder
 # seed de desarrollo (seedDev) durante el build y contamina la BD a la que apunte
 # DATABASE_URL — incluida producción si se construye contra ella (ISR prerender).
 ENV NODE_ENV=production
-ARG DATABASE_URL
-ARG PAYLOAD_SECRET
+# Build hermético (ADR 0031): el build NO toca ninguna base de datos. Los data
+# helpers devuelven vacío con este flag y el warm-up post-deploy regenera el
+# contenido vía /api/revalidate. DATABASE_URL y PAYLOAD_SECRET son placeholders
+# sintácticamente válidos (Payload los exige al cargar config) y ya no llegan
+# como build-args → no quedan secretos reales en `docker history`.
+ENV BUILD_WITHOUT_DB=1
+ENV DATABASE_URL=postgresql://build:build@localhost:5432/build
+ENV PAYLOAD_SECRET=build-time-placeholder-secret
 ARG NEXT_PUBLIC_SITE_URL
 ARG NEXT_PUBLIC_GA_ID
-ENV DATABASE_URL=${DATABASE_URL}
-ENV PAYLOAD_SECRET=${PAYLOAD_SECRET}
 ENV NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL}
 ENV NEXT_PUBLIC_GA_ID=${NEXT_PUBLIC_GA_ID}
 COPY . .

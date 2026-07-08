@@ -1,6 +1,7 @@
 import 'server-only'
 import type { Category, Post } from '@/payload-types'
 import { getPayload } from './getPayload'
+import { BUILD_WITHOUT_DB } from './build-guard'
 
 export async function getCategoryBySlug(slug: string): Promise<Category | null> {
   const payload = await getPayload()
@@ -13,6 +14,7 @@ export async function getCategoryBySlug(slug: string): Promise<Category | null> 
 }
 
 export async function getCategories(): Promise<Category[]> {
+  if (BUILD_WITHOUT_DB) return []
   const payload = await getPayload()
   const { docs } = await payload.find({
     collection: 'categories',

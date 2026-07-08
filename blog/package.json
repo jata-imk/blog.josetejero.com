@@ -4,6 +4,7 @@
   "description": "Blog/portafolio de José Tejero — Next.js + Payload CMS v3 + PostgreSQL",
   "license": "MIT",
   "type": "module",
+  "packageManager": "pnpm@11.5.3",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
