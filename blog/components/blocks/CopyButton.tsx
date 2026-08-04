@@ -3,7 +3,13 @@
 import { useState } from 'react'
 import { Ic } from '../ui/Ic'
 
-export function CopyButton({ code }: { code: string }) {
+export function CopyButton({
+  code,
+  className = 'ab-code-copy',
+}: {
+  code: string
+  className?: string
+}) {
   const [copied, setCopied] = useState(false)
 
   function copy() {
@@ -15,7 +21,7 @@ export function CopyButton({ code }: { code: string }) {
 
   return (
     <button
-      className="ab-code-copy"
+      className={className}
       onClick={copy}
       aria-label={copied ? 'Copiado' : 'Copiar código'}
     >

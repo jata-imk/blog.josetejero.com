@@ -10,3 +10,4 @@
 export { makeBodyConverters } from './converters'
 export { extractToc } from './toc'
 export { calloutBlock } from './calloutBlock'
+export { chmodCalculatorBlock } from './chmodCalculatorBlock'

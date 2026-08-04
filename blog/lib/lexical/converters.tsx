@@ -6,6 +6,7 @@ import {
 } from '@payloadcms/richtext-lexical/react'
 import type { SerializedBlockNode } from '@payloadcms/richtext-lexical'
 import { Callout } from '@/components/blocks/Callout'
+import { ChmodCalculator } from '@/components/blocks/ChmodCalculator'
 import { CodeBlockClient } from '@/components/blocks/CodeBlockClient'
 import { escapeHtml, type LexicalChildNode } from '@/lib/code-highlight'
 
@@ -21,6 +22,14 @@ type CodeBlockFields = {
   language?: string
   /** El `CodeBlock` premade de Payload guarda el código como string aquí. */
   code?: string
+}
+
+type ChmodCalculatorFields = {
+  blockType: 'chmodCalculator'
+  initialMode?: string
+  initialTarget?: 'file' | 'dir'
+  showSpecial?: boolean | null
+  title?: string
 }
 
 type HeadingNode = {
@@ -139,6 +148,19 @@ export function makeBodyConverters(highlightMap: Map<string, string>): JSXConver
           const text = fields.code ?? ''
           const html = highlightMap.get(text) ?? escapeHtml(text)
           return <CodeBlockClient lang={fields.language} code={text} html={html} />
+        },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        chmodCalculator: ({ node }: { node: SerializedBlockNode<any> }) => {
+          const typedNode = node as SerializedBlockNode<ChmodCalculatorFields>
+          const fields = typedNode.fields ?? {}
+          return (
+            <ChmodCalculator
+              initialMode={fields.initialMode}
+              initialTarget={fields.initialTarget}
+              showSpecial={fields.showSpecial}
+              title={fields.title}
+            />
+          )
         },
       },
     }
