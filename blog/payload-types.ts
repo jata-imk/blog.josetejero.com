@@ -308,6 +308,10 @@ export interface Tag {
 export interface Comment {
   id: number;
   post: number | Post;
+  /**
+   * Comentario al que responde. Solo se admite un nivel: un comentario con padre no puede tener respuestas.
+   */
+  parent?: (number | null) | Comment;
   authorName: string;
   authorEmail?: string | null;
   body: string;
@@ -497,6 +501,7 @@ export interface TagsSelect<T extends boolean = true> {
  */
 export interface CommentsSelect<T extends boolean = true> {
   post?: T;
+  parent?: T;
   authorName?: T;
   authorEmail?: T;
   body?: T;

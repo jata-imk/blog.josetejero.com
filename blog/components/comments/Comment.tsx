@@ -18,12 +18,17 @@ export function Comment({
   date,
   text,
   status,
+  isReply,
+  onReply,
   children,
 }: {
   authorName: string
   date: string
   text: string
   status?: 'pending' | 'ok' | 'err'
+  /** Las respuestas no pueden a su vez responderse: los hilos son de un solo nivel. */
+  isReply?: boolean
+  onReply?: () => void
   children?: ReactNode
 }) {
   const initials = authorName
@@ -49,12 +54,14 @@ export function Comment({
           {status && <Status variant={status} />}
         </div>
         <p className="ab-comment-text">{text}</p>
-        <div className="ab-comment-actions">
-          <button type="button">
-            <Ic name="reply" size={13} sw={2} />
-            Responder
-          </button>
-        </div>
+        {onReply && !isReply && (
+          <div className="ab-comment-actions">
+            <button type="button" onClick={onReply}>
+              <Ic name="reply" size={13} sw={2} />
+              Responder
+            </button>
+          </div>
+        )}
         {children && (
           <div className="ab-comment-replies">
             {children}

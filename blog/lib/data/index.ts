@@ -31,7 +31,14 @@ export {
   type SeriesStepStatus,
   type SeriesPostWithStatus,
 } from './series'
-export { getCommentsByPost, getPendingComments } from './comments'
+export {
+  getCommentsByPost,
+  getCommentThreads,
+  createComment,
+  type CommentThread,
+  type CreateCommentInput,
+  type CreateCommentResult,
+} from './comments'
 export {
   searchAll,
   normalizeScope,
