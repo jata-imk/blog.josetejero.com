@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { revalidatePath } from 'next/cache'
 
 /**
- * Revalidación on-demand del caché ISR (ADR 0031).
+ * Revalidación on-demand del caché ISR (ADR 0033).
  *
  * El build hermético produce una imagen cuyas páginas prerenderizadas
  * (home, listados, sitemap, RSS) nacen vacías. El paso de warm-up del

@@ -1,6 +1,6 @@
 # Runbook: pipeline CI/CD (GitHub Actions + GHCR)
 
-> ADR relacionado: [0031 — CI/CD con build hermético y deploy automático](../adr/0031-ci-cd-build-hermetico-y-deploy-automatico.md).
+> ADR relacionado: [0033 — CI/CD con build hermético y deploy automático](../adr/0033-ci-cd-build-hermetico-y-deploy-automatico.md).
 > Complementa a [deploy.md](./deploy.md), que conserva el flujo manual como plan B.
 
 ## Qué hace el pipeline y por qué
@@ -164,7 +164,7 @@ En el VPS, `.env` de prod añade `REVALIDATE_SECRET=...` (ver `.env.example`). G
 
 ## Migraciones: siguen siendo manuales y ANTES del merge
 
-El pipeline **no corre migraciones** (decisión del ADR 0031, ratifica el
+El pipeline **no corre migraciones** (decisión del ADR 0033, ratifica el
 [ADR 0027](../adr/0027-migraciones-y-seed-para-produccion.md)). Si tu cambio incluye una migración
 de schema (`migrations/` nuevo), el orden es:
 

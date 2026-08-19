@@ -149,7 +149,7 @@ No subas `.env` al repo.
 ## Build en GitHub Actions
 
 **Este es el flujo principal y ya está implementado** (ADR
-[0031](../adr/0031-ci-cd-build-hermetico-y-deploy-automatico.md)): cada push a `main` construye la
+[0033](../adr/0033-ci-cd-build-hermetico-y-deploy-automatico.md)): cada push a `main` construye la
 imagen en GitHub Actions, la publica en GHCR y despliega al VPS por SSH. El pipeline completo,
 su configuración (secrets, GHCR, clave SSH) y el troubleshooting están documentados en
 **[ci-cd.md](./ci-cd.md)**.
@@ -166,7 +166,7 @@ El ADR [0021](../adr/0021-deploy-vps-cloudpanel-docker-compose.md) marca CI/GHCR
 construir la imagen **en el mismo VPS**, porque ahí PostgreSQL ya está a mano (publicado en
 `127.0.0.1:5432`).
 
-> **El build ya no toca la BD** (build hermético, ADR 0031). Los gotchas históricos de
+> **El build ya no toca la BD** (build hermético, ADR 0033). Los gotchas históricos de
 > `--network host` y `ENOTFOUND postgres` quedaron obsoletos: el `Dockerfile` define
 > `BUILD_WITHOUT_DB=1` y ya no acepta `DATABASE_URL`/`PAYLOAD_SECRET` como build-args. El build
 > funciona igual en el VPS, en tu PC o en CI, sin red y sin túnel.
@@ -295,7 +295,7 @@ El frontend público usa ISR (`revalidate = 3600`) y `/blog/[slug]` vuelve a usa
 `generateStaticParams`. Esto favorece SEO porque Next puede entregar HTML prerenderizado y
 regenerarlo después.
 
-**El build del pipeline ya NO necesita PostgreSQL** (build hermético, ADR 0031): con
+**El build del pipeline ya NO necesita PostgreSQL** (build hermético, ADR 0033): con
 `BUILD_WITHOUT_DB=1` los helpers de datos devuelven vacío en build y el warm-up post-deploy
 regenera todo vía `POST /api/revalidate` (ver [ci-cd.md](./ci-cd.md)). El `Dockerfile` ya no acepta
 `DATABASE_URL` ni `PAYLOAD_SECRET` como build-args — usa placeholders internos.
@@ -565,11 +565,41 @@ En desarrollo, cuando el cambio de schema esté destinado a producción, genera 
 pnpm migrate:create nombre-de-cambio
 ```
 
-Revisa el SQL generado y, en producción, aplica **antes** de dar por completo el deploy:
+Revisa el SQL generado y **aplícalo a producción ANTES de mergear a `main`**. Con el pipeline
+activo (ADR [0033](../adr/0033-ci-cd-build-hermetico-y-deploy-automatico.md)), el push a `main`
+despliega la imagen nueva en minutos: si la migración no está aplicada, la app nueva arranca contra
+un schema viejo y las páginas que tocan ese schema fallan **en runtime**. El build no te avisa,
+porque es hermético y no ve la BD. Ver [ci-cd.md → Migraciones](./ci-cd.md).
 
-```bash
+El CLI se corre desde tu PC por túnel SSH (o desde el host del VPS si tiene Node), nunca dentro del
+contenedor `app`: es `standalone` y no incluye el CLI de Payload.
+
+```powershell
+# --- tu PC (PowerShell), con el túnel SSH abierto contra el Postgres de prod ---
+$env:NODE_ENV = 'production'
+$env:DATABASE_URL = 'postgresql://USUARIO:PASS@localhost:5432/BASE'
+
+pnpm payload migrate:status   # a qué BD apuntas y qué falta por aplicar
 pnpm payload migrate
+pnpm payload migrate:status   # todas aplicadas
 ```
+
+> **`migrate:status` antes de `migrate`, siempre.** Es la forma barata de comprobar que la variable
+> de sesión ganó sobre el `.env` (que apunta a la BD de dev) **antes** de escribir en prod. Si la
+> lista no cuadra con lo que esperas de producción, para y revisa el túnel.
+
+> **`NODE_ENV=production` es obligatorio.** Sin él, el `onInit` de `payload.config.ts` corre
+> `seedDev()` y siembra usuarios `*@test.local` y posts falsos en la base a la que apuntes — prod
+> incluida. Ver ADR [0027](../adr/0027-migraciones-y-seed-para-produccion.md).
+
+> **El aviso "you've run Payload in dev mode… data loss will occur" sale siempre en esta BD.**
+> Payload lo lanza cuando encuentra en `payload_migrations` la fila centinela `name = 'dev'`,
+> `batch = -1`, que deja el `push` del modo dev. En la base de producción existe desde el
+> 2026-07-03 (residuo del primer arranque sin `NODE_ENV=production`), así que el aviso aparece en
+> cada migración y **no dice nada sobre el SQL que vas a correr**: el texto es genérico. Antes de
+> responder `yes`: lee el SQL de la migración pendiente, confirma con `migrate:status` que apuntas
+> a prod, y ten el backup hecho. Borrar esa fila (`DELETE FROM payload_migrations WHERE name = 'dev'`)
+> silencia el aviso para siempre; es solo un centinela, pero es tocar prod a mano.
 
 No dependas de seed ni auto-push en producción: el seed de dev es solo para `NODE_ENV !== 'production'`
 y `push` está desactivado en prod.

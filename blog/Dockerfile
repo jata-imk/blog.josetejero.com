@@ -15,7 +15,7 @@ FROM deps AS builder
 # seed de desarrollo (seedDev) durante el build y contamina la BD a la que apunte
 # DATABASE_URL — incluida producción si se construye contra ella (ISR prerender).
 ENV NODE_ENV=production
-# Build hermético (ADR 0031): el build NO toca ninguna base de datos. Los data
+# Build hermético (ADR 0033): el build NO toca ninguna base de datos. Los data
 # helpers devuelven vacío con este flag y el warm-up post-deploy regenera el
 # contenido vía /api/revalidate. DATABASE_URL y PAYLOAD_SECRET son placeholders
 # sintácticamente válidos (Payload los exige al cargar config) y ya no llegan

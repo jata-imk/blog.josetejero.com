@@ -163,7 +163,7 @@ más interesante técnicamente; es qué duele más.
 
 - [x] Build hermético implementado y verificado (compila sin base de datos)
 - [x] Workflow de GitHub Actions escrito (lint → build → GHCR → deploy SSH → warm-up)
-- [x] Runbook `ci-cd.md` + ADR 0031 documentados en el repo
+- [x] Runbook `ci-cd.md` + ADR 0033 documentados en el repo
 - [ ] Secrets configurados en GitHub (VPS_HOST, VPS_USER, VPS_SSH_KEY, REVALIDATE_SECRET)
 - [ ] Primer run del pipeline completo contra producción
 - [ ] Prueba de rollback real

@@ -1,8 +1,11 @@
-# 0031 — CI/CD con build hermético y deploy automático (GitHub Actions + GHCR)
+# 0033 — CI/CD con build hermético y deploy automático (GitHub Actions + GHCR)
 
 - Estado: aceptada
 - Fecha: 2026-07-08
 - Decidido por: José (dirección) + Claude (diseño), sobre el punto 4 del roadmap de mejoras
+- Nota: redactado como 0031 en su rama; renumerado a **0033** al integrar, porque `main` ya había
+  ocupado 0031 (bloque `chmodCalculator`) y 0032 (comentarios). El mensaje del commit original sigue
+  diciendo 0031.
 
 ## Contexto
 

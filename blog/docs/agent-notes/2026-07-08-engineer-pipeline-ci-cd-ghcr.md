@@ -2,7 +2,7 @@
 
 ## Qué se hizo
 
-Implementación completa del punto 4 del roadmap (ADR 0031, concreta el camino preferente del
+Implementación completa del punto 4 del roadmap (ADR 0033, concreta el camino preferente del
 ADR 0021):
 
 - **Build hermético**: `lib/data/build-guard.ts` (flag `BUILD_WITHOUT_DB`) + guards de retorno
@@ -23,7 +23,7 @@ ADR 0021):
   posts vía sitemap). Concurrency `deploy-prod` sin cancelación.
 - **Docs**: runbook nuevo `docs/runbooks/ci-cd.md` (didáctico, con setup inicial y
   troubleshooting); `deploy.md` actualizado (túnel SSH para build obsoleto, plan B hermético,
-  gotcha `--no-cache` marcado obsoleto); ADR 0031.
+  gotcha `--no-cache` marcado obsoleto); ADR 0033.
 
 ## Verificación
 

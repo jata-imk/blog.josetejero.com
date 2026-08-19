@@ -1,4 +1,4 @@
-# Pipeline CI/CD del blog (ADR 0031). Documentación completa y didáctica:
+# Pipeline CI/CD del blog (ADR 0033). Documentación completa y didáctica:
 # blog/docs/runbooks/ci-cd.md
 #
 # push a main → lint → build hermético + push a GHCR → deploy SSH al VPS → warm-up.
