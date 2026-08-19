@@ -59,6 +59,34 @@ custom. Ver `docs/agent-notes/2026-06-29-engineer-import-md-ui.md` §1.
 `description` (textarea) sigue siendo el blurb corto para las cards; `body` (richText) es la
 portada rich en el detalle de la serie.
 
+## Ajuste — imágenes portrait recortadas en el cuerpo (2026-08-04)
+
+El "no se añadió converter custom" de arriba asumía implícitamente que cualquier imagen inline
+tendría un aspect ratio compatible con los tamaños de `collections/Media.ts` — que son **los tres
+16:9 de portada** (`thumbnail`, `card`, `hero`; ver ADR 0029). Un caso real lo rompió: una imagen
+*portrait* (1122×1402) subida al cuerpo de un post se veía recortada al aspect de `hero` en
+cualquier viewport de escritorio (961–1920px), aunque nunca se pidió que fuera 16:9.
+
+Causa: el `UploadJSXConverter` default arma un `<picture>` con un `<source media="(max-width:
+Npx)">` por cada tamaño generado — la condición usa el **ancho del tamaño**, no su aspect ratio.
+El navegador toma la primera fuente cuyo viewport encaje, sin saber que esa fuente está recortada.
+Para un original más angosto que `hero` (1920) pero más alto que `hero` (1080), Payload igual
+genera el crop (solo omite un tamaño si el original es más chico **en los dos ejes**).
+
+**Se revierte el no-op:** se añade un cuarto tamaño solo-ancho **sin crop** en
+`collections/Media.ts` (`{ name: 'content', width: 1000 }`, sin `height` → sharp reescala
+preservando aspect ratio, sin `fit: cover`) y un converter custom para el nodo `upload` en
+`lib/lexical/converters.tsx`, que ignora el `<picture>` responsive y sirve siempre `sizes.content`
+(o el original si no se generó) en un único `<img>`.
+
+**Trade-off aceptado:** se pierde el `<picture>` responsive (servir un archivo más chico en
+móvil) para las imágenes de cuerpo. Correcto para este blog: son diagramas técnicos, no fotos
+pesadas, y nunca recortar pesa más que ahorrar unos KB en móvil.
+
+Los SVG (Payload no les genera `sizes`) y los uploads no-imagen (siguen como link) no cambian de
+comportamiento. El pipeline de `coverImage`/`hero` (portada, `Thumb` + `next/image` + `object-fit:
+cover`) tampoco cambia — ese recorte 16:9 es intencional (ADR 0029).
+
 ## Consecuencias
 - Más fácil: las series tienen una portada/directorio rico; la jerarquía de 3 niveles se ve como
   indentación sin complejidad de sub-series; las imágenes inline del contenido viejo migran con

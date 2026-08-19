@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { RichText } from '@payloadcms/richtext-lexical/react'
-import { getPostBySlug, getPosts, getPostsInSeries, getCommentsByPost } from '@/lib/data'
+import { getPostBySlug, getPosts, getPostsInSeries, getCommentThreads } from '@/lib/data'
 import { coverImageOf } from '@/lib/media'
 import { makeBodyConverters, extractToc } from '@/lib/lexical'
 import { Thumb } from '@/components/ui/Thumb'
@@ -15,13 +15,30 @@ import { Prose } from '@/components/blocks/Prose'
 import { AuthorCard } from '@/components/post/AuthorCard'
 import { PrevNext } from '@/components/post/PrevNext'
 import { SeriesNav } from '@/components/series/SeriesNav'
-import { CommentForm } from '@/components/comments/CommentForm'
-import { Comment } from '@/components/comments/Comment'
+import { CommentsSection } from '@/components/comments/CommentsSection'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { blogPostingJsonLd, postBreadcrumbJsonLd, alternatesFor, SITE_NAME, SITE_LOCALE } from '@/lib/seo'
-import type { Category, Tag as TagType, Series, User } from '@/payload-types'
+import type { Category, Tag as TagType, Series, User, Comment } from '@/payload-types'
+import type { PublicComment } from '@/components/comments/CommentsSection'
 
 type Props = { params: Promise<{ slug: string }> }
+
+const COMMENT_DATE_FORMAT = new Intl.DateTimeFormat('es-ES', { dateStyle: 'medium' })
+
+/**
+ * Recorta el documento de Payload a lo que se pinta. Importante: los comentarios se envían a una
+ * isla cliente, así que todo lo que se deje aquí acaba viajando al navegador — `authorEmail` se
+ * queda fuera a propósito. La fecha se formatea en el servidor para no depender de la zona horaria
+ * del visitante y evitar desajustes de hidratación.
+ */
+function toPublicComment(comment: Comment): PublicComment {
+  return {
+    id: comment.id,
+    authorName: comment.authorName,
+    date: COMMENT_DATE_FORMAT.format(new Date(comment.createdAt)),
+    text: comment.body,
+  }
+}
 
 export const dynamicParams = true
 
@@ -100,10 +117,10 @@ export default async function PostPage({ params }: Props) {
   const series =
     typeof post.series === 'object' && post.series !== null ? (post.series as Series) : null
 
-  const [highlightMap, seriesPosts, comments] = await Promise.all([
+  const [highlightMap, seriesPosts, commentThreads] = await Promise.all([
     highlightLexicalCode(post.body?.root as { children?: LexicalChildNode[] } | undefined),
     series ? getPostsInSeries(series.id) : Promise.resolve([]),
-    getCommentsByPost(post.id),
+    getCommentThreads(post.id),
   ])
 
   // Derive TOC from Lexical tree — not persisted (ADR 0012)
@@ -264,40 +281,13 @@ export default async function PostPage({ params }: Props) {
       )}
 
       {/* Comentarios */}
-      <div className="post-comments" style={{ marginTop: 48 }}>
-        <div className="post-comments-head">
-          <h2 className="post-comments-title">Comentarios</h2>
-          {comments.length > 0 && (
-            <span
-              className="badge badge-soft"
-              style={{ fontSize: 13, textTransform: 'none', letterSpacing: 0 }}
-            >
-              {comments.length}
-            </span>
-          )}
-        </div>
-
-        <CommentForm postId={String(post.id)} />
-
-        {comments.length === 0 ? (
-          <p style={{ marginTop: 24, color: 'var(--ink-3)', fontSize: 14, fontStyle: 'italic' }}>
-            Sé la primera persona en comentar.
-          </p>
-        ) : (
-          <div className="post-comments-list">
-            {comments.map((c) => (
-              <Comment
-                key={c.id}
-                authorName={c.authorName}
-                date={new Intl.DateTimeFormat('es-ES', { dateStyle: 'medium' }).format(
-                  new Date(c.createdAt),
-                )}
-                text={c.body}
-              />
-            ))}
-          </div>
-        )}
-      </div>
+      <CommentsSection
+        postId={String(post.id)}
+        threads={commentThreads.map(({ comment, replies }) => ({
+          comment: toPublicComment(comment),
+          replies: replies.map(toPublicComment),
+        }))}
+      />
 
     </>
   )

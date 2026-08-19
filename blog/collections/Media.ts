@@ -22,6 +22,10 @@ export const Media: CollectionConfig = {
       { name: 'thumbnail', width: 480, height: 270, position: 'centre' },
       { name: 'card', width: 960, height: 540, position: 'centre' },
       { name: 'hero', width: 1920, height: 1080, position: 'centre' },
+      // Solo-ancho (sin height): sharp reescala sin recortar. Pensado para imágenes
+      // inline del cuerpo, que pueden ser portrait — a diferencia de las tres de
+      // arriba (16:9, portada), esta preserva el aspect ratio original. Ver ADR 0023.
+      { name: 'content', width: 1000 },
     ],
     adminThumbnail: 'thumbnail',
     mimeTypes: ['image/*', 'image/svg+xml'],

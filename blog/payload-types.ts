@@ -199,6 +199,14 @@ export interface Media {
       filesize?: number | null;
       filename?: string | null;
     };
+    content?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
   };
 }
 /**
@@ -300,6 +308,10 @@ export interface Tag {
 export interface Comment {
   id: number;
   post: number | Post;
+  /**
+   * Comentario al que responde. Solo se admite un nivel: un comentario con padre no puede tener respuestas.
+   */
+  parent?: (number | null) | Comment;
   authorName: string;
   authorEmail?: string | null;
   body: string;
@@ -489,6 +501,7 @@ export interface TagsSelect<T extends boolean = true> {
  */
 export interface CommentsSelect<T extends boolean = true> {
   post?: T;
+  parent?: T;
   authorName?: T;
   authorEmail?: T;
   body?: T;
@@ -538,6 +551,16 @@ export interface MediaSelect<T extends boolean = true> {
               filename?: T;
             };
         hero?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        content?:
           | T
           | {
               url?: T;

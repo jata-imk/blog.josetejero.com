@@ -19,7 +19,10 @@ diagramas, código. El diseño viene de **Claude Design** y se entrega como bund
 - Self-hosted en **VPS Debian 12** con **Docker Compose para app + PostgreSQL** y
   **CloudPanel/Nginx** como reverse proxy. **Caddy descartado** y **Cloudflare pendiente**.
   La app mantiene `output: 'standalone'`.
-- Único **bloque custom = `Callout`** (variant `note|tip|warning|danger`, `title`, `content` richText anidado).
+- **Dos bloques custom** en Lexical (cualquier bloque adicional requiere su propio ADR, ver ADR 0003):
+  `Callout` (variant `note|tip|warning|danger`, `title`, `content` richText anidado) y
+  `chmodCalculator` (`initialMode`, `showSpecial`, `title` — calculadora interactiva de permisos,
+  ver ADR 0031).
 - **Código** = nodo built-in de Lexical; **Shiki + botón copiar son RENDER** (frontend), no un bloque.
 - **Imágenes/SVG** = upload nativo de Lexical (colección `Media`). SVG como `<img>`, no inline.
 
