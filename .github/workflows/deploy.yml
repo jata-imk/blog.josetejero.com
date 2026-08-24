@@ -88,7 +88,7 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
             set -e
-            cd /var/www/html/blog-prod/blog
+            cd /var/www/html/blog.josetejero.com/blog
             # Deploy por SHA exacto (no :latest): el rollback es redesplegar
             # un SHA anterior. APP_IMAGE exportado prevalece sobre el .env.
             export APP_IMAGE=ghcr.io/${{ github.repository_owner }}/josetejero-blog:${{ github.sha }}

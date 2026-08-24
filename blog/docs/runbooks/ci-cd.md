@@ -111,7 +111,7 @@ riesgo.
 Entra por SSH al VPS (`appleboy/ssh-action` con `VPS_HOST`/`VPS_USER`/`VPS_SSH_KEY`) y ejecuta:
 
 ```bash
-cd /var/www/html/blog-prod/blog
+cd /var/www/html/blog.josetejero.com/blog
 export APP_IMAGE=ghcr.io/<owner>/josetejero-blog:<sha>   # SHA exacto, no :latest
 docker compose pull app
 docker compose up -d
@@ -185,7 +185,7 @@ Cada deploy queda como `ghcr.io/<owner>/josetejero-blog:<sha>`. Para volver a un
 **Opción A — manual por SSH (más rápida):**
 
 ```bash
-cd /var/www/html/blog-prod/blog
+cd /var/www/html/blog.josetejero.com/blog
 export APP_IMAGE=ghcr.io/<owner>/josetejero-blog:<sha-bueno-anterior>
 docker compose pull app && docker compose up -d
 # regenerar el caché ISR de inmediato:

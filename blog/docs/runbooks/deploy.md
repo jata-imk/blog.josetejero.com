@@ -55,7 +55,7 @@ sudo chown -R "$USER":"$USER" /var/www/html
 
 ```bash
 /var/www/html/blog-dev
-/var/www/html/blog-prod
+/var/www/html/blog.josetejero.com
 ```
 
 ## PostgreSQL dev en el VPS
@@ -123,8 +123,8 @@ docker compose down -v
 
 ```bash
 cd /var/www/html
-git clone <URL_DEL_REPO> blog-prod
-cd blog-prod/blog
+git clone <URL_DEL_REPO> blog.josetejero.com
+cd blog.josetejero.com/blog
 cp .env.example .env
 ```
 
@@ -183,7 +183,7 @@ construir la imagen **en el mismo VPS**, porque ahí PostgreSQL ya está a mano 
 Secuencia completa desde `blog/` en el VPS:
 
 ```bash
-cd /var/www/html/blog-prod/blog
+cd /var/www/html/blog.josetejero.com/blog
 
 # 1. Levanta solo PostgreSQL
 docker compose up -d postgres
@@ -354,7 +354,7 @@ Conviene tener claro que en el VPS hay **dos copias del código**, y no se pisan
 
 - **La imagen Docker** — trae el código "horneado" en el build; es lo que *corre* la app. `docker
   compose up` solo la enciende, no copia nada del disco del VPS.
-- **El repo clonado** (`/var/www/html/blog-prod/blog`) — aporta `docker-compose.yml` y `.env`, y si le
+- **El repo clonado** (`/var/www/html/blog.josetejero.com/blog`) — aporta `docker-compose.yml` y `.env`, y si le
   haces `pnpm install`, además te da el CLI de Payload. Solo comparte con el contenedor la **base de
   datos**, nada más.
 
@@ -469,7 +469,7 @@ pnpm payload migrate
 
 ```bash
 # --- en el VPS ---
-cd /var/www/html/blog-prod/blog
+cd /var/www/html/blog.josetejero.com/blog
 git pull                              # trae el código nuevo al checkout
 docker build \
   --build-arg 'NEXT_PUBLIC_SITE_URL=https://josetejero.com' \

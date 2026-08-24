@@ -116,7 +116,7 @@ separados:
 
 ```bash
 /var/www/html/blog-dev
-/var/www/html/blog-prod
+/var/www/html/blog.josetejero.com
 ```
 
 ## Scripts
