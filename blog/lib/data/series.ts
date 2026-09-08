@@ -1,6 +1,7 @@
 import 'server-only'
 import type { Post, Series } from '@/payload-types'
 import { getPayload } from './getPayload'
+import { BUILD_WITHOUT_DB } from './build-guard'
 
 export async function getSeriesBySlug(slug: string): Promise<Series | null> {
   const payload = await getPayload()
@@ -15,6 +16,7 @@ export async function getSeriesBySlug(slug: string): Promise<Series | null> {
 export const getSeries = getSeriesList
 
 export async function getSeriesList(): Promise<Series[]> {
+  if (BUILD_WITHOUT_DB) return []
   const payload = await getPayload()
   const { docs } = await payload.find({
     collection: 'series',

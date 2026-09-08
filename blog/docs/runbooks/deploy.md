@@ -55,7 +55,7 @@ sudo chown -R "$USER":"$USER" /var/www/html
 
 ```bash
 /var/www/html/blog-dev
-/var/www/html/blog-prod
+/var/www/html/blog.josetejero.com
 ```
 
 ## PostgreSQL dev en el VPS
@@ -123,8 +123,8 @@ docker compose down -v
 
 ```bash
 cd /var/www/html
-git clone <URL_DEL_REPO> blog-prod
-cd blog-prod/blog
+git clone <URL_DEL_REPO> blog.josetejero.com
+cd blog.josetejero.com/blog
 cp .env.example .env
 ```
 
@@ -148,22 +148,16 @@ No subas `.env` al repo.
 
 ## Build en GitHub Actions
 
-El camino recomendado es construir la imagen en GitHub Actions, con acceso a PostgreSQL por túnel
-SSH para que ISR pueda prerenderizar posts publicados. La imagen resultante se publica en un
-registry, por ejemplo GHCR, y el VPS solo hace pull.
+**Este es el flujo principal y ya está implementado** (ADR
+[0033](../adr/0033-ci-cd-build-hermetico-y-deploy-automatico.md)): cada push a `main` construye la
+imagen en GitHub Actions, la publica en GHCR y despliega al VPS por SSH. El pipeline completo,
+su configuración (secrets, GHCR, clave SSH) y el troubleshooting están documentados en
+**[ci-cd.md](./ci-cd.md)**.
 
-Variables necesarias durante el build:
-
-```env
-DATABASE_URL=postgresql://blog_prod:...@localhost:5433/blog_prod
-PAYLOAD_SECRET=...
-NEXT_PUBLIC_SITE_URL=https://josetejero.com
-NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
-```
-
-Si el build se ejecuta dentro de Docker, asegúrate de que el contenedor de build pueda alcanzar el
-puerto local del túnel SSH. En runners Linux normalmente se resuelve con build network `host` o una
-configuración equivalente del action de Docker.
+El build es **hermético**: gracias al flag `BUILD_WITHOUT_DB=1` del `Dockerfile`, ya **no necesita
+acceso a PostgreSQL** — ni túnel SSH ni `DATABASE_URL` real. El diseño anterior (túnel SSH desde el
+runner hasta la BD del VPS) quedó obsoleto. Las páginas prerenderizadas nacen vacías en la imagen y
+el job de warm-up del pipeline las regenera segundos después del deploy vía `POST /api/revalidate`.
 
 ## Build en el VPS (alternativa sin CI)
 
@@ -172,11 +166,10 @@ El ADR [0021](../adr/0021-deploy-vps-cloudpanel-docker-compose.md) marca CI/GHCR
 construir la imagen **en el mismo VPS**, porque ahí PostgreSQL ya está a mano (publicado en
 `127.0.0.1:5432`).
 
-> **`docker build` con host `postgres` falla en el VPS.** Durante el build no existe la red de
-> Compose, así que el nombre de servicio `postgres` no se resuelve (`getaddrinfo ENOTFOUND
-> postgres`). La solución es construir con `--network host` y una `DATABASE_URL` que apunte a
-> `localhost:5432` (el puerto publicado en el host). `--network host` **solo funciona en Linux**
-> (el VPS), no en Docker Desktop de Windows/Mac.
+> **El build ya no toca la BD** (build hermético, ADR 0033). Los gotchas históricos de
+> `--network host` y `ENOTFOUND postgres` quedaron obsoletos: el `Dockerfile` define
+> `BUILD_WITHOUT_DB=1` y ya no acepta `DATABASE_URL`/`PAYLOAD_SECRET` como build-args. El build
+> funciona igual en el VPS, en tu PC o en CI, sin red y sin túnel.
 
 > **`docker build` no arranca nada.** Solo *crea la imagen*. Si después de construir haces
 > `docker compose ps` y solo ves `postgres`, es normal: falta `docker compose up -d` para
@@ -190,24 +183,26 @@ construir la imagen **en el mismo VPS**, porque ahí PostgreSQL ya está a mano 
 Secuencia completa desde `blog/` en el VPS:
 
 ```bash
-cd /var/www/html/blog-prod/blog
+cd /var/www/html/blog.josetejero.com/blog
 
 # 1. Levanta solo PostgreSQL
 docker compose up -d postgres
 
-# 2. Migra primero (las tablas deben existir para que generateStaticParams prerenderice)
-DATABASE_URL='postgresql://USUARIO:PASS@localhost:5432/DB' pnpm payload migrate
+# 2. SOLO si hay migraciones nuevas: migra ANTES de arrancar la app nueva
+#    (NODE_ENV=production obligatorio — ver sección Migraciones)
+NODE_ENV=production DATABASE_URL='postgresql://USUARIO:PASS@localhost:5432/DB' pnpm payload migrate
 
-# 3. Construye la imagen con red host y DATABASE_URL a localhost (NO "postgres")
-docker build --network host \
-  --build-arg 'DATABASE_URL=postgresql://USUARIO:PASS@localhost:5432/DB' \
-  --build-arg 'PAYLOAD_SECRET=TU_SECRET' \
+# 3. Construye la imagen — build hermético: sin --network host, sin credenciales de BD
+docker build \
   --build-arg 'NEXT_PUBLIC_SITE_URL=https://josetejero.com' \
   --build-arg 'NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX' \
   -t josetejero-blog:local .
 
 # 4. Arranca la app (usa la imagen recién construida)
 docker compose up -d
+
+# 5. Regenera el caché ISR — la imagen hermética nace con home/listados/sitemap/RSS vacíos
+curl -X POST https://josetejero.com/api/revalidate -H "Authorization: Bearer TU_REVALIDATE_SECRET"
 ```
 
 > **Gotcha de shell: contraseñas con `&`, `*`, `$`.** En bash, `&` significa "ejecuta en segundo
@@ -218,33 +213,17 @@ docker compose up -d
 
 > **El build NO debe sembrar datos de prueba en la BD.** El `onInit` de `payload.config.ts` corre
 > `seedDev()` (usuarios `*@test.local`, posts de ejemplo, catálogos) salvo que
-> `NODE_ENV === 'production'`. Por eso la etapa `builder` del `Dockerfile` **define
-> `ENV NODE_ENV=production`**: sin eso, construir contra la BD de prod (ISR) la contamina con datos
-> de prueba. Tras un build contra prod, revisa que en los logs **no** aparezcan líneas `[seed] ...`.
-> Si ves datos de prueba en prod, resetea: `docker compose down -v` → `up -d postgres` → `migrate`
-> → rebuild → `up -d`.
+> `NODE_ENV === 'production'`. Con el build hermético este riesgo desapareció **durante el build**
+> (no hay conexión posible), pero la etapa `builder` conserva `ENV NODE_ENV=production` como
+> defensa en profundidad, y el riesgo sigue vivo al correr el **CLI de Payload** (migrate/seed)
+> desde tu PC — ver la nota de `NODE_ENV=production` en la sección de migraciones.
 
-> **Rebuild "exitoso" pero las páginas siguen con datos viejos → caché de capas de Docker.**
-> `docker build` cachea la capa `RUN pnpm build` (`Dockerfile` línea ~24) según el código copiado
-> (`COPY . .`) y los valores de `ARG`/`ENV` (`DATABASE_URL`, `PAYLOAD_SECRET`,
-> `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_GA_ID`). Si el código no cambió y pasas los **mismos** `--build-arg` de siempre,
-> Docker reutiliza la capa cacheada y **`next build` nunca se vuelve a ejecutar**, aunque el comando
-> `docker build` termine "bien". El contenido de la BD en vivo (categorías/tags/series/posts nuevos)
-> no es un input que Docker pueda ver — solo mira archivos y argumentos, así que agregar contenido
-> sin tocar código **no invalida el caché** y las páginas estáticas (`/categorias`, `/series`,
-> `/tags/[slug]`, sin `searchParams`) siguen sirviendo el HTML horneado de la build anterior.
->
-> Si rebuildeaste solo para reflejar contenido nuevo (sin cambios de código), agrega `--no-cache`:
-> ```bash
-> docker build --no-cache --network host \
->   --build-arg 'DATABASE_URL=...' --build-arg 'PAYLOAD_SECRET=...' \
->   --build-arg 'NEXT_PUBLIC_SITE_URL=https://josetejero.com' \
->   --build-arg 'NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX' \
->   -t josetejero-blog:local .
-> docker compose up -d --force-recreate
-> ```
-> Confirma con `curl -sI http://127.0.0.1:3000/categorias | grep -i x-nextjs-cache` — debe dejar de
-> decir `HIT` del build viejo.
+> **El gotcha histórico de `--no-cache` para "reflejar contenido nuevo" quedó obsoleto.** Con el
+> build hermético el contenido de la BD **nunca se hornea en la imagen**: llega en runtime vía ISR
+> y el endpoint de revalidación. Para que aparezca contenido nuevo NO hay que rebuildear nada —
+> basta `curl -X POST https://josetejero.com/api/revalidate -H "Authorization: Bearer ..."` o
+> esperar el ciclo ISR de 1 h. `--no-cache` solo tendría sentido hoy ante una capa de Docker
+> corrupta, no por contenido.
 
 ## Primer deploy en el VPS
 
@@ -316,13 +295,14 @@ El frontend público usa ISR (`revalidate = 3600`) y `/blog/[slug]` vuelve a usa
 `generateStaticParams`. Esto favorece SEO porque Next puede entregar HTML prerenderizado y
 regenerarlo después.
 
-El build necesita acceso a PostgreSQL para prerenderizar los slugs publicados. En GitHub Actions,
-abre un túnel SSH al VPS y ejecuta el build con una `DATABASE_URL` que apunte al puerto local del
-túnel. El `Dockerfile` acepta `DATABASE_URL`, `PAYLOAD_SECRET` y `NEXT_PUBLIC_SITE_URL` como build
-args; esos valores se usan solo en la etapa `builder`.
+**El build del pipeline ya NO necesita PostgreSQL** (build hermético, ADR 0033): con
+`BUILD_WITHOUT_DB=1` los helpers de datos devuelven vacío en build y el warm-up post-deploy
+regenera todo vía `POST /api/revalidate` (ver [ci-cd.md](./ci-cd.md)). El `Dockerfile` ya no acepta
+`DATABASE_URL` ni `PAYLOAD_SECRET` como build-args — usa placeholders internos.
 
-No uses la base de producción para experimentos de desarrollo. Para builds reales de producción,
-puedes apuntar a `blog_prod` si el objetivo es prerenderizar contenido publicado real.
+Esto aplica a **cualquier** `docker build` con este `Dockerfile`, incluido el build manual en el
+VPS (plan B): la imagen siempre sale con las páginas prerenderizadas vacías, y se rellenan al
+llamar `POST /api/revalidate` (o al expirar el ciclo ISR de 1 h).
 
 ## Desarrollo local con BD dev en el VPS
 
@@ -374,7 +354,7 @@ Conviene tener claro que en el VPS hay **dos copias del código**, y no se pisan
 
 - **La imagen Docker** — trae el código "horneado" en el build; es lo que *corre* la app. `docker
   compose up` solo la enciende, no copia nada del disco del VPS.
-- **El repo clonado** (`/var/www/html/blog-prod/blog`) — aporta `docker-compose.yml` y `.env`, y si le
+- **El repo clonado** (`/var/www/html/blog.josetejero.com/blog`) — aporta `docker-compose.yml` y `.env`, y si le
   haces `pnpm install`, además te da el CLI de Payload. Solo comparte con el contenedor la **base de
   datos**, nada más.
 
@@ -470,12 +450,17 @@ A partir de aquí ya puedes importar/redactar posts y asociarlos a los catálogo
 
 ## Redeploy tras cambios de código
 
+> **Este flujo manual es el plan B.** El camino normal es el pipeline: push a `main` y GitHub
+> Actions hace build + deploy solo (ver [ci-cd.md](./ci-cd.md)). Lo único que sigue siendo manual
+> con el pipeline es el paso 0 (migraciones, ANTES del merge). Usa esta sección solo si Actions o
+> GHCR no están disponibles.
+
 Tras el primer deploy, cada nuevo cambio de código sigue este flujo. No hace falta bajar la app: un
 rebuild + `docker compose up -d` recrea el contenedor `app` porque cambió la imagen.
 
 ```powershell
-# 0. SOLO si el cambio toca el schema — migra ANTES del build, porque ISR
-#    prerenderiza páginas leyendo la BD durante el build. Desde tu PC (PowerShell) por
+# 0. SOLO si el cambio toca el schema — migra ANTES de arrancar la app nueva
+#    (la app nueva espera el schema nuevo). Desde tu PC (PowerShell) por
 #    túnel — NODE_ENV=production obligatorio, ver nota arriba:
 $env:NODE_ENV = 'production'
 $env:DATABASE_URL = 'postgresql://blog_prod:TU_PASSWORD@localhost:5432/blog_prod'
@@ -484,17 +469,16 @@ pnpm payload migrate
 
 ```bash
 # --- en el VPS ---
-cd /var/www/html/blog-prod/blog
+cd /var/www/html/blog.josetejero.com/blog
 git pull                              # trae el código nuevo al checkout
-docker compose up -d postgres         # asegura la BD arriba (la necesita el build para ISR)
-docker build --network host \
-  --build-arg 'DATABASE_URL=postgresql://blog_prod:TU_PASSWORD@localhost:5432/blog_prod' \
-  --build-arg 'PAYLOAD_SECRET=TU_SECRET' \
+docker build \
   --build-arg 'NEXT_PUBLIC_SITE_URL=https://josetejero.com' \
   --build-arg 'NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX' \
-  -t josetejero-blog:local .
+  -t josetejero-blog:local .          # build hermético: no necesita la BD
 docker compose up -d                  # recrea el contenedor app con la imagen nueva
 docker compose logs -f app
+# la imagen nace con páginas vacías — regenera el caché ISR:
+curl -X POST https://josetejero.com/api/revalidate -H "Authorization: Bearer TU_REVALIDATE_SECRET"
 ```
 
 ### Bajar la app (sin perder datos)
@@ -581,11 +565,41 @@ En desarrollo, cuando el cambio de schema esté destinado a producción, genera 
 pnpm migrate:create nombre-de-cambio
 ```
 
-Revisa el SQL generado y, en producción, aplica **antes** de dar por completo el deploy:
+Revisa el SQL generado y **aplícalo a producción ANTES de mergear a `main`**. Con el pipeline
+activo (ADR [0033](../adr/0033-ci-cd-build-hermetico-y-deploy-automatico.md)), el push a `main`
+despliega la imagen nueva en minutos: si la migración no está aplicada, la app nueva arranca contra
+un schema viejo y las páginas que tocan ese schema fallan **en runtime**. El build no te avisa,
+porque es hermético y no ve la BD. Ver [ci-cd.md → Migraciones](./ci-cd.md).
 
-```bash
+El CLI se corre desde tu PC por túnel SSH (o desde el host del VPS si tiene Node), nunca dentro del
+contenedor `app`: es `standalone` y no incluye el CLI de Payload.
+
+```powershell
+# --- tu PC (PowerShell), con el túnel SSH abierto contra el Postgres de prod ---
+$env:NODE_ENV = 'production'
+$env:DATABASE_URL = 'postgresql://USUARIO:PASS@localhost:5432/BASE'
+
+pnpm payload migrate:status   # a qué BD apuntas y qué falta por aplicar
 pnpm payload migrate
+pnpm payload migrate:status   # todas aplicadas
 ```
+
+> **`migrate:status` antes de `migrate`, siempre.** Es la forma barata de comprobar que la variable
+> de sesión ganó sobre el `.env` (que apunta a la BD de dev) **antes** de escribir en prod. Si la
+> lista no cuadra con lo que esperas de producción, para y revisa el túnel.
+
+> **`NODE_ENV=production` es obligatorio.** Sin él, el `onInit` de `payload.config.ts` corre
+> `seedDev()` y siembra usuarios `*@test.local` y posts falsos en la base a la que apuntes — prod
+> incluida. Ver ADR [0027](../adr/0027-migraciones-y-seed-para-produccion.md).
+
+> **El aviso "you've run Payload in dev mode… data loss will occur" sale siempre en esta BD.**
+> Payload lo lanza cuando encuentra en `payload_migrations` la fila centinela `name = 'dev'`,
+> `batch = -1`, que deja el `push` del modo dev. En la base de producción existe desde el
+> 2026-07-03 (residuo del primer arranque sin `NODE_ENV=production`), así que el aviso aparece en
+> cada migración y **no dice nada sobre el SQL que vas a correr**: el texto es genérico. Antes de
+> responder `yes`: lee el SQL de la migración pendiente, confirma con `migrate:status` que apuntas
+> a prod, y ten el backup hecho. Borrar esa fila (`DELETE FROM payload_migrations WHERE name = 'dev'`)
+> silencia el aviso para siempre; es solo un centinela, pero es tocar prod a mano.
 
 No dependas de seed ni auto-push en producción: el seed de dev es solo para `NODE_ENV !== 'production'`
 y `push` está desactivado en prod.

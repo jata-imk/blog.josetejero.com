@@ -1,6 +1,7 @@
 import 'server-only'
 import type { Category, Tag, Post } from '@/payload-types'
 import { getPayload } from './getPayload'
+import { BUILD_WITHOUT_DB } from './build-guard'
 
 export type RelatedTag = Pick<Tag, 'id' | 'name' | 'slug'>
 
@@ -22,6 +23,7 @@ export async function getTagBySlug(slug: string): Promise<Tag | null> {
 }
 
 export async function getTags(): Promise<Tag[]> {
+  if (BUILD_WITHOUT_DB) return []
   const payload = await getPayload()
   const { docs } = await payload.find({
     collection: 'tags',
