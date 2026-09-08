@@ -138,7 +138,20 @@ export function makeBodyConverters(highlightMap: Map<string, string>): JSXConver
         const src = size?.url ?? doc.url ?? undefined
         const width = size?.width ?? doc.width ?? undefined
         const height = size?.height ?? doc.height ?? undefined
-        return <img src={src} width={width ?? undefined} height={height ?? undefined} alt={alt} loading="lazy" />
+        const img = (
+          <img src={src} width={width ?? undefined} height={height ?? undefined} alt={alt} loading="lazy" />
+        )
+        // El `caption` de la colección Media (o un override en `node.fields`, hoy
+        // siempre null) se emite como <figcaption>. Sin caption, la imagen sale
+        // suelta igual que antes — nada de <figure> vacío.
+        const caption = node.fields?.caption || doc.caption || ''
+        if (!caption) return img
+        return (
+          <figure>
+            {img}
+            <figcaption>{caption}</figcaption>
+          </figure>
+        )
       },
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       tablecell: (args: any) => {

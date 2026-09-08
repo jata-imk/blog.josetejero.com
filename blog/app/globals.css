@@ -1328,6 +1328,19 @@ pre,
   height: auto;
   border-radius: var(--r);
 }
+/* imagen del cuerpo con pie de foto: el converter `upload` la envuelve en
+   <figure> solo cuando el doc de Media trae `caption` (lib/lexical/converters.tsx). */
+.ab-prose figure {
+  margin: 0; /* anula el margin-inline del UA, igual que en blockquote */
+}
+.ab-prose figcaption {
+  margin-top: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--ink-3);
+  text-align: center;
+}
 .ab-prose .ab-code,
 .ab-prose .ab-table-wrap,
 .ab-prose .ab-callout,
