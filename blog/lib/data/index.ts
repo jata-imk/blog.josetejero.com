@@ -27,6 +27,7 @@ export {
   getSeriesWithPosts,
   getPostsInSeries,
   getSeriesNavigationContext,
+  seriesStepStatus,
   type SeriesNavigationContext,
   type SeriesStepStatus,
   type SeriesPostWithStatus,

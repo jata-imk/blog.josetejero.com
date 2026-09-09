@@ -1,4 +1,12 @@
-type StepState = 'done' | 'current' | 'soon'
+import type { SeriesStepStatus } from '@/lib/data'
+
+const STEP_LABEL: Record<SeriesStepStatus, string> = {
+  done: 'Completado',
+  current: 'En progreso',
+  next: 'Siguiente en la serie',
+  available: 'Disponible',
+  soon: 'Próximamente',
+}
 
 export function SeriesStep({
   number,
@@ -9,7 +17,7 @@ export function SeriesStep({
 }: {
   number: number
   title: string
-  state: StepState
+  state: SeriesStepStatus
   href?: string
   /** Nivel de indentación dentro de la serie (0 = raíz, 1 = sub-artículo). ADR 0023. */
   depth?: number
@@ -23,7 +31,7 @@ export function SeriesStep({
       <div>
         <div style={{ fontWeight: 650, fontSize: 15, lineHeight: 1.3 }}>{title}</div>
         <div style={{ fontSize: 12.5, color: 'var(--muted)', marginTop: 3 }}>
-          {state === 'done' ? 'Completado' : state === 'current' ? 'En progreso' : 'Próximamente'}
+          {STEP_LABEL[state]}
         </div>
       </div>
     </div>
