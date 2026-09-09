@@ -2226,6 +2226,16 @@ pre,
   background: var(--bg-soft-2);
   color: var(--muted);
 }
+/* `next` y `available`: artículos publicados y navegables. Sin opacidad
+   reducida (no son pendientes); el número usa el gris neutro del sistema. */
+.ab-step.next .ab-step-num,
+.ab-step.available .ab-step-num {
+  background: var(--bg-soft-2);
+  color: var(--ink-2);
+}
+.ab-step.next {
+  border-color: var(--violet-tint);
+}
 
 /* empty state */
 .ab-empty {

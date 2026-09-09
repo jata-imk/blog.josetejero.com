@@ -26,18 +26,55 @@ export async function getSeriesList(): Promise<Series[]> {
   return docs
 }
 
-export type SeriesStepStatus = 'done' | 'current'
+/**
+ * Estados posibles de un paso de serie. Dos superficies los consumen con
+ * contratos distintos:
+ * - `/series/[slug]` (avance editorial): solo `done` | `current`, calculado en
+ *   `getSeriesWithPosts` — ver ADR 0014 §5.
+ * - `SeriesNav` dentro de un post (posición de lectura): `done` | `current` |
+ *   `next` | `available`, calculado en `seriesStepStatus` — ver ADR 0034.
+ *
+ * `soon` queda reservado por si algún día el CMS modela entregas planeadas como
+ * dato real; hoy no se sintetiza en ninguna de las dos superficies.
+ */
+export type SeriesStepStatus = 'done' | 'current' | 'next' | 'available' | 'soon'
 
 export type SeriesPostWithStatus = Post & {
   stepStatus: SeriesStepStatus
 }
 
 /**
- * Recupera una serie con sus posts publicados y estado editorial.
+ * Deriva el estado de un paso en `SeriesNav` (la navegación que aparece dentro
+ * de un post) a partir de la posición del lector, NO del estado de publicación:
+ * todos los posts que recibe `SeriesNav` ya están publicados (los filtra
+ * `getPostsInSeries`), así que ninguno es `soon`.
+ *
+ * - `currentIndex < 0` (el post actual no está en la lista publicada) → `available`
+ * - antes del actual → `done`
+ * - el actual → `current`
+ * - el inmediatamente siguiente → `next`
+ * - el resto → `available`
+ *
+ * Función pura y sin dependencias: separa la regla de la presentación (ADR 0034).
+ */
+export function seriesStepStatus(
+  index: number,
+  currentIndex: number,
+): SeriesStepStatus {
+  if (currentIndex < 0) return 'available'
+  if (index < currentIndex) return 'done'
+  if (index === currentIndex) return 'current'
+  return index === currentIndex + 1 ? 'next' : 'available'
+}
+
+/**
+ * Recupera una serie con sus posts publicados y estado editorial, para la
+ * página `/series/[slug]`.
  * Retorna `null` si la serie no existe (llamador debe hacer `notFound()`).
  * Si la serie existe pero no tiene posts, retorna `{ series, posts: [] }` (EmptyState).
  *
- * El estado editorial se calcula así (ADR 0014):
+ * El estado editorial se calcula así (ADR 0014 §5) — es un contrato distinto al
+ * de `SeriesNav` (ver `seriesStepStatus`):
  * - Posts anteriores al último publicado → `done`
  * - Último post publicado → `current`
  * - No hay estado `soon` (solo aparecería si el CMS persiste releases planeados)

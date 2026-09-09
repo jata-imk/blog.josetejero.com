@@ -1,4 +1,5 @@
 import type { Post, Series } from '@/payload-types'
+import { seriesStepStatus } from '@/lib/data'
 import { Badge } from '@/components/ui/Badge'
 import { SeriesStep, SeriesProgress } from './SeriesStep'
 
@@ -14,8 +15,10 @@ export function SeriesNav({
   currentPostId: number
 }) {
   const currentIndex = posts.findIndex((p) => p.id === currentPostId)
-  const doneCount = currentIndex >= 0 ? currentIndex : 0
-  const progress = posts.length > 0 ? Math.round((doneCount / posts.length) * 100) : 0
+  // Progreso de lectura: el post actual cuenta como leído, así que el último
+  // post de la serie llega al 100%.
+  const readCount = currentIndex >= 0 ? currentIndex + 1 : 0
+  const progress = posts.length > 0 ? Math.round((readCount / posts.length) * 100) : 0
 
   return (
     <div
@@ -34,19 +37,16 @@ export function SeriesNav({
       </div>
 
       <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 8 }}>
-        {posts.map((post, i) => {
-          const state =
-            i < currentIndex ? 'done' : i === currentIndex ? 'current' : 'soon'
-          return (
-            <SeriesStep
-              key={post.id}
-              number={i + 1}
-              title={post.title}
-              state={state}
-              href={state !== 'soon' ? `/blog/${post.slug}` : undefined}
-            />
-          )
-        })}
+        {posts.map((post, i) => (
+          <SeriesStep
+            key={post.id}
+            number={i + 1}
+            title={post.title}
+            state={seriesStepStatus(i, currentIndex)}
+            // Todos los posts de la lista están publicados: siempre navegables.
+            href={`/blog/${post.slug}`}
+          />
+        ))}
       </div>
 
       {posts.length > 1 && (
