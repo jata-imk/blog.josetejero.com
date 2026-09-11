@@ -8,7 +8,9 @@ import type { SerializedBlockNode } from '@payloadcms/richtext-lexical'
 import { Callout } from '@/components/blocks/Callout'
 import { ChmodCalculator } from '@/components/blocks/ChmodCalculator'
 import { CodeBlockClient } from '@/components/blocks/CodeBlockClient'
+import { FigureTrigger } from '@/components/image-viewer/FigureViewer'
 import { escapeHtml, type LexicalChildNode } from '@/lib/code-highlight'
+import type { ViewerFigure } from '@/lib/figures'
 import type { Media } from '@/payload-types'
 
 type CalloutFields = {
@@ -83,7 +85,11 @@ function slugifyHeading(text: string): string {
  * con el HTML ya resaltado: Shiki queda en servidor (ADR 0008) y solo el botón
  * copiar viaja como cliente.
  */
-export function makeBodyConverters(highlightMap: Map<string, string>): JSXConvertersFunction {
+export function makeBodyConverters(
+  highlightMap: Map<string, string>,
+  options: { figures?: ViewerFigure[] } = {},
+): JSXConvertersFunction {
+  const viewerFigures = new Map((options.figures ?? []).map((figure) => [figure.id, figure]))
   return ({ defaultConverters }) => {
     const converters: JSXConverters = {
       ...defaultConverters,
@@ -145,6 +151,15 @@ export function makeBodyConverters(highlightMap: Map<string, string>): JSXConver
         // siempre null) se emite como <figcaption>. Sin caption, la imagen sale
         // suelta igual que antes — nada de <figure> vacío.
         const caption = node.fields?.caption || doc.caption || ''
+        const viewerFigure = typeof node.id === 'string' ? viewerFigures.get(node.id) : undefined
+        if (viewerFigure) {
+          return (
+            <figure className="viewer-figure">
+              <FigureTrigger figure={viewerFigure}>{img}</FigureTrigger>
+              {caption ? <figcaption>{caption}</figcaption> : null}
+            </figure>
+          )
+        }
         if (!caption) return img
         return (
           <figure>
