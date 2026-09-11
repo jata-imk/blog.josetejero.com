@@ -1,5 +1,6 @@
 import { ImageResponse } from 'next/og'
 import { SITE_NAME, SITE_DESCRIPTION } from '@/lib/seo'
+import { OG_BG, OG_GRAD, OG_INK, OG_INK_3, OG_LINE, OG_ON_ACCENT, OG_SIZE } from '@/lib/og-theme'
 
 /* ============================================================
    Imagen Open Graph por defecto (ADR 0029)
@@ -21,19 +22,12 @@ import { SITE_NAME, SITE_DESCRIPTION } from '@/lib/seo'
    Origen de cada valor: app/globals.css (:root).
    ============================================================ */
 
-// Paleta copiada de app/globals.css — mantener en sincronía
-const INK = '#0f172a' //   --ink
-const INK_3 = '#64748b' // --ink-3
-const BG = '#ffffff' //    --bg
-const LINE = '#e9edf3' //  --line
-const GRAD = 'linear-gradient(115deg, #2563eb 0%, #6d3aed 55%, #7c3aed 100%)' // --grad
-
 // Texto alternativo del og:image (accesibilidad de la tarjeta)
 export const alt = SITE_NAME
 
 // 1200×630 es el tamaño canónico de Open Graph (ratio 1.91:1):
 // lo que Facebook definió y todos los demás adoptaron.
-export const size = { width: 1200, height: 630 }
+export const size = OG_SIZE
 export const contentType = 'image/png'
 
 export default function OpenGraphImage() {
@@ -46,7 +40,7 @@ export default function OpenGraphImage() {
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
-          background: BG,
+          background: OG_BG,
           padding: 72,
           fontFamily: 'sans-serif',
         }}
@@ -59,7 +53,7 @@ export default function OpenGraphImage() {
             left: 0,
             width: '100%',
             height: 14,
-            backgroundImage: GRAD,
+            backgroundImage: OG_GRAD,
           }}
         />
 
@@ -69,8 +63,8 @@ export default function OpenGraphImage() {
             width: 88,
             height: 88,
             borderRadius: 24,
-            backgroundImage: GRAD,
-            color: '#ffffff',
+            backgroundImage: OG_GRAD,
+            color: OG_ON_ACCENT,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -82,10 +76,10 @@ export default function OpenGraphImage() {
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-          <div style={{ fontSize: 76, fontWeight: 800, color: INK, letterSpacing: '-0.03em' }}>
+          <div style={{ fontSize: 76, fontWeight: 800, color: OG_INK, letterSpacing: '-0.03em' }}>
             {SITE_NAME}
           </div>
-          <div style={{ fontSize: 32, color: INK_3, lineHeight: 1.4, maxWidth: 900 }}>
+          <div style={{ fontSize: 32, color: OG_INK_3, lineHeight: 1.4, maxWidth: 900 }}>
             {SITE_DESCRIPTION}
           </div>
         </div>
@@ -96,10 +90,10 @@ export default function OpenGraphImage() {
             display: 'flex',
             alignItems: 'center',
             gap: 16,
-            borderTop: `2px solid ${LINE}`,
+            borderTop: `2px solid ${OG_LINE}`,
             paddingTop: 28,
             fontSize: 26,
-            color: INK_3,
+            color: OG_INK_3,
           }}
         >
           Blog · Desarrollo web · Automatización · IA
