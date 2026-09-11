@@ -323,8 +323,7 @@ export function FigureViewerProvider({
       if (disposed) return
       instance = Panzoom(image, {
         canvas: true,
-        contain: 'outside',
-        minScale: 1,
+        minScale: 0.5,
         maxScale: 8,
         step: 0.25,
         panOnlyWhenZoomed: true,
