@@ -128,7 +128,12 @@ export default async function Home() {
     <>
       {/* hero */}
       <section style={{ textAlign: 'center', padding: '92px 40px 70px', maxWidth: 760, margin: '0 auto' }}>
-        <div className="eyebrow" style={{ marginBottom: 18 }}>Desarrollo · Automatización · IA</div>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
+          <div className="eyebrow">Desarrollo · Automatización · IA</div>
+          <span className="font-sketch" style={{ fontSize: 20, color: 'var(--blue)', transform: 'rotate(-2deg)', display: 'inline-block' }}>
+            ✦ cuaderno de notas
+          </span>
+        </div>
         <h1 style={{ fontSize: 52, fontWeight: 800, letterSpacing: '-.04em', lineHeight: 1.08 }}>
           Hola, soy José Alejandro <span style={{ WebkitTextFillColor: 'initial' }}>👨‍💻</span>
         </h1>
@@ -136,13 +141,16 @@ export default async function Home() {
           Escribo sobre desarrollo web, automatización, inteligencia artificial, backend, frontend
           y aprendizajes construyendo software.
         </p>
-        <div style={{ display: 'flex', gap: 12, justifyContent: 'center', marginTop: 34 }}>
+        <div style={{ display: 'flex', gap: 14, justifyContent: 'center', alignItems: 'center', marginTop: 34, flexWrap: 'wrap' }}>
           <a href="/blog" className="btn btn-grad">
             <Ic name="bookOpen" size={16} sw={2} />Leer el blog
           </a>
           <a href="/series" className="btn btn-secondary">
             <Ic name="layers" size={16} sw={2} />Ver series
           </a>
+          <span className="font-sketch" style={{ fontSize: 22, color: 'var(--ink-3)', transform: 'rotate(3deg)', display: 'inline-block' }}>
+            👈 ¡empieza por aquí!
+          </span>
         </div>
       </section>
 

@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation'
 import { Ic } from '../ui/Ic'
 import { SearchTriggerBtn } from '../search/SearchTriggerBtn'
 import { useTheme } from '../../lib/use-theme'
+import { CuadernoConfigTrigger } from '../ui/CuadernoConfigModal'
 
 const NAV_LINKS = [
   { label: 'Inicio',      href: '/' },
@@ -63,6 +64,8 @@ export function Header() {
             </a>
           ))}
         </div>
+
+        <CuadernoConfigTrigger />
 
         <button
           className="icon-btn theme-toggle"

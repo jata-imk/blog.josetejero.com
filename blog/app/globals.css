@@ -99,8 +99,12 @@
   --font-sketch: var(--font-caveat, cursive, sans-serif);
 
   /* Cuaderno del Ingeniero / Paper & Grid Tokens (Light) */
-  --paper-grid: radial-gradient(rgba(15, 23, 42, 0.055) 1px, transparent 1px);
-  --paper-grid-size: 24px;
+  --paper-grid: radial-gradient(
+    rgba(15, 23, 42, 0.22) 1.5px,
+    transparent 1.5px
+  );
+  --paper-grid-size: 26px 26px;
+  --paper-grid-pos: 0 0;
   --chalk-white: #ffffff;
   --chalk-yellow: #fef08a;
   --chalk-blue: #93c5fd;
@@ -283,7 +287,10 @@
   --on-accent-soft: rgba(255, 255, 255, 0.08);
 
   /* Cuaderno del Ingeniero / Paper & Grid Tokens (Dark) */
-  --paper-grid: radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  --paper-grid: radial-gradient(
+    rgba(255, 255, 255, 0.14) 1.5px,
+    transparent 1.5px
+  );
   --chalk-white: #f8fafc;
   --chalk-yellow: #fde047;
   --chalk-blue: #60a5fa;
@@ -313,6 +320,82 @@
   --green-border: #1a4a35;
   --amber-border: #3d3418;
   --rose-border: #3d1a26;
+}
+
+/* ============================================================
+   Cuaderno del Ingeniero — Sistema de Pauta, Tintas y Papel
+   ============================================================ */
+
+/* 1. Tintas de Pauta / Cuadrícula (Modo Claro) */
+:root,
+:root[data-grid-color="neutral"] {
+  --paper-grid-color-lines: rgba(148, 163, 184, 0.42);
+  --paper-grid-color-dots: rgba(15, 23, 42, 0.24);
+}
+:root[data-grid-color="blue"] {
+  --paper-grid-color-lines: rgba(37, 99, 235, 0.35);
+  --paper-grid-color-dots: rgba(37, 99, 235, 0.32);
+}
+:root[data-grid-color="violet"] {
+  --paper-grid-color-lines: rgba(124, 58, 237, 0.35);
+  --paper-grid-color-dots: rgba(124, 58, 237, 0.32);
+}
+:root[data-grid-color="amber"] {
+  --paper-grid-color-lines: rgba(217, 119, 6, 0.35);
+  --paper-grid-color-dots: rgba(217, 119, 6, 0.32);
+}
+
+/* Tintas de Pauta / Cuadrícula (Modo Oscuro) */
+[data-theme="dark"],
+[data-theme="dark"][data-grid-color="neutral"] {
+  --paper-grid-color-lines: rgba(255, 255, 255, 0.16);
+  --paper-grid-color-dots: rgba(255, 255, 255, 0.18);
+}
+[data-theme="dark"][data-grid-color="blue"] {
+  --paper-grid-color-lines: rgba(96, 165, 250, 0.30);
+  --paper-grid-color-dots: rgba(96, 165, 250, 0.30);
+}
+[data-theme="dark"][data-grid-color="violet"] {
+  --paper-grid-color-lines: rgba(167, 139, 250, 0.30);
+  --paper-grid-color-dots: rgba(167, 139, 250, 0.30);
+}
+[data-theme="dark"][data-grid-color="amber"] {
+  --paper-grid-color-lines: rgba(251, 191, 36, 0.30);
+  --paper-grid-color-dots: rgba(251, 191, 36, 0.30);
+}
+
+/* 2. Pautas: Cuadrícula (por defecto #1), Puntos (#2), Isométrico (#3), Lisa */
+:root,
+:root[data-grid="lines"] {
+  --paper-grid:
+    linear-gradient(to right, var(--paper-grid-color-lines) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--paper-grid-color-lines) 1px, transparent 1px);
+  --paper-grid-size: 28px 28px;
+  --paper-grid-pos: 0 0;
+}
+:root[data-grid="dots"] {
+  --paper-grid: radial-gradient(var(--paper-grid-color-dots) 1.5px, transparent 1.5px);
+  --paper-grid-size: 26px 26px;
+  --paper-grid-pos: 0 0;
+}
+:root[data-grid="iso"] {
+  --paper-grid:
+    radial-gradient(var(--paper-grid-color-dots) 1.5px, transparent 1.5px),
+    radial-gradient(var(--paper-grid-color-dots) 1.5px, transparent 1.5px);
+  --paper-grid-size: 32px 32px;
+  --paper-grid-pos: 0 0, 16px 16px;
+}
+:root[data-grid="none"] {
+  --paper-grid: none;
+}
+
+/* 3. Degradado / Foco central de la pauta */
+:root,
+:root[data-grid-fade="true"] {
+  --paper-grid-mask: radial-gradient(ellipse 90% 70% at 50% 30%, black 20%, rgba(0, 0, 0, 0.5) 65%, transparent 100%);
+}
+:root[data-grid-fade="false"] {
+  --paper-grid-mask: none;
 }
 
 /* mapeo categoría → acento + tint (usar con data-cat="…"). Slugs = catálogo real
@@ -360,8 +443,6 @@ body {
   font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   color: var(--ink);
   background-color: var(--bg);
-  background-image: var(--paper-grid);
-  background-size: var(--paper-grid-size) var(--paper-grid-size);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
@@ -369,22 +450,70 @@ body {
   min-height: 100vh;
 }
 
-/* Textura táctil de grano de papel analógico (SVG procedimental en CSS, 0 KB transfer) */
-.paper-grain {
+/* ============================================================
+   Cuaderno del Ingeniero — Canvas de Fondo
+   z-index: -1 sitúa la textura y la cuadrícula estrictamente detrás del contenido.
+   Las tarjetas, cabeceras y tipografías quedan 100% nítidas y limpias por encima.
+   ============================================================ */
+.paper-canvas {
   position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: -1;
+  overflow: hidden;
+  background-color: var(--bg);
+}
+
+.paper-canvas-texture {
+  position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-  pointer-events: none;
-  z-index: 9999;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='paperNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23paperNoise)' opacity='1'/%3E%3C/svg%3E");
-  opacity: 0.028;
+  opacity: var(--paper-texture-opacity, 0.22);
   mix-blend-mode: multiply;
+  transition: opacity 0.2s ease;
 }
 
-[data-theme="dark"] .paper-grain {
-  opacity: 0.038;
+[data-theme="dark"] .paper-canvas-texture {
   mix-blend-mode: screen;
+}
+
+/* Textura 1: Papel arrugado orgánico con pliegues procedimentales SVG */
+:root .paper-canvas-texture,
+:root[data-paper-texture="wrinkled"] .paper-canvas-texture {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 500 500' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='wrinkles'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.012' numOctaves='5' result='noise'/%3E%3CfeDiffuseLighting in='noise' lightingColor='%23fff' surfaceScale='3.2' result='light'%3E%3CfeDistantLight azimuth='55' elevation='50'/%3E%3C/feDiffuseLighting%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23wrinkles)'/%3E%3C/svg%3E");
+  background-size: 500px 500px;
+}
+
+/* Textura 2: Grano analógico fino */
+:root[data-paper-texture="grain"] .paper-canvas-texture {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='paperNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23paperNoise)' opacity='1'/%3E%3C/svg%3E");
+  background-size: 256px 256px;
+}
+
+/* Textura desactivada */
+:root[data-paper-texture="none"] .paper-canvas-texture {
+  display: none;
+}
+
+/* Capa de Pauta / Cuadrícula */
+.paper-canvas-grid {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background-image: var(--paper-grid);
+  background-size: var(--paper-grid-size);
+  background-position: var(--paper-grid-pos, 0 0);
+  mask-image: var(--paper-grid-mask, none);
+  -webkit-mask-image: var(--paper-grid-mask, none);
+  transition: opacity 0.2s ease;
+}
+
+:root[data-grid="none"] .paper-canvas-grid {
+  display: none;
 }
 
 /* Tipografía de boceto/anotación */
@@ -1507,7 +1636,9 @@ pre,
   min-width: 0;
   min-height: 0;
   display: grid;
-  grid-template-columns: var(--viewer-control) minmax(0, 1fr) var(--viewer-control);
+  grid-template-columns: var(--viewer-control) minmax(0, 1fr) var(
+      --viewer-control
+    );
   align-items: stretch;
   gap: var(--viewer-stage-gap);
   padding: var(--viewer-stage-gap);
@@ -1904,7 +2035,7 @@ pre,
 .ab-chmod-target-option:has(input:focus-visible) {
   box-shadow: var(--ring);
 }
-.ab-chmod-target-option[data-active='true'] {
+.ab-chmod-target-option[data-active="true"] {
   background: var(--blue-tint);
   border-color: var(--blue-border);
   color: var(--blue-700);
@@ -1994,7 +2125,7 @@ pre,
   padding: 5px 0;
   cursor: pointer;
 }
-.ab-chmod-row input[type='checkbox'] {
+.ab-chmod-row input[type="checkbox"] {
   accent-color: var(--blue);
   width: 15px;
   height: 15px;
