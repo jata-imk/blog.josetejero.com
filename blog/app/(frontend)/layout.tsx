@@ -1,6 +1,6 @@
 import '../globals.css'
 import type { Metadata } from 'next'
-import { inter, jetbrainsMono } from '../fonts'
+import { inter, jetbrainsMono, caveat } from '../fonts'
 import { Header } from '../../components/layout/Header'
 import { Footer } from '../../components/layout/Footer'
 import { GlobalSearchProvider } from '../../components/search/GlobalSearchProvider'
@@ -95,7 +95,7 @@ export default function FrontendLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="es" data-theme="light" className={`${inter.variable} ${jetbrainsMono.variable}`} suppressHydrationWarning>
+    <html lang="es" data-theme="light" className={`${inter.variable} ${jetbrainsMono.variable} ${caveat.variable}`} suppressHydrationWarning>
       <head>
         <script
           dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP_SCRIPT }}
@@ -108,6 +108,7 @@ export default function FrontendLayout({
         />
       </head>
       <body className="bg-bg text-ink font-sans">
+        <div className="paper-grain" aria-hidden="true" />
         {/* JSON-LD WebSite: se emite UNA vez para todo el sitio; le da a
             Google el nombre canónico del sitio y la entidad del autor */}
         <JsonLd data={websiteJsonLd()} />

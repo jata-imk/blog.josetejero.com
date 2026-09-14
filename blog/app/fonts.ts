@@ -1,4 +1,4 @@
-import { Inter, JetBrains_Mono } from 'next/font/google'
+import { Inter, JetBrains_Mono, Caveat } from 'next/font/google'
 
 export const inter = Inter({
   subsets: ['latin'],
@@ -13,3 +13,11 @@ export const jetbrainsMono = JetBrains_Mono({
   display: 'swap',
   weight: ['400', '500', '600'],
 })
+
+export const caveat = Caveat({
+  subsets: ['latin'],
+  variable: '--font-caveat',
+  display: 'swap',
+  weight: ['400', '600', '700'],
+})
+
