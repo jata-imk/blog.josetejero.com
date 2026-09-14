@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation'
 import { Ic } from '../ui/Ic'
 import { SearchTriggerBtn } from '../search/SearchTriggerBtn'
 import { useTheme } from '../../lib/use-theme'
+import { CuadernoConfigTrigger } from '../ui/CuadernoConfigModal'
 
 const NAV_LINKS = [
   { label: 'Inicio',      href: '/' },
@@ -64,15 +65,18 @@ export function Header() {
           ))}
         </div>
 
-        <button
-          className="icon-btn theme-toggle"
-          aria-label={theme === 'dark' ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro'}
-          aria-pressed={theme === 'dark'}
-          title={theme === 'dark' ? 'Tema claro' : 'Tema oscuro'}
-          onClick={toggle}
-        >
-          <Ic name={theme === 'dark' ? 'sun' : 'moon'} size={18} sw={1.8} />
-        </button>
+        <div className="header-actions">
+          <CuadernoConfigTrigger />
+          <button
+            className="icon-btn theme-toggle"
+            aria-label={theme === 'dark' ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro'}
+            aria-pressed={theme === 'dark'}
+            title={theme === 'dark' ? 'Tema claro' : 'Tema oscuro'}
+            onClick={toggle}
+          >
+            <Ic name={theme === 'dark' ? 'sun' : 'moon'} size={18} sw={1.8} />
+          </button>
+        </div>
       </div>
     </header>
   )
