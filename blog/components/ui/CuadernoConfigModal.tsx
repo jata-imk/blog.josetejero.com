@@ -15,7 +15,7 @@ export const DEFAULT_CUADERNO_SETTINGS: CuadernoSettings = {
   color: 'blue',
   fade: true,
   texture: 'wrinkled',
-  opacity: 0.22,
+  opacity: 0.40,
 }
 
 function applySettingsToDOM(s: CuadernoSettings) {
@@ -30,11 +30,30 @@ function applySettingsToDOM(s: CuadernoSettings) {
 export function CuadernoConfigTrigger() {
   const [open, setOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const [isDark, setIsDark] = useState(false)
   const [settings, setSettings] = useState<CuadernoSettings>(DEFAULT_CUADERNO_SETTINGS)
 
-  // Mount check for client portal
+  // Mount check and theme observer
   useEffect(() => {
     setMounted(true)
+    const checkDark = () => {
+      setIsDark(document.documentElement.getAttribute('data-theme') === 'dark')
+    }
+    checkDark()
+    const obs = new MutationObserver(checkDark)
+    obs.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
+    
+    // Fallback sync scroll position
+    const onScroll = () => {
+      document.documentElement.style.setProperty('--scroll-y', `${window.scrollY || window.pageYOffset || 0}px`)
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    onScroll()
+
+    return () => {
+      obs.disconnect()
+      window.removeEventListener('scroll', onScroll)
+    }
   }, [])
 
   // Load from localStorage on mount
@@ -92,7 +111,7 @@ export function CuadernoConfigTrigger() {
         title="Personalizar Cuaderno (Pauta, Textura y Colores)"
         onClick={() => setOpen(true)}
       >
-        <Ic name="sliders" size={18} sw={1.8} />
+        <Ic name="gear" size={18} sw={1.8} />
       </button>
 
       {open && mounted && createPortal(
@@ -337,19 +356,21 @@ export function CuadernoConfigTrigger() {
             {/* SECTION 5: Intensidad de Textura */}
             {settings.texture !== 'none' && (
               <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8 }}>
                   <label style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--ink-2)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                     Intensidad de Textura
                   </label>
                   <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--blue)' }}>
-                    {Math.round(settings.opacity * 100)}%
+                    {isDark
+                      ? `${Math.round(settings.opacity * 0.42 * 100)}% (🌙 Modo oscuro)`
+                      : `${Math.round(settings.opacity * 100)}% (☀️ Modo claro)`}
                   </span>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
                   {[
-                    { val: 0.12, label: 'Sutil (12%)' },
-                    { val: 0.22, label: 'Media (22%)' },
-                    { val: 0.35, label: 'Marcada (35%)' },
+                    { val: 0.24, label: isDark ? 'Sutil (10%)' : 'Sutil (24%)' },
+                    { val: 0.40, label: isDark ? 'Media (17%)' : 'Media (40%)' },
+                    { val: 0.56, label: isDark ? 'Marcada (23%)' : 'Marcada (56%)' },
                   ].map((level) => {
                     const active = Math.abs(settings.opacity - level.val) < 0.05
                     return (
@@ -373,6 +394,11 @@ export function CuadernoConfigTrigger() {
                     )
                   })}
                 </div>
+                {isDark && (
+                  <p style={{ fontSize: 11.5, color: 'var(--muted)', marginTop: 6, lineHeight: 1.4 }}>
+                    ℹ️ En modo oscuro la textura se calibra automáticamente para preservar la profundidad del fondo sin generar neblina.
+                  </p>
+                )}
               </div>
             )}
 

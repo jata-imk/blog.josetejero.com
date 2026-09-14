@@ -371,28 +371,28 @@
     linear-gradient(to right, var(--paper-grid-color-lines) 1px, transparent 1px),
     linear-gradient(to bottom, var(--paper-grid-color-lines) 1px, transparent 1px);
   --paper-grid-size: 28px 28px;
-  --paper-grid-pos: 0 0;
+  --paper-grid-pos: 0 calc(-1 * var(--scroll-y, 0px));
 }
 :root[data-grid="dots"] {
   --paper-grid: radial-gradient(var(--paper-grid-color-dots) 1.5px, transparent 1.5px);
   --paper-grid-size: 26px 26px;
-  --paper-grid-pos: 0 0;
+  --paper-grid-pos: 0 calc(-1 * var(--scroll-y, 0px));
 }
 :root[data-grid="iso"] {
   --paper-grid:
     radial-gradient(var(--paper-grid-color-dots) 1.5px, transparent 1.5px),
     radial-gradient(var(--paper-grid-color-dots) 1.5px, transparent 1.5px);
   --paper-grid-size: 32px 32px;
-  --paper-grid-pos: 0 0, 16px 16px;
+  --paper-grid-pos: 0 calc(-1 * var(--scroll-y, 0px)), 16px calc(16px - var(--scroll-y, 0px));
 }
 :root[data-grid="none"] {
   --paper-grid: none;
 }
 
-/* 3. Degradado / Foco central de la pauta */
+/* 3. Degradado / Foco central de la pauta (centrado en viewport, parejo en los 4 extremos) */
 :root,
 :root[data-grid-fade="true"] {
-  --paper-grid-mask: radial-gradient(ellipse 90% 70% at 50% 30%, black 20%, rgba(0, 0, 0, 0.5) 65%, transparent 100%);
+  --paper-grid-mask: radial-gradient(ellipse 88% 72% at 50% 50%, black 25%, rgba(0, 0, 0, 0.45) 65%, transparent 100%);
 }
 :root[data-grid-fade="false"] {
   --paper-grid-mask: none;
@@ -452,14 +452,18 @@ body {
 
 /* ============================================================
    Cuaderno del Ingeniero — Canvas de Fondo
-   z-index: -1 sitúa la textura y la cuadrícula estrictamente detrás del contenido.
-   Las tarjetas, cabeceras y tipografías quedan 100% nítidas y limpias por encima.
+   position: absolute + z-index: -1 permite que la textura y cuadrícula
+   acompañen el scroll del documento de forma natural, mientras que
+   las tarjetas y textos quedan 100% nítidos por encima.
    ============================================================ */
 .paper-canvas {
-  position: fixed;
-  inset: 0;
-  width: 100vw;
-  height: 100vh;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  min-height: 100%;
   pointer-events: none;
   z-index: -1;
   overflow: hidden;
@@ -471,26 +475,27 @@ body {
   inset: 0;
   width: 100%;
   height: 100%;
-  opacity: var(--paper-texture-opacity, 0.22);
+  opacity: var(--paper-texture-opacity, 0.40);
   mix-blend-mode: multiply;
   transition: opacity 0.2s ease;
 }
 
 [data-theme="dark"] .paper-canvas-texture {
   mix-blend-mode: screen;
+  opacity: calc(var(--paper-texture-opacity, 0.40) * 0.42);
 }
 
-/* Textura 1: Papel arrugado orgánico con pliegues procedimentales SVG */
+/* Textura 1: Papel arrugado orgánico con pliegues procedimentales SVG (relieve marcado) */
 :root .paper-canvas-texture,
 :root[data-paper-texture="wrinkled"] .paper-canvas-texture {
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 500 500' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='wrinkles'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.012' numOctaves='5' result='noise'/%3E%3CfeDiffuseLighting in='noise' lightingColor='%23fff' surfaceScale='3.2' result='light'%3E%3CfeDistantLight azimuth='55' elevation='50'/%3E%3C/feDiffuseLighting%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23wrinkles)'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 500 500' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='wrinkles'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.012' numOctaves='5' result='noise'/%3E%3CfeDiffuseLighting in='noise' lightingColor='%23fff' surfaceScale='5.0' result='light'%3E%3CfeDistantLight azimuth='55' elevation='42'/%3E%3C/feDiffuseLighting%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23wrinkles)'/%3E%3C/svg%3E");
   background-size: 500px 500px;
 }
 
-/* Textura 2: Grano analógico fino */
+/* Textura 2: Grano analógico fino con mayor dispersión y grano visible */
 :root[data-paper-texture="grain"] .paper-canvas-texture {
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='paperNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23paperNoise)' opacity='1'/%3E%3C/svg%3E");
-  background-size: 256px 256px;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 300 300' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='paperNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.45' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23paperNoise)' opacity='1'/%3E%3C/svg%3E");
+  background-size: 300px 300px;
 }
 
 /* Textura desactivada */
@@ -498,12 +503,13 @@ body {
   display: none;
 }
 
-/* Capa de Pauta / Cuadrícula */
+/* Capa de Pauta / Cuadrícula (Fixed al viewport con pauta sincronizada al scroll) */
 .paper-canvas-grid {
-  position: absolute;
+  position: fixed;
   inset: 0;
   width: 100%;
   height: 100%;
+  pointer-events: none;
   background-image: var(--paper-grid);
   background-size: var(--paper-grid-size);
   background-position: var(--paper-grid-pos, 0 0);
@@ -678,9 +684,15 @@ pre,
   background: var(--bg-soft);
 }
 
-/* ── theme toggle — visible en desktop y móvil (ADR 0028) ── */
-.theme-toggle {
+/* ── header actions & theme toggle ──────────────────────────── */
+.header-actions {
   margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.theme-toggle {
+  /* margin-left: auto handled by .header-actions */
 }
 
 /* ── buttons ─────────────────────────────────────────────────── */
