@@ -33,9 +33,12 @@ export function Header() {
   return (
     <header className="site-header">
       <div className="site-header-in">
-        <a className="logo" href="/">
+        <a className="logo" href="/" aria-label="josetejero.com — Inicio">
           <span className="logo-mark">J</span>
-          josetejero<span className="dot">.com</span>
+          {/* en móvil solo queda la marca "J" (ver .logo-text en globals.css) */}
+          <span className="logo-text">
+            josetejero<span className="dot">.com</span>
+          </span>
         </a>
 
         <nav className="site-nav" aria-label="Navegación principal">
