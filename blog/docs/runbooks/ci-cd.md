@@ -79,17 +79,24 @@ pre-genera leyendo el sitemap.
 
 - `push` a `main`, solo si cambió algo bajo `blog/` o el propio workflow (`paths:`). Un cambio que
   solo toca el README de la raíz no gasta un build.
+- `pull_request` hacia `main` (mismos `paths:`): corre **solo** el job `lint` como gate antes del
+  merge. `build-push` tiene `if: github.event_name != 'pull_request'`, y como `deploy` y `warm-up`
+  dependen de él, se omiten en cadena: un PR nunca publica imagen ni despliega. Se añadió tras el
+  PR #6, que se mergeó sin checks y rompió el pipeline en `main` por un error de ESLint.
 - `workflow_dispatch`: botón "Run workflow" en la pestaña Actions — sirve para redeplegar a mano o
   hacer rollback (ver abajo).
-- `concurrency: deploy-prod` con `cancel-in-progress: false`: nunca corren dos deploys a la vez ni
-  se cancela uno a medias; si haces dos pushes seguidos, el segundo espera.
+- `concurrency`: en push/dispatch el grupo es `deploy-prod` con `cancel-in-progress: false` (nunca
+  corren dos deploys a la vez ni se cancela uno a medias; si haces dos pushes seguidos, el segundo
+  espera). En PR el grupo es `pr-<número>` y un push nuevo al PR cancela el lint anterior; así los
+  PR no hacen cola detrás de un deploy.
 
 ### Job 1: `lint`
 
 Instala dependencias (`pnpm install --frozen-lockfile`, la versión de pnpm sale del campo
-`packageManager` de `blog/package.json` — una sola fuente de verdad) y corre `pnpm lint`. Si ESLint
-falla, el pipeline se detiene aquí: no se construye ni se despliega nada roto. El typecheck real
-ocurre dentro de `next build` en el siguiente job.
+`packageManager` de `blog/package.json` — una sola fuente de verdad), corre `pnpm lint` y luego
+`tsc --noEmit`. Si ESLint o TypeScript fallan, el pipeline se detiene aquí: no se construye ni se
+despliega nada roto. `next build` vuelve a verificar tipos en el siguiente job, pero tenerlo aquí
+permite que el gate de PR también atrape errores de tipos.
 
 ### Job 2: `build-push`
 

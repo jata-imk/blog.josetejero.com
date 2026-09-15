@@ -1,6 +1,7 @@
-// Script anti-FOUC para el sistema de personalización "Cuaderno del Ingeniero"
-// Lee las preferencias de libreta en localStorage y las aplica antes del primer render en el <html>.
-// También sincroniza --scroll-y (única fuente: CuadernoConfigTrigger ya no registra su propio listener).
+// Script anti-FOUC para el sistema de personalización "Cuaderno del Ingeniero" (ADR 0036).
+// Corre en <head> antes del primer paint: lee las preferencias de localStorage y las
+// aplica como data-* en <html>. También sincroniza --scroll-y en la capa de pauta
+// (.paper-canvas-grid) para que la cuadrícula "fija" se desplace con el documento.
 export const CUADERNO_BOOTSTRAP_SCRIPT = `(function(){
   var root = document.documentElement;
   try {
@@ -21,13 +22,17 @@ export const CUADERNO_BOOTSTRAP_SCRIPT = `(function(){
       if (s.opacity) root.style.setProperty('--paper-texture-opacity', String(s.opacity));
     }
   } catch (e) { /* localStorage bloqueado o JSON corrupto: se quedan los defaults de CSS */ }
+
+  // El script corre en <head>: la capa aún no existe, se busca de forma perezosa.
+  var grid = null;
   var ticking = false;
   function sync() {
     ticking = false;
-    root.style.setProperty('--scroll-y', (window.scrollY || window.pageYOffset || 0) + 'px');
+    grid = grid || document.querySelector('.paper-canvas-grid');
+    if (grid) grid.style.setProperty('--scroll-y', (window.scrollY || 0) + 'px');
   }
   window.addEventListener('scroll', function () {
     if (!ticking) { ticking = true; requestAnimationFrame(sync); }
   }, { passive: true });
-  sync();
+  document.addEventListener('DOMContentLoaded', sync);
 })()`

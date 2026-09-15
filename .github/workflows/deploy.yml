@@ -2,6 +2,7 @@
 # blog/docs/runbooks/ci-cd.md
 #
 # push a main → lint → build hermético + push a GHCR → deploy SSH al VPS → warm-up.
+# pull_request a main → SOLO lint (gate antes del merge; nada se publica ni despliega).
 # Las migraciones de BD NO las corre el pipeline: son manuales y ANTES del merge
 # (ver runbook, sección "Migraciones").
 
@@ -13,14 +14,20 @@ on:
     paths:
       - 'blog/**'
       - '.github/workflows/deploy.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'blog/**'
+      - '.github/workflows/deploy.yml'
   # Permite relanzar el pipeline a mano desde la pestaña Actions
   # (p. ej. para un rollback: Run workflow sobre un commit anterior).
   workflow_dispatch: {}
 
 # Un solo deploy a la vez; los siguientes se encolan, nunca se cancela uno a medias.
+# Los PR usan su propio grupo (no bloquean deploys) y un push nuevo cancela el lint anterior.
 concurrency:
-  group: deploy-prod
-  cancel-in-progress: false
+  group: ${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || 'deploy-prod' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
   IMAGE: ghcr.io/${{ github.repository_owner }}/josetejero-blog
@@ -45,9 +52,12 @@ jobs:
           cache-dependency-path: blog/pnpm-lock.yaml
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint
+      - run: pnpm exec tsc --noEmit
 
   build-push:
     needs: lint
+    # En PR no se publica imagen; deploy y warm-up dependen de este job y se omiten en cadena.
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     permissions:
       contents: read

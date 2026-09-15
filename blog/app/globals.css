@@ -98,13 +98,7 @@
   --font-mono: var(--font-jetbrains, ui-monospace, monospace);
   --font-sketch: var(--font-caveat, cursive, sans-serif);
 
-  /* Cuaderno del Ingeniero / Paper & Grid Tokens (Light) */
-  --paper-grid: radial-gradient(
-    rgba(15, 23, 42, 0.22) 1.5px,
-    transparent 1.5px
-  );
-  --paper-grid-size: 26px 26px;
-  --paper-grid-pos: 0 0;
+  /* tizas del Cuaderno — reservadas para Doodles (Fase 2: ChalkUnderline, ChalkCircle…) */
   --chalk-white: #ffffff;
   --chalk-yellow: #fef08a;
   --chalk-blue: #93c5fd;
@@ -286,11 +280,7 @@
   --on-accent: #ffffff;
   --on-accent-soft: rgba(255, 255, 255, 0.08);
 
-  /* Cuaderno del Ingeniero / Paper & Grid Tokens (Dark) */
-  --paper-grid: radial-gradient(
-    rgba(255, 255, 255, 0.14) 1.5px,
-    transparent 1.5px
-  );
+  /* tizas del Cuaderno (Fase 2) */
   --chalk-white: #f8fafc;
   --chalk-yellow: #fde047;
   --chalk-blue: #60a5fa;
@@ -326,15 +316,16 @@
    Cuaderno del Ingeniero — Sistema de Pauta, Tintas y Papel
    ============================================================ */
 
-/* 1. Tintas de Pauta / Cuadrícula (Modo Claro) */
+/* 1. Tintas de Pauta / Cuadrícula (Modo Claro). Default = blue, igual que
+   DEFAULT_CUADERNO_SETTINGS y CUADERNO_BOOTSTRAP_SCRIPT (sin JS no cambia el look). */
 :root,
-:root[data-grid-color="neutral"] {
-  --paper-grid-color-lines: rgba(148, 163, 184, 0.42);
-  --paper-grid-color-dots: rgba(15, 23, 42, 0.24);
-}
 :root[data-grid-color="blue"] {
   --paper-grid-color-lines: rgba(37, 99, 235, 0.35);
   --paper-grid-color-dots: rgba(37, 99, 235, 0.32);
+}
+:root[data-grid-color="neutral"] {
+  --paper-grid-color-lines: rgba(148, 163, 184, 0.42);
+  --paper-grid-color-dots: rgba(15, 23, 42, 0.24);
 }
 :root[data-grid-color="violet"] {
   --paper-grid-color-lines: rgba(124, 58, 237, 0.35);
@@ -347,13 +338,13 @@
 
 /* Tintas de Pauta / Cuadrícula (Modo Oscuro) */
 [data-theme="dark"],
-[data-theme="dark"][data-grid-color="neutral"] {
-  --paper-grid-color-lines: rgba(255, 255, 255, 0.16);
-  --paper-grid-color-dots: rgba(255, 255, 255, 0.18);
-}
 [data-theme="dark"][data-grid-color="blue"] {
   --paper-grid-color-lines: rgba(96, 165, 250, 0.30);
   --paper-grid-color-dots: rgba(96, 165, 250, 0.30);
+}
+[data-theme="dark"][data-grid-color="neutral"] {
+  --paper-grid-color-lines: rgba(255, 255, 255, 0.16);
+  --paper-grid-color-dots: rgba(255, 255, 255, 0.18);
 }
 [data-theme="dark"][data-grid-color="violet"] {
   --paper-grid-color-lines: rgba(167, 139, 250, 0.30);
@@ -371,19 +362,16 @@
     linear-gradient(to right, var(--paper-grid-color-lines) 1px, transparent 1px),
     linear-gradient(to bottom, var(--paper-grid-color-lines) 1px, transparent 1px);
   --paper-grid-size: 28px 28px;
-  --paper-grid-pos: 0 calc(-1 * var(--scroll-y, 0px));
 }
 :root[data-grid="dots"] {
   --paper-grid: radial-gradient(var(--paper-grid-color-dots) 1.5px, transparent 1.5px);
   --paper-grid-size: 26px 26px;
-  --paper-grid-pos: 0 calc(-1 * var(--scroll-y, 0px));
 }
 :root[data-grid="iso"] {
   --paper-grid:
     radial-gradient(var(--paper-grid-color-dots) 1.5px, transparent 1.5px),
     radial-gradient(var(--paper-grid-color-dots) 1.5px, transparent 1.5px);
   --paper-grid-size: 32px 32px;
-  --paper-grid-pos: 0 calc(-1 * var(--scroll-y, 0px)), 16px calc(16px - var(--scroll-y, 0px));
 }
 :root[data-grid="none"] {
   --paper-grid: none;
@@ -503,7 +491,9 @@ body {
   display: none;
 }
 
-/* Capa de Pauta / Cuadrícula (Fixed al viewport con pauta sincronizada al scroll) */
+/* Capa de Pauta / Cuadrícula (Fixed al viewport con pauta sincronizada al scroll).
+   --scroll-y lo escribe CUADERNO_BOOTSTRAP_SCRIPT en ESTE elemento (no en :root):
+   así cada frame de scroll solo invalida estilos de esta capa, no de todo el documento. */
 .paper-canvas-grid {
   position: fixed;
   inset: 0;
@@ -512,10 +502,14 @@ body {
   pointer-events: none;
   background-image: var(--paper-grid);
   background-size: var(--paper-grid-size);
-  background-position: var(--paper-grid-pos, 0 0);
+  background-position: 0 calc(-1 * var(--scroll-y, 0px));
   mask-image: var(--paper-grid-mask, none);
   -webkit-mask-image: var(--paper-grid-mask, none);
-  transition: opacity 0.2s ease;
+}
+:root[data-grid="iso"] .paper-canvas-grid {
+  background-position:
+    0 calc(-1 * var(--scroll-y, 0px)),
+    16px calc(16px - var(--scroll-y, 0px));
 }
 
 :root[data-grid="none"] .paper-canvas-grid {
@@ -525,6 +519,260 @@ body {
 /* Tipografía de boceto/anotación */
 .font-sketch {
   font-family: var(--font-sketch);
+}
+
+/* ── anotaciones a mano del hero ── */
+.hero-eyebrow {
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  column-gap: 10px;
+  row-gap: var(--sp-1);
+  margin-bottom: var(--sp-4);
+}
+.hero-sketch {
+  display: inline-block;
+  line-height: 1.1;
+}
+.hero-sketch-tag {
+  font-size: 20px;
+  color: var(--blue);
+  transform: rotate(-2deg);
+}
+.hero-sketch-hint {
+  font-size: 22px;
+  color: var(--ink-3);
+  transform: rotate(3deg);
+}
+@media (max-width: 640px) {
+  .hero-sketch-hint {
+    display: none;
+  }
+}
+
+/* ── Taller del Cuaderno (panel de personalización, ADR 0036) ── */
+.nb-dialog {
+  width: min(480px, calc(100vw - var(--sp-8)));
+  max-height: calc(100dvh - var(--sp-8));
+  margin: auto;
+  padding: 0;
+  border: 1px solid var(--line-3);
+  border-radius: var(--r-xl);
+  background: var(--bg);
+  color: var(--ink);
+  box-shadow: var(--sh-panel);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.nb-dialog::backdrop {
+  background: var(--overlay);
+  backdrop-filter: blur(var(--sp-1));
+}
+.nb-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 22px var(--sp-6);
+}
+.nb-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sp-3);
+}
+.nb-head .icon-btn {
+  margin: calc(-1 * var(--sp-1)) calc(-1 * var(--sp-2)) 0 0;
+}
+.nb-title {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 750;
+  letter-spacing: -0.02em;
+}
+.nb-desc {
+  margin: var(--sp-1) 0 0;
+  font-size: 13px;
+  color: var(--ink-3);
+}
+.nb-group {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+.nb-legend {
+  width: 100%;
+  padding: 0;
+  margin-bottom: var(--sp-2);
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--ink-2);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.nb-legend-split {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--sp-2);
+}
+.nb-legend-value {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--blue);
+  text-transform: none;
+  letter-spacing: 0;
+}
+.nb-options {
+  display: grid;
+  gap: var(--sp-2);
+}
+.nb-options-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.nb-options-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.nb-options-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.nb-option {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px var(--sp-3);
+  text-align: left;
+  border-radius: 10px;
+  border: 1px solid var(--line-2);
+  background: var(--bg-soft);
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
+}
+.nb-option:hover {
+  border-color: var(--line-3);
+}
+.nb-option[aria-pressed="true"] {
+  border-color: var(--blue);
+  box-shadow: inset 0 0 0 1px var(--blue);
+  background: var(--blue-tint);
+  color: var(--blue-700);
+}
+.nb-option-center {
+  align-items: center;
+  text-align: center;
+  padding-inline: var(--sp-1);
+}
+.nb-option-swatch {
+  align-items: center;
+  gap: 6px;
+  padding-inline: 6px;
+}
+.nb-option-label {
+  font-size: 13px;
+  font-weight: 650;
+}
+.nb-option-desc {
+  font-size: 11px;
+  color: var(--muted);
+}
+.nb-option[aria-pressed="true"] .nb-option-desc {
+  color: var(--blue);
+}
+.nb-swatch {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  box-shadow: var(--sh-1);
+}
+.nb-swatch[data-grid-color="blue"] { background: var(--blue); }
+.nb-swatch[data-grid-color="neutral"] { background: var(--muted); }
+.nb-swatch[data-grid-color="violet"] { background: var(--violet); }
+.nb-swatch[data-grid-color="amber"] { background: var(--amber); }
+.nb-switch-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  padding: var(--sp-3) 14px;
+  border-radius: 10px;
+  background: var(--bg-soft);
+  border: 1px solid var(--line-2);
+}
+.nb-switch {
+  position: relative;
+  flex-shrink: 0;
+  width: 44px;
+  height: var(--sp-6);
+  border: 0;
+  border-radius: var(--sp-3);
+  background: var(--line-3);
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+.nb-switch::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--on-accent);
+  box-shadow: var(--sh-1);
+  transition: transform 0.2s ease;
+}
+.nb-switch[aria-checked="true"] {
+  background: var(--blue);
+}
+.nb-switch[aria-checked="true"]::after {
+  transform: translateX(20px);
+}
+.nb-note {
+  margin: 6px 0 0;
+  font-size: 11.5px;
+  line-height: 1.4;
+  color: var(--muted);
+}
+.nb-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+.nb-reset {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px var(--sp-3);
+  border-radius: var(--r-sm);
+  border: 1px solid var(--line-2);
+  background: transparent;
+  color: var(--ink-3);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.nb-reset:hover {
+  color: var(--ink);
+  border-color: var(--line-3);
+}
+.nb-done {
+  padding: var(--sp-2) 18px;
+  font-size: 13.5px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .nb-option,
+  .nb-switch,
+  .nb-switch::after {
+    transition: none;
+  }
+}
+@media (max-width: 480px) {
+  .nb-options-3,
+  .nb-options-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 h1,
