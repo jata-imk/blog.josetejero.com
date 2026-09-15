@@ -37,6 +37,8 @@ Fase 3 (home):
 - `HeroTypewriter` (client): rota "desarrollo web / automatización / inteligencia artificial /
   backend / frontend" con resaltador y cursor de bloque. SSR = primera palabra completa;
   `aria-hidden` + texto `sr-only` con la lista; con reduced-motion se queda fija.
+  La palabra ocupa **su propio renglón de altura fija** (corrección posterior, PR de la Fase 5): al
+  escribir/borrar, la frase ganaba o perdía renglones y desplazaba el contenido (layout shift).
 - `HeroLamp` (client): escucha el puntero en `.hero-zone` y escribe `--lamp-x/--lamp-y/--lamp-on` en
   `.paper-canvas`. La capa `.paper-canvas-lamp` repite la pauta 3 veces bajo una máscara radial de
   190 px. Solo `pointer: fine` y sin reduced-motion.
