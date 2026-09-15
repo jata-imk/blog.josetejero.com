@@ -691,9 +691,6 @@ pre,
   align-items: center;
   gap: 6px;
 }
-.theme-toggle {
-  /* margin-left: auto handled by .header-actions */
-}
 
 /* ── buttons ─────────────────────────────────────────────────── */
 .btn {

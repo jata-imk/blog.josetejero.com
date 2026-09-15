@@ -1,3 +1,5 @@
+'use client'
+
 import { useState, useEffect, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import { Ic } from './Ic'
@@ -33,7 +35,7 @@ export function CuadernoConfigTrigger() {
   const [isDark, setIsDark] = useState(false)
   const [settings, setSettings] = useState<CuadernoSettings>(DEFAULT_CUADERNO_SETTINGS)
 
-  // Mount check and theme observer
+  // Mount check and theme observer (--scroll-y lo sincroniza CUADERNO_BOOTSTRAP_SCRIPT)
   useEffect(() => {
     setMounted(true)
     const checkDark = () => {
@@ -42,18 +44,7 @@ export function CuadernoConfigTrigger() {
     checkDark()
     const obs = new MutationObserver(checkDark)
     obs.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
-    
-    // Fallback sync scroll position
-    const onScroll = () => {
-      document.documentElement.style.setProperty('--scroll-y', `${window.scrollY || window.pageYOffset || 0}px`)
-    }
-    window.addEventListener('scroll', onScroll, { passive: true })
-    onScroll()
-
-    return () => {
-      obs.disconnect()
-      window.removeEventListener('scroll', onScroll)
-    }
+    return () => obs.disconnect()
   }, [])
 
   // Load from localStorage on mount
@@ -80,7 +71,9 @@ export function CuadernoConfigTrigger() {
       applySettingsToDOM(next)
       try {
         localStorage.setItem('cuaderno_settings', JSON.stringify(next))
-      } catch {}
+      } catch {
+        // storage bloqueado (modo privado / cuota): el ajuste aplica solo en esta sesión
+      }
       return next
     })
   }, [])
@@ -90,7 +83,9 @@ export function CuadernoConfigTrigger() {
     applySettingsToDOM(DEFAULT_CUADERNO_SETTINGS)
     try {
       localStorage.setItem('cuaderno_settings', JSON.stringify(DEFAULT_CUADERNO_SETTINGS))
-    } catch {}
+    } catch {
+      // storage bloqueado: los defaults ya quedaron aplicados en el DOM
+    }
   }, [])
 
   // Close on Escape key
