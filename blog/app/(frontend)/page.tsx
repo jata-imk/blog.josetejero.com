@@ -3,6 +3,7 @@ import { ListRow } from '../../components/post/ListRow'
 import { Cat } from '../../components/ui/Cat'
 import { Badge } from '../../components/ui/Badge'
 import { Ic } from '../../components/ui/Ic'
+import { ChalkUnderline } from '../../components/ui/Doodles'
 import type { CatInfo } from '../../components/ui/Cat'
 import type { Metadata } from 'next'
 import { getPosts, getCategories, getSeriesList } from '../../lib/data'
@@ -32,7 +33,9 @@ function SectionHead({
     <div className="section-head">
       <div>
         {eyebrow && <div className="eyebrow" style={{ marginBottom: 8 }}>{eyebrow}</div>}
-        <h2 style={{ fontSize: 26, fontWeight: 750, letterSpacing: '-.03em' }}>{title}</h2>
+        <h2 style={{ fontSize: 26, fontWeight: 750, letterSpacing: '-.03em' }}>
+          <ChalkUnderline>{title}</ChalkUnderline>
+        </h2>
       </div>
       {link && linkHref && (
         <a
@@ -171,6 +174,7 @@ export default async function Home() {
               href={`/blog/${p.slug}`}
               image={coverImageOf(p, 'card')}
               priority={i === 0}
+              tape={i === 0}
             />
           ))}
         </div>

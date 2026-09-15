@@ -1,4 +1,5 @@
 import { PostCard } from '../../../components/post/PostCard'
+import { ChalkUnderline, WashiTape } from '../../../components/ui/Doodles'
 import { FeaturedCard } from '../../../components/post/FeaturedCard'
 import { Pagination } from '../../../components/ui/Pagination'
 import { Breadcrumb } from '../../../components/ui/Breadcrumb'
@@ -124,7 +125,7 @@ export default async function BlogPage({
             <h1
               style={{ fontSize: 40, fontWeight: 800, letterSpacing: '-.04em', lineHeight: 1.1 }}
             >
-              Blog
+              <ChalkUnderline tone="pink" variant="double">Blog</ChalkUnderline>
             </h1>
             <p
               style={{
@@ -152,6 +153,7 @@ export default async function BlogPage({
           >
             <a href="/blog" className={`ab-chip${!cat ? ' active' : ''}`}>
               Todos
+              {!cat && <WashiTape size="sm" tone="blue" rotate={-6} />}
             </a>
             {categories.map((c) => (
               <a
@@ -160,6 +162,7 @@ export default async function BlogPage({
                 className={`ab-chip${cat === c.slug ? ' active' : ''}`}
               >
                 {c.name}
+                {cat === c.slug && <WashiTape size="sm" tone="blue" rotate={-6} />}
               </a>
             ))}
           </div>

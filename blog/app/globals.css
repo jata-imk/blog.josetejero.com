@@ -98,13 +98,14 @@
   --font-mono: var(--font-jetbrains, ui-monospace, monospace);
   --font-sketch: var(--font-caveat, cursive, sans-serif);
 
-  /* tizas del Cuaderno — reservadas para Doodles (Fase 2: ChalkUnderline, ChalkCircle…) */
+  /* tizas del Cuaderno — tintas planas tipo risografía para Doodles (ADR 0038) */
+  --chalk-ink: #0f172a;
   --chalk-white: #ffffff;
-  --chalk-yellow: #fef08a;
-  --chalk-blue: #93c5fd;
-  --chalk-pink: #fbcfe8;
-  --chalk-green: #86efac;
-  --chalk-orange: #fed7aa;
+  --chalk-yellow: #ffcc00;
+  --chalk-blue: #2f5bea;
+  --chalk-pink: #f0419a;
+  --chalk-green: #00a95c;
+  --chalk-orange: #ff6b2c;
 
   /* radios */
   --r-sm: 8px;
@@ -280,13 +281,14 @@
   --on-accent: #ffffff;
   --on-accent-soft: rgba(255, 255, 255, 0.08);
 
-  /* tizas del Cuaderno (Fase 2) */
+  /* tizas del Cuaderno (ADR 0038) — más luminosas sobre fondo oscuro */
+  --chalk-ink: #e2e8f0;
   --chalk-white: #f8fafc;
-  --chalk-yellow: #fde047;
-  --chalk-blue: #60a5fa;
-  --chalk-pink: #f472b6;
-  --chalk-green: #4ade80;
-  --chalk-orange: #fb923c;
+  --chalk-yellow: #facc15;
+  --chalk-blue: #7b9bff;
+  --chalk-pink: #ff6fb5;
+  --chalk-green: #34d399;
+  --chalk-orange: #ff8a50;
 
   /* inversión — en dark mode: fondo claro + texto oscuro para destacar contra bg oscuro */
   --bg-invert: #f1f5f9;
@@ -3397,6 +3399,125 @@ a.tag-pill:hover {
     border-radius: 0;
     background: var(--bg);
   }
+}
+
+/* ============================================================
+   Kit de Trazos & Doodles (ADR 0038) — components/ui/Doodles.tsx
+   Los SVG pintan con currentColor; el tono lo da .doodle-tone-* desde --chalk-*.
+   ============================================================ */
+.doodle-tone-ink { color: var(--chalk-ink); }
+.doodle-tone-blue { color: var(--chalk-blue); }
+.doodle-tone-pink { color: var(--chalk-pink); }
+.doodle-tone-yellow { color: var(--chalk-yellow); }
+.doodle-tone-green { color: var(--chalk-green); }
+.doodle-tone-orange { color: var(--chalk-orange); }
+
+.doodle-underline,
+.doodle-circle {
+  position: relative;
+  display: inline-block;
+}
+.doodle-circle {
+  margin-inline: 0.3em;
+}
+.doodle-underline-svg,
+.doodle-circle-svg {
+  position: absolute;
+  pointer-events: none;
+  overflow: visible;
+}
+.doodle-underline-svg {
+  left: -0.12em;
+  right: -0.12em;
+  bottom: -0.2em;
+  width: calc(100% + 0.24em);
+  height: 0.42em;
+}
+.doodle-circle-svg {
+  inset: -0.34em -0.4em;
+  width: calc(100% + 0.8em);
+  height: calc(100% + 0.68em);
+}
+.doodle-arrow,
+.doodle-sparkle {
+  display: inline-block;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+/* dibujado progresivo opcional (pathLength=1 en cada trazo) */
+.doodle-animated path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: doodle-draw 0.7s cubic-bezier(0.6, 0.1, 0.3, 1) 0.25s forwards;
+}
+.doodle-animated path + path {
+  animation-delay: 0.6s;
+}
+@keyframes doodle-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .doodle-animated path {
+    stroke-dasharray: none;
+    stroke-dashoffset: 0;
+    animation: none;
+  }
+}
+
+/* ── cinta washi ── */
+.washi {
+  --washi-rotate: -4deg;
+  position: absolute;
+  z-index: 4;
+  pointer-events: none;
+  display: block;
+  transform: rotate(var(--washi-rotate));
+  background: color-mix(in srgb, currentColor var(--washi-alpha), transparent);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 28' preserveAspectRatio='none'%3E%3Cpath d='M8.0 1.8 L42.0 0.9 L82.0 2.0 L112.0 1.1 L112.7 1.1 L117.7 4.0 L113.4 6.8 L117.4 9.7 L112.8 12.6 L117.8 15.4 L112.3 18.3 L117.5 21.2 L112.9 24.0 L118.7 26.9 L112.0 26.9 L82.0 27.5 L42.0 26.3 L8.0 27.3 L7.9 27.3 L3.3 24.5 L7.9 21.6 L1.3 18.8 L7.0 16.0 L4.3 13.1 L6.5 10.3 L0.6 7.5 L7.0 4.6 L2.0 1.8Z'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 28' preserveAspectRatio='none'%3E%3Cpath d='M8.0 1.8 L42.0 0.9 L82.0 2.0 L112.0 1.1 L112.7 1.1 L117.7 4.0 L113.4 6.8 L117.4 9.7 L112.8 12.6 L117.8 15.4 L112.3 18.3 L117.5 21.2 L112.9 24.0 L118.7 26.9 L112.0 26.9 L82.0 27.5 L42.0 26.3 L8.0 27.3 L7.9 27.3 L3.3 24.5 L7.9 21.6 L1.3 18.8 L7.0 16.0 L4.3 13.1 L6.5 10.3 L0.6 7.5 L7.0 4.6 L2.0 1.8Z'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+  filter: drop-shadow(0 1px 0 rgba(15, 23, 42, 0.12));
+}
+:root {
+  --washi-alpha: 78%;
+}
+[data-theme="dark"] {
+  /* más opaca: sobre fondo oscuro la transparencia ensucia el tono (amarillo → oliva) */
+  --washi-alpha: 90%;
+}
+.washi-md {
+  width: 112px;
+  height: 26px;
+  top: -13px;
+  left: calc(50% - 56px);
+}
+.washi-sm {
+  width: 34px;
+  height: 12px;
+  top: -8px;
+  left: calc(50% - 17px);
+}
+
+/* tarjetas con cinta: la cinta sobresale del borde, así que el recorte pasa a la imagen */
+.card.has-tape {
+  position: relative;
+  overflow: visible;
+}
+.post-card.has-tape .thumb {
+  border-radius: var(--zine-radius) var(--zine-radius) 0 0;
+}
+.ab-feat.has-tape > .thumb {
+  border-radius: var(--zine-radius) 0 0 var(--zine-radius);
+}
+@media (max-width: 768px) {
+  .ab-feat.has-tape > .thumb {
+    border-radius: var(--zine-radius) var(--zine-radius) 0 0;
+  }
+}
+.ab-chip.active {
+  position: relative;
 }
 
 /* ============================================================

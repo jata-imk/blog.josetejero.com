@@ -1,4 +1,5 @@
 import { Badge } from '../../../components/ui/Badge'
+import { ChalkUnderline } from '../../../components/ui/Doodles'
 import { EmptyState } from '../../../components/ui/EmptyState'
 import { Breadcrumb } from '../../../components/ui/Breadcrumb'
 import { Ic } from '../../../components/ui/Ic'
@@ -30,7 +31,7 @@ export default async function SeriesIndexPage() {
         <div style={{ marginTop: 32, marginBottom: 48 }}>
           <div className="eyebrow" style={{ marginBottom: 12 }}>Aprende paso a paso</div>
           <h1 style={{ fontSize: 40, fontWeight: 800, letterSpacing: '-.04em', lineHeight: 1.1 }}>
-            Series
+            <ChalkUnderline tone="pink" variant="double">Series</ChalkUnderline>
           </h1>
           <p style={{ fontSize: 16, lineHeight: 1.6, marginTop: 14, maxWidth: 540, color: 'var(--ink-3)' }}>
             Guías estructuradas en múltiples partes, de principio a fin.

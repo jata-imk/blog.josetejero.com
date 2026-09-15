@@ -4,6 +4,7 @@ import { Badge } from '../ui/Badge'
 import { Meta, MetaSep } from '../ui/Meta'
 import { Thumb } from '../ui/Thumb'
 import { Ic } from '../ui/Ic'
+import { WashiTape } from '../ui/Doodles'
 import type { CoverImage } from '@/lib/media'
 
 export function FeaturedCard({
@@ -24,7 +25,8 @@ export function FeaturedCard({
   image?: CoverImage | null
 }) {
   return (
-    <article className="card card-hover ab-feat">
+    <article className="card card-hover ab-feat has-tape">
+      <WashiTape tone="yellow" rotate={-3} />
       <Thumb slug={category?.slug} glow image={image} sizes="(max-width: 768px) 100vw, 700px" priority />
       <div className="ab-feat-body">
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
