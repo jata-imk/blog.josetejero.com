@@ -5,6 +5,7 @@ import { Ic } from '../ui/Ic'
 import { SearchTriggerBtn } from '../search/SearchTriggerBtn'
 import { useTheme } from '../../lib/use-theme'
 import { CuadernoConfigTrigger } from '../ui/CuadernoConfigModal'
+import { MobileNav } from './MobileNav'
 
 const NAV_LINKS = [
   { label: 'Inicio',      href: '/' },
@@ -66,6 +67,10 @@ export function Header() {
         </div>
 
         <div className="header-actions">
+          {/* En desktop la búsqueda vive en .header-social; en móvil ese grupo se oculta */}
+          <div className="header-search-mobile">
+            <SearchTriggerBtn />
+          </div>
           <CuadernoConfigTrigger />
           <button
             className="icon-btn theme-toggle"
@@ -76,6 +81,11 @@ export function Header() {
           >
             <Ic name={theme === 'dark' ? 'sun' : 'moon'} size={18} sw={1.8} />
           </button>
+          <MobileNav
+            links={NAV_LINKS}
+            social={SOCIAL_LINKS}
+            isActive={(href) => matchActive(pathname, href)}
+          />
         </div>
       </div>
     </header>

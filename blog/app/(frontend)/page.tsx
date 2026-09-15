@@ -145,8 +145,8 @@ export default async function Home() {
           <a href="/blog" className="btn btn-grad">
             <Ic name="bookOpen" size={16} sw={2} />Leer el blog
           </a>
-          <a href="/series" className="btn btn-secondary">
-            <Ic name="layers" size={16} sw={2} />Ver series
+          <a href="/sobre-mi" className="btn btn-secondary">
+            <Ic name="user" size={16} sw={2} />Sobre mí
           </a>
           {/* Anotación decorativa: apunta a los CTA en fila; en móvil (botones apilados) se oculta */}
           <span className="font-sketch hero-sketch hero-sketch-hint" aria-hidden="true">
