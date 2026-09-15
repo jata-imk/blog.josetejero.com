@@ -3,7 +3,9 @@ import { ListRow } from '../../components/post/ListRow'
 import { Cat } from '../../components/ui/Cat'
 import { Badge } from '../../components/ui/Badge'
 import { Ic } from '../../components/ui/Ic'
-import { ChalkUnderline } from '../../components/ui/Doodles'
+import { ChalkCircle, ChalkUnderline, DoodleArrow, DoodleSparkle } from '../../components/ui/Doodles'
+import { HeroTypewriter } from '../../components/home/HeroTypewriter'
+import { HeroLamp } from '../../components/home/HeroLamp'
 import type { CatInfo } from '../../components/ui/Cat'
 import type { Metadata } from 'next'
 import { getPosts, getCategories, getSeriesList } from '../../lib/data'
@@ -129,39 +131,50 @@ export default async function Home() {
 
   return (
     <>
-      {/* hero */}
-      <section style={{ textAlign: 'center', padding: '92px 40px 70px', maxWidth: 760, margin: '0 auto' }}>
-        <div className="hero-eyebrow">
-          <div className="eyebrow">Desarrollo · Automatización · IA</div>
-          <span className="font-sketch hero-sketch hero-sketch-tag">
-            <span aria-hidden="true">✦ </span>cuaderno de notas
-          </span>
-        </div>
-        <h1 style={{ fontSize: 52, fontWeight: 800, letterSpacing: '-.04em', lineHeight: 1.08 }}>
-          Hola, soy José Alejandro <span style={{ WebkitTextFillColor: 'initial' }}>👨‍💻</span>
-        </h1>
-        <p style={{ fontSize: 19, lineHeight: 1.6, marginTop: 22, maxWidth: 620, marginInline: 'auto', color: 'var(--ink-3)' }}>
-          Escribo sobre desarrollo web, automatización, inteligencia artificial, backend, frontend
-          y aprendizajes construyendo software.
-        </p>
-        <div style={{ display: 'flex', gap: 14, justifyContent: 'center', alignItems: 'center', marginTop: 34, flexWrap: 'wrap' }}>
-          <a href="/blog" className="btn btn-grad">
-            <Ic name="bookOpen" size={16} sw={2} />Leer el blog
-          </a>
-          <a href="/sobre-mi" className="btn btn-secondary">
-            <Ic name="user" size={16} sw={2} />Sobre mí
-          </a>
-          {/* Anotación decorativa: apunta a los CTA en fila; en móvil (botones apilados) se oculta */}
-          <span className="font-sketch hero-sketch hero-sketch-hint" aria-hidden="true">
-            👈 ¡empieza por aquí!
-          </span>
-        </div>
-      </section>
+      {/* hero (Fase 3 del Cuaderno, ADR 0039): la zona completa activa la linterna sobre la pauta */}
+      <div className="hero-zone">
+        <HeroLamp />
+        <section style={{ textAlign: 'center', padding: '92px 40px 70px', maxWidth: 760, margin: '0 auto' }}>
+          <div className="hero-eyebrow">
+            <div className="eyebrow">Desarrollo · Automatización · IA</div>
+            <span className="font-sketch hero-sketch hero-sketch-tag">
+              <DoodleSparkle tone="yellow" size={18} /> cuaderno de notas
+            </span>
+          </div>
+          <h1 className="hero-title">
+            <DoodleSparkle tone="pink" size={30} className="hero-spark hero-spark-a" />
+            Hola, soy <ChalkCircle tone="pink" animated>José Alejandro</ChalkCircle>{' '}
+            <span style={{ WebkitTextFillColor: 'initial' }}>👨‍💻</span>
+            <DoodleSparkle tone="blue" size={22} className="hero-spark hero-spark-b" />
+          </h1>
+          <p style={{ fontSize: 19, lineHeight: 1.6, marginTop: 22, maxWidth: 620, marginInline: 'auto', color: 'var(--ink-3)' }}>
+            Escribo sobre{' '}
+            <HeroTypewriter
+              words={['desarrollo web', 'automatización', 'inteligencia artificial', 'backend', 'frontend']}
+              srText="desarrollo web, automatización, inteligencia artificial, backend y frontend"
+            />{' '}
+            y aprendizajes construyendo software.
+          </p>
+          <div style={{ display: 'flex', gap: 14, justifyContent: 'center', alignItems: 'center', marginTop: 34, flexWrap: 'wrap' }}>
+            <a href="/blog" className="btn btn-grad">
+              <Ic name="bookOpen" size={16} sw={2} />Leer el blog
+            </a>
+            <a href="/sobre-mi" className="btn btn-secondary">
+              <Ic name="user" size={16} sw={2} />Sobre mí
+            </a>
+            {/* Anotación decorativa: apunta a los CTA en fila; en móvil (botones apilados) se oculta */}
+            <span className="hero-hint" aria-hidden="true">
+              <DoodleArrow tone="ink" size={56} flip rotate={-10} animated />
+              <span className="font-sketch hero-sketch hero-sketch-hint">¡empieza por aquí!</span>
+            </span>
+          </div>
+        </section>
+      </div>
 
       {/* featured posts */}
       <section className="wrap" style={{ paddingBottom: 70 }}>
         <SectionHead eyebrow="Lo más reciente" title="Posts destacados" link="Ver todo" linkHref="/blog" />
-        <div className="grid-posts">
+        <div className="grid-posts tilt-set">
           {featuredPosts.map((p, i) => (
             <PostCard
               key={p.id}
@@ -215,7 +228,7 @@ export default async function Home() {
       <section className="bg-bg-soft border-t border-b border-line" style={{ padding: '60px 0' }}>
         <div className="wrap">
           <SectionHead eyebrow="Aprende paso a paso" title="Series recomendadas" link="Todas las series" linkHref="/series" />
-          <div className="grid-series">
+          <div className="grid-series tilt-set">
             {seriesList.slice(0, 3).map((s) => (
               <SeriesCard
                 key={s.id}

@@ -516,8 +516,8 @@ body {
 }
 
 /* Capa de Pauta / Cuadrícula (Fixed al viewport con pauta sincronizada al scroll).
-   --scroll-y lo escribe CUADERNO_BOOTSTRAP_SCRIPT en ESTE elemento (no en :root):
-   así cada frame de scroll solo invalida estilos de esta capa, no de todo el documento. */
+   --scroll-y lo escribe CUADERNO_BOOTSTRAP_SCRIPT en .paper-canvas (no en :root): así cada
+   frame de scroll solo invalida estilos del lienzo (pauta + linterna), no de todo el documento. */
 .paper-canvas-grid {
   position: fixed;
   inset: 0;
@@ -536,8 +536,45 @@ body {
     16px calc(16px - var(--scroll-y, 0px));
 }
 
-:root[data-grid="none"] .paper-canvas-grid {
+:root[data-grid="none"] .paper-canvas-grid,
+:root[data-grid="none"] .paper-canvas-lamp {
   display: none;
+}
+
+/* Linterna del hero (ADR 0039): la misma pauta repetida tres veces encima de la capa normal
+   (≈ cuádruple de tinta), visible solo en un círculo alrededor del cursor. Sin blur ni brillo:
+   solo más trazo. HeroLamp escribe --lamp-x/--lamp-y/--lamp-on en .paper-canvas. */
+.paper-canvas-lamp {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: var(--paper-grid), var(--paper-grid), var(--paper-grid);
+  background-size: var(--paper-grid-size);
+  background-position: 0 calc(-1 * var(--scroll-y, 0px));
+  mask-image: radial-gradient(
+    circle 190px at var(--lamp-x, -999px) var(--lamp-y, -999px),
+    #000 0%,
+    rgba(0, 0, 0, 0.7) 50%,
+    transparent 100%
+  );
+  -webkit-mask-image: radial-gradient(
+    circle 190px at var(--lamp-x, -999px) var(--lamp-y, -999px),
+    #000 0%,
+    rgba(0, 0, 0, 0.7) 50%,
+    transparent 100%
+  );
+  opacity: var(--lamp-on, 0);
+  transition: opacity 0.35s ease;
+}
+:root[data-grid="iso"] .paper-canvas-lamp {
+  background-position:
+    0 calc(-1 * var(--scroll-y, 0px)),
+    16px calc(16px - var(--scroll-y, 0px));
+}
+@media (prefers-reduced-motion: reduce) {
+  .paper-canvas-lamp {
+    display: none;
+  }
 }
 
 /* Tipografía de boceto/anotación */
@@ -569,9 +606,102 @@ body {
   color: var(--ink-3);
   transform: rotate(3deg);
 }
+/* Fase 3 (ADR 0039): título con círculo a mano, chispas, máquina de escribir y flecha */
+.hero-zone {
+  position: relative;
+}
+.hero-title {
+  position: relative;
+  display: inline-block;
+  font-size: 52px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1.08;
+}
+.hero-spark {
+  position: absolute;
+  pointer-events: none;
+}
+/* en el título el círculo no suma margen: el ancho extra empujaba el emoji a otra línea */
+.hero-title .doodle-circle {
+  margin-inline: 0;
+  white-space: nowrap;
+}
+.hero-title .doodle-circle-svg {
+  inset: -0.2em -0.3em;
+  width: calc(100% + 0.6em);
+  height: calc(100% + 0.4em);
+}
+.hero-spark-a {
+  top: -22px;
+  left: -30px;
+  rotate: -12deg;
+}
+.hero-spark-b {
+  right: -26px;
+  top: 6px;
+}
+.hero-sketch-tag .doodle-sparkle {
+  vertical-align: -2px;
+}
+.hero-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  color: var(--ink-3);
+}
+.hero-hint .doodle-arrow {
+  margin-top: 10px;
+}
+:root {
+  --typewriter-hl: var(--zine-hl);
+}
+[data-theme="dark"] {
+  --typewriter-hl: rgba(250, 204, 21, 0.3);
+}
+.typewriter {
+  white-space: nowrap;
+}
+.typewriter-text {
+  color: var(--ink);
+  font-weight: 650;
+  padding-inline: 0.12em;
+  background: linear-gradient(transparent 58%, var(--typewriter-hl) 58%);
+}
+.typewriter-cursor {
+  display: none;
+  width: 0.5ch;
+  height: 1.05em;
+  margin-left: 2px;
+  vertical-align: -0.16em;
+  background: var(--ink);
+}
+.typewriter[data-motion] .typewriter-cursor {
+  display: inline-block;
+  animation: typewriter-blink 1s steps(1) infinite;
+}
+@keyframes typewriter-blink {
+  50% {
+    opacity: 0;
+  }
+}
 @media (max-width: 640px) {
-  .hero-sketch-hint {
+  .hero-hint {
     display: none;
+  }
+  .hero-title {
+    font-size: 38px;
+    /* aire entre renglones: el círculo del nombre no debe rozar "Hola, soy" */
+    line-height: 1.35;
+  }
+}
+@media (max-width: 380px) {
+  .hero-title {
+    font-size: 32px;
+  }
+  /* pantallas muy angostas: "Ver todo" junto al título de sección no cabía */
+  .section-head {
+    flex-wrap: wrap;
   }
 }
 
@@ -1656,6 +1786,9 @@ pre,
   .site-header-in {
     padding: 0 18px;
     height: 56px;
+  }
+  .logo-text {
+    display: none;
   }
   .site-nav,
   .header-social {
@@ -3521,6 +3654,31 @@ a.tag-pill:hover {
 }
 
 /* ============================================================
+   Fase 4 · Collage (ADR 0039): tarjetas pegadas "a mano" con inclinación sutil
+   que se enderezan al pasar el puntero. Usa `rotate` (propiedad independiente)
+   para no pelear con el `transform` del hover de .card-hover.
+   ============================================================ */
+.tilt-set > * {
+  rotate: -1deg;
+  transition: rotate 0.22s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+.tilt-set > :nth-child(3n + 2) {
+  rotate: 0.8deg;
+}
+.tilt-set > :nth-child(3n) {
+  rotate: -0.5deg;
+}
+.tilt-set > :hover,
+.tilt-set > :focus-within {
+  rotate: 0deg;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tilt-set > * {
+    transition: none;
+  }
+}
+
+/* ============================================================
    Estilo Zine (ADR 0037) — capa sobre los componentes base
    Bordes de tinta, sombras duras desplazadas, colores planos y resaltador.
    Toda la "intensidad" vive en estos tokens: para suavizar el look, bajar
@@ -3644,9 +3802,19 @@ a.tag-pill:hover {
   box-shadow: var(--zine-shift-sm) var(--zine-shift-sm) 0 var(--zine-shadow);
   transform: rotate(-2deg);
 }
+/* categorías: conservan su tinte y punto de color por categoría (el board prefirió esto al sello) */
 .cat-pill {
   border: 1.5px solid var(--c, var(--blue));
   border-radius: var(--zine-radius-sm);
+}
+/* Fase 4 (ADR 0039): series como sticker */
+.badge-series {
+  background: var(--violet);
+  color: #ffffff;
+  border: var(--zine-border) solid var(--zine-ink);
+  border-radius: 3px;
+  box-shadow: var(--zine-shift-sm) var(--zine-shift-sm) 0 var(--zine-shadow);
+  rotate: 2deg;
 }
 
 /* tarjetas */
