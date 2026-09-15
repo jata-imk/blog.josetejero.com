@@ -7,12 +7,12 @@ export const CUADERNO_BOOTSTRAP_SCRIPT = `(function(){
   try {
     var raw = localStorage.getItem('cuaderno_settings');
     if (!raw) {
-      // Cuadrícula (#1 elegida), color azul blueprint, degradado activo, papel arrugado al 40%
+      // Cuadrícula (#1 elegida), color azul blueprint, degradado activo, papel arrugado sutil (24%)
       root.setAttribute('data-grid', 'lines');
       root.setAttribute('data-grid-color', 'blue');
       root.setAttribute('data-grid-fade', 'true');
       root.setAttribute('data-paper-texture', 'wrinkled');
-      root.style.setProperty('--paper-texture-opacity', '0.40');
+      root.style.setProperty('--paper-texture-opacity', '0.24');
     } else {
       var s = JSON.parse(raw);
       if (s.grid) root.setAttribute('data-grid', s.grid);

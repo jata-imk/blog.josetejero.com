@@ -285,8 +285,7 @@ export function CommandPalette({ open, initialQuery = '', onClose }: CommandPale
           <div
             style={{
               ...searchBoxStyle,
-              borderColor: inputFocused ? 'var(--blue)' : 'var(--line-2)',
-              boxShadow: inputFocused ? 'var(--ring)' : 'var(--sh-1)',
+              boxShadow: `var(--zine-shift-sm) var(--zine-shift-sm) 0 ${inputFocused ? 'var(--blue)' : 'var(--zine-shadow)'}`,
             }}
           >
             <span style={searchIconStyle}>
@@ -423,9 +422,10 @@ const panelStyle: CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
   background: 'var(--bg)',
-  border: '1px solid var(--line-2)',
-  borderRadius: 'var(--r-xl)',
-  boxShadow: 'var(--sh-panel)',
+  // Estilo Zine (ADR 0037): borde de tinta y sombra dura, tokens en globals.css
+  border: 'var(--zine-border) solid var(--zine-ink)',
+  borderRadius: 'calc(var(--zine-radius) + 4px)',
+  boxShadow: 'calc(var(--zine-shift) + 4px) calc(var(--zine-shift) + 4px) 0 var(--zine-shadow)',
 }
 
 const headerStyle: CSSProperties = {
@@ -448,8 +448,8 @@ const searchBoxStyle: CSSProperties = {
   gap: 10,
   minHeight: 52,
   padding: '8px 10px 8px 14px',
-  border: '1px solid var(--line-2)',
-  borderRadius: 'var(--r-lg)',
+  border: 'var(--zine-border) solid var(--zine-ink)',
+  borderRadius: 'var(--zine-radius)',
   background: 'var(--bg)',
   transition: 'border-color .15s, box-shadow .15s',
 }
