@@ -21,6 +21,9 @@ Thumbs.db
 # Uploads locales de Payload (media generada)
 blog/media/
 
+# Borradores locales usados para importar contenido al CMS
+blog/.codex-content/
+
 # QA artifacts (testing screenshots, capturas y logs de Playwright)
 # Cubre toda la raíz y blog/: las capturas de QA usan prefijo tod-<n>-... y *-rerun/-final.
 .qa-artifacts/
