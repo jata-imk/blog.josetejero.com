@@ -64,7 +64,7 @@
   /* tinta */
   --ink: #0f172a;
   --ink-2: #334155;
-  --ink-3: #64748b;
+  --ink-3: #536177; /* antes #64748b: +contraste sobre papel texturizado (ADR 0037) */
   --muted: #94a3b8;
 
   /* líneas */
@@ -317,51 +317,63 @@
    ============================================================ */
 
 /* 1. Tintas de Pauta / Cuadrícula (Modo Claro). Default = blue, igual que
-   DEFAULT_CUADERNO_SETTINGS y CUADERNO_BOOTSTRAP_SCRIPT (sin JS no cambia el look). */
+   DEFAULT_CUADERNO_SETTINGS y CUADERNO_BOOTSTRAP_SCRIPT (sin JS no cambia el look).
+   Legibilidad (ADR 0037): líneas finas muy tenues + línea mayor cada 5 cuadros,
+   como el papel de ingeniería real; la pauta acompaña, no compite con el texto. */
 :root,
 :root[data-grid-color="blue"] {
-  --paper-grid-color-lines: rgba(37, 99, 235, 0.35);
-  --paper-grid-color-dots: rgba(37, 99, 235, 0.32);
+  --paper-grid-color-lines: rgba(37, 99, 235, 0.10);
+  --paper-grid-color-major: rgba(37, 99, 235, 0.20);
+  --paper-grid-color-dots: rgba(37, 99, 235, 0.24);
 }
 :root[data-grid-color="neutral"] {
-  --paper-grid-color-lines: rgba(148, 163, 184, 0.42);
-  --paper-grid-color-dots: rgba(15, 23, 42, 0.24);
+  --paper-grid-color-lines: rgba(100, 116, 139, 0.13);
+  --paper-grid-color-major: rgba(100, 116, 139, 0.24);
+  --paper-grid-color-dots: rgba(15, 23, 42, 0.20);
 }
 :root[data-grid-color="violet"] {
-  --paper-grid-color-lines: rgba(124, 58, 237, 0.35);
-  --paper-grid-color-dots: rgba(124, 58, 237, 0.32);
+  --paper-grid-color-lines: rgba(124, 58, 237, 0.10);
+  --paper-grid-color-major: rgba(124, 58, 237, 0.20);
+  --paper-grid-color-dots: rgba(124, 58, 237, 0.24);
 }
 :root[data-grid-color="amber"] {
-  --paper-grid-color-lines: rgba(217, 119, 6, 0.35);
-  --paper-grid-color-dots: rgba(217, 119, 6, 0.32);
+  --paper-grid-color-lines: rgba(217, 119, 6, 0.12);
+  --paper-grid-color-major: rgba(217, 119, 6, 0.22);
+  --paper-grid-color-dots: rgba(217, 119, 6, 0.26);
 }
 
 /* Tintas de Pauta / Cuadrícula (Modo Oscuro) */
 [data-theme="dark"],
 [data-theme="dark"][data-grid-color="blue"] {
-  --paper-grid-color-lines: rgba(96, 165, 250, 0.30);
-  --paper-grid-color-dots: rgba(96, 165, 250, 0.30);
+  --paper-grid-color-lines: rgba(96, 165, 250, 0.08);
+  --paper-grid-color-major: rgba(96, 165, 250, 0.16);
+  --paper-grid-color-dots: rgba(96, 165, 250, 0.22);
 }
 [data-theme="dark"][data-grid-color="neutral"] {
-  --paper-grid-color-lines: rgba(255, 255, 255, 0.16);
-  --paper-grid-color-dots: rgba(255, 255, 255, 0.18);
+  --paper-grid-color-lines: rgba(255, 255, 255, 0.05);
+  --paper-grid-color-major: rgba(255, 255, 255, 0.10);
+  --paper-grid-color-dots: rgba(255, 255, 255, 0.16);
 }
 [data-theme="dark"][data-grid-color="violet"] {
-  --paper-grid-color-lines: rgba(167, 139, 250, 0.30);
-  --paper-grid-color-dots: rgba(167, 139, 250, 0.30);
+  --paper-grid-color-lines: rgba(167, 139, 250, 0.08);
+  --paper-grid-color-major: rgba(167, 139, 250, 0.16);
+  --paper-grid-color-dots: rgba(167, 139, 250, 0.22);
 }
 [data-theme="dark"][data-grid-color="amber"] {
-  --paper-grid-color-lines: rgba(251, 191, 36, 0.30);
-  --paper-grid-color-dots: rgba(251, 191, 36, 0.30);
+  --paper-grid-color-lines: rgba(251, 191, 36, 0.07);
+  --paper-grid-color-major: rgba(251, 191, 36, 0.14);
+  --paper-grid-color-dots: rgba(251, 191, 36, 0.20);
 }
 
 /* 2. Pautas: Cuadrícula (por defecto #1), Puntos (#2), Isométrico (#3), Lisa */
 :root,
 :root[data-grid="lines"] {
   --paper-grid:
+    linear-gradient(to right, var(--paper-grid-color-major) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--paper-grid-color-major) 1px, transparent 1px),
     linear-gradient(to right, var(--paper-grid-color-lines) 1px, transparent 1px),
     linear-gradient(to bottom, var(--paper-grid-color-lines) 1px, transparent 1px);
-  --paper-grid-size: 28px 28px;
+  --paper-grid-size: 140px 140px, 140px 140px, 28px 28px, 28px 28px;
 }
 :root[data-grid="dots"] {
   --paper-grid: radial-gradient(var(--paper-grid-color-dots) 1.5px, transparent 1.5px);
@@ -377,10 +389,20 @@
   --paper-grid: none;
 }
 
-/* 3. Degradado / Foco central de la pauta (centrado en viewport, parejo en los 4 extremos) */
+/* 3. Carril de lectura: la pauta se atenúa en la columna central (donde vive el
+   contenido) y se ve completa en los márgenes. Antes era al revés: la máscara la
+   dejaba más intensa justo detrás del texto. */
 :root,
 :root[data-grid-fade="true"] {
-  --paper-grid-mask: radial-gradient(ellipse 88% 72% at 50% 50%, black 25%, rgba(0, 0, 0, 0.45) 65%, transparent 100%);
+  --paper-grid-mask: linear-gradient(
+    90deg,
+    #000 0,
+    #000 calc(50% - 600px),
+    rgba(0, 0, 0, 0.35) calc(50% - 420px),
+    rgba(0, 0, 0, 0.35) calc(50% + 420px),
+    #000 calc(50% + 600px),
+    #000 100%
+  );
 }
 :root[data-grid-fade="false"] {
   --paper-grid-mask: none;
@@ -463,14 +485,14 @@ body {
   inset: 0;
   width: 100%;
   height: 100%;
-  opacity: var(--paper-texture-opacity, 0.40);
+  opacity: var(--paper-texture-opacity, 0.24);
   mix-blend-mode: multiply;
   transition: opacity 0.2s ease;
 }
 
 [data-theme="dark"] .paper-canvas-texture {
   mix-blend-mode: screen;
-  opacity: calc(var(--paper-texture-opacity, 0.40) * 0.42);
+  opacity: calc(var(--paper-texture-opacity, 0.24) * 0.42);
 }
 
 /* Textura 1: Papel arrugado orgánico con pliegues procedimentales SVG (relieve marcado) */
@@ -3321,5 +3343,249 @@ a.tag-pill:hover {
   .cookie-banner-actions .btn {
     flex: 1;
     justify-content: center;
+  }
+}
+
+/* ============================================================
+   Hoja de lectura para posts (ADR 0037)
+   El artículo va sobre una hoja blanca con línea de margen roja de cuaderno escolar;
+   la pauta queda como "escritorio" alrededor. El margen negativo hace crecer la hoja
+   hacia afuera, así el texto conserva su ancho de lectura (--wrap-narrow).
+   ============================================================ */
+:root {
+  --sheet-pad: 56px;
+  --sheet-margin-line: rgba(225, 29, 72, 0.28);
+  --sheet-shadow: 0 1px 2px rgba(15, 23, 42, 0.06), 0 12px 32px -12px rgba(15, 23, 42, 0.18);
+}
+[data-theme="dark"] {
+  --sheet-margin-line: rgba(251, 113, 133, 0.22);
+  --sheet-shadow: 0 1px 2px rgba(0, 0, 0, 0.35), 0 12px 32px -12px rgba(0, 0, 0, 0.6);
+}
+.post-article {
+  position: relative;
+  box-sizing: content-box;
+  padding: 36px var(--sheet-pad) 48px;
+  margin-inline: calc(-1 * var(--sheet-pad));
+  border-radius: 6px;
+  background:
+    linear-gradient(
+      to right,
+      transparent 30px,
+      var(--sheet-margin-line) 30px,
+      var(--sheet-margin-line) 31px,
+      transparent 31px
+    ),
+    var(--bg);
+  box-shadow: var(--sheet-shadow);
+}
+/* el primer bloque de la hoja no hereda el margin-top de sección (h2: 52px) */
+.ab-prose > :first-child,
+.ab-prose .payload-richtext > :first-child {
+  margin-top: 0;
+}
+@media (min-width: 769px) and (max-width: 1180px) {
+  :root {
+    --sheet-pad: 36px;
+  }
+}
+@media (max-width: 768px) {
+  :root {
+    --sheet-pad: 18px;
+  }
+  .post-article {
+    padding-block: 24px 36px;
+    border-radius: 0;
+    background: var(--bg);
+  }
+}
+
+/* ============================================================
+   Estilo Zine (ADR 0037) — capa sobre los componentes base
+   Bordes de tinta, sombras duras desplazadas, colores planos y resaltador.
+   Toda la "intensidad" vive en estos tokens: para suavizar el look, bajar
+   --zine-border y --zine-shift; para desactivarlo, borrar esta sección.
+   ============================================================ */
+:root {
+  --zine-ink: #0f172a;
+  --zine-shadow: #0f172a;
+  --zine-border: 2px;
+  --zine-shift: 4px;
+  --zine-shift-sm: 2px;
+  --zine-radius: 6px;
+  --zine-radius-sm: 4px;
+  --zine-hl: #fde047;
+  --zine-hl-ink: #0f172a;
+  --zine-cta-bg: var(--blue);
+  --zine-cta-ink: #ffffff;
+}
+[data-theme="dark"] {
+  --zine-ink: #cbd5e1;
+  --zine-shadow: #020617;
+  --zine-hl: #facc15;
+  --zine-cta-bg: #60a5fa;
+  --zine-cta-ink: #0f172a;
+}
+
+/* botones */
+.btn {
+  border: var(--zine-border) solid var(--zine-ink);
+  border-radius: var(--zine-radius);
+  box-shadow: var(--zine-shift) var(--zine-shift) 0 var(--zine-shadow);
+  font-weight: 700;
+  transition:
+    transform 0.12s,
+    box-shadow 0.12s,
+    background 0.15s;
+}
+.btn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: calc(var(--zine-shift) + 2px) calc(var(--zine-shift) + 2px) 0 var(--zine-shadow);
+}
+.btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 var(--zine-shadow);
+}
+.btn-grad,
+.btn-grad:hover {
+  background: var(--zine-cta-bg);
+  color: var(--zine-cta-ink);
+}
+.btn-secondary,
+.btn-secondary:hover {
+  background: var(--bg);
+  border-color: var(--zine-ink);
+}
+
+/* chips, orden y paginación */
+.ab-chip,
+.blog-sort,
+.ab-pager button {
+  border: var(--zine-border) solid var(--zine-ink);
+  border-radius: var(--zine-radius-sm);
+  background: var(--bg);
+  color: var(--ink);
+  font-weight: 600;
+  box-shadow: var(--zine-shift-sm) var(--zine-shift-sm) 0 var(--zine-shadow);
+  transition:
+    transform 0.12s,
+    box-shadow 0.12s,
+    background 0.15s;
+}
+.ab-chip:hover,
+.blog-sort:hover,
+.ab-pager button:hover:not(:disabled) {
+  background: var(--bg);
+  border-color: var(--zine-ink);
+  color: var(--ink);
+  transform: translate(-1px, -1px);
+  box-shadow: calc(var(--zine-shift-sm) + 1px) calc(var(--zine-shift-sm) + 1px) 0 var(--zine-shadow);
+}
+.ab-chip.active,
+.ab-pager button.active {
+  background: var(--zine-hl);
+  color: var(--zine-hl-ink);
+  border-color: var(--zine-ink);
+}
+
+/* campos */
+.ab-search input,
+.ab-input,
+.ab-textarea {
+  border: var(--zine-border) solid var(--zine-ink);
+  border-radius: var(--zine-radius);
+  box-shadow: var(--zine-shift) var(--zine-shift) 0 var(--zine-shadow);
+}
+.ab-search input:focus,
+.ab-input:focus,
+.ab-textarea:focus {
+  border-color: var(--zine-ink);
+  box-shadow: var(--zine-shift) var(--zine-shift) 0 var(--blue);
+}
+
+/* etiquetas: tags como recortes, "Destacado" como sticker */
+.tag-pill {
+  background: var(--bg);
+  border: 1.5px dashed var(--zine-ink);
+  border-radius: 3px;
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+}
+a.tag-pill:hover {
+  background: var(--zine-hl);
+  color: var(--zine-hl-ink);
+}
+.badge-grad {
+  background: var(--zine-hl);
+  color: var(--zine-hl-ink);
+  border: var(--zine-border) solid var(--zine-ink);
+  border-radius: 3px;
+  box-shadow: var(--zine-shift-sm) var(--zine-shift-sm) 0 var(--zine-shadow);
+  transform: rotate(-2deg);
+}
+.cat-pill {
+  border: 1.5px solid var(--c, var(--blue));
+  border-radius: var(--zine-radius-sm);
+}
+
+/* tarjetas */
+.ab-author {
+  background: var(--bg);
+}
+.card,
+.ab-author,
+.ab-pn {
+  border: var(--zine-border) solid var(--zine-ink);
+  border-radius: calc(var(--zine-radius) + 2px);
+  box-shadow: calc(var(--zine-shift) + 1px) calc(var(--zine-shift) + 1px) 0 var(--zine-shadow);
+}
+.card-hover:hover,
+.ab-pn:hover {
+  border-color: var(--zine-ink);
+  transform: translate(-2px, -2px);
+  box-shadow: calc(var(--zine-shift) + 3px) calc(var(--zine-shift) + 3px) 0 var(--zine-shadow);
+}
+
+.nb-dialog {
+  border: var(--zine-border) solid var(--zine-ink);
+  border-radius: calc(var(--zine-radius) + 4px);
+  box-shadow: calc(var(--zine-shift) + 4px) calc(var(--zine-shift) + 4px) 0 var(--zine-shadow);
+}
+.mobile-nav {
+  border-left: var(--zine-border) solid var(--zine-ink);
+  box-shadow: none;
+}
+.nb-option {
+  border: var(--zine-border) solid var(--zine-ink);
+  border-radius: var(--zine-radius-sm);
+}
+.nb-option[aria-pressed="true"] {
+  background: var(--zine-hl);
+  color: var(--zine-hl-ink);
+  border-color: var(--zine-ink);
+  box-shadow: var(--zine-shift-sm) var(--zine-shift-sm) 0 var(--zine-shadow);
+}
+.nb-option[aria-pressed="true"] .nb-option-desc {
+  color: var(--zine-hl-ink);
+}
+.mobile-nav-links a.active {
+  background: var(--zine-hl);
+  color: var(--zine-hl-ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn,
+  .ab-chip,
+  .blog-sort,
+  .ab-pager button,
+  .card,
+  .ab-pn {
+    transition: none;
+  }
+  .btn:hover,
+  .ab-chip:hover,
+  .card-hover:hover,
+  .ab-pn:hover {
+    transform: none;
   }
 }

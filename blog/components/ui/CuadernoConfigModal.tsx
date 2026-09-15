@@ -21,7 +21,7 @@ export const DEFAULT_CUADERNO_SETTINGS: CuadernoSettings = {
   color: 'blue',
   fade: true,
   texture: 'wrinkled',
-  opacity: 0.40,
+  opacity: 0.24,
 }
 
 const STORAGE_KEY = 'cuaderno_settings'
@@ -232,9 +232,9 @@ export function CuadernoConfigTrigger() {
 
               <div className="nb-switch-row">
                 <div>
-                  <div id="nb-fade-label" className="nb-option-label">Desvanecer bordes</div>
+                  <div id="nb-fade-label" className="nb-option-label">Despejar zona de lectura</div>
                   <div className="nb-option-desc">
-                    Suaviza la cuadrícula hacia los extremos para mayor foco visual
+                    Atenúa la pauta detrás del contenido y la deja completa en los márgenes
                   </div>
                 </div>
                 <button
