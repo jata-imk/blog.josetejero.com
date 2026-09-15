@@ -4,6 +4,7 @@ import { Badge } from '../ui/Badge'
 import { Tag, TagRow } from '../ui/Tag'
 import { Meta, MetaSep } from '../ui/Meta'
 import { Thumb } from '../ui/Thumb'
+import { WashiTape } from '../ui/Doodles'
 import type { CoverImage } from '@/lib/media'
 
 export type PostCardTag = string | { name: string; slug?: string }
@@ -21,6 +22,8 @@ export type PostCardProps = {
   image?: CoverImage | null
   /** Marca la imagen como LCP candidate — usar solo en la primera tarjeta above the fold. */
   priority?: boolean
+  /** Pega una cinta washi en el borde superior (tarjeta destacada, ADR 0038). */
+  tape?: boolean
 }
 
 export function PostCard({
@@ -35,9 +38,11 @@ export function PostCard({
   href = '#',
   image,
   priority,
+  tape,
 }: PostCardProps) {
   return (
-    <article className="card card-hover post-card">
+    <article className={`card card-hover post-card${tape ? ' has-tape' : ''}`}>
+      {tape && <WashiTape tone="yellow" rotate={-3} />}
       <a href={href} tabIndex={-1} aria-hidden="true">
         <Thumb slug={category?.slug} image={image} sizes="(max-width: 768px) 100vw, 400px" priority={priority} />
       </a>
