@@ -8,10 +8,13 @@ import type { SerializedBlockNode } from '@payloadcms/richtext-lexical'
 import { Callout } from '@/components/blocks/Callout'
 import { ChmodCalculator } from '@/components/blocks/ChmodCalculator'
 import { CodeBlockClient } from '@/components/blocks/CodeBlockClient'
+import { VideoCompare } from '@/components/blocks/VideoCompare'
+import type { VideoClip, VideoInput } from '@/components/blocks/videoCompareShared'
 import { FigureTrigger } from '@/components/image-viewer/FigureViewer'
 import { escapeHtml, type LexicalChildNode } from '@/lib/code-highlight'
 import type { ViewerFigure } from '@/lib/figures'
 import type { Media } from '@/payload-types'
+import type { VideoAccent, VideoAspect, VideoMode } from './videoCompareBlock'
 
 type CalloutFields = {
   blockType: 'callout'
@@ -33,6 +36,70 @@ type ChmodCalculatorFields = {
   initialTarget?: 'file' | 'dir'
   showSpecial?: boolean | null
   title?: string
+}
+
+type VideoCompareFields = {
+  blockType: 'videoCompare'
+  title?: string | null
+  mode?: VideoMode | null
+  prompt?: string | null
+  input?: number | Media | null
+  doodle?: string | null
+  results?: {
+    label?: string | null
+    accent?: VideoAccent | null
+    video?: number | Media | null
+    poster?: number | Media | null
+    aspect?: VideoAspect | null
+    note?: string | null
+  }[] | null
+  caption?: string | null
+}
+
+/** Un upload llega poblado (objeto) solo si el `depth` de la query alcanza; si no, es un id. */
+function populated(value: number | Media | null | undefined): Media | undefined {
+  return value && typeof value === 'object' && value.url ? value : undefined
+}
+
+/**
+ * Traduce los campos del bloque `videoCompare` a props planas del componente
+ * (ADR 0041). Los resultados cuyo video no llegó poblado se descartan.
+ */
+function toVideoCompareProps(fields: Partial<VideoCompareFields>) {
+  const results: VideoClip[] = (fields.results ?? []).flatMap((row) => {
+    const video = populated(row.video)
+    if (!video?.url) return []
+    const poster = populated(row.poster)
+    return [{
+      label: row.label?.trim() || undefined,
+      accent: row.accent ?? 'blue',
+      src: video.url,
+      mimeType: video.mimeType ?? undefined,
+      poster: poster ? (poster.sizes?.content?.url ?? poster.url ?? undefined) : undefined,
+      aspect: row.aspect ?? 'horizontal',
+      note: row.note?.trim() || undefined,
+    }]
+  })
+  const inputDoc = populated(fields.input)
+  const input: VideoInput | undefined = inputDoc?.url
+    ? {
+        kind: inputDoc.mimeType?.startsWith('video') ? 'video' : 'image',
+        src: inputDoc.sizes?.content?.url ?? inputDoc.url,
+        mimeType: inputDoc.mimeType ?? undefined,
+        alt: inputDoc.alt ?? '',
+        width: inputDoc.sizes?.content?.width ?? inputDoc.width ?? undefined,
+        height: inputDoc.sizes?.content?.height ?? inputDoc.height ?? undefined,
+      }
+    : undefined
+  return {
+    title: fields.title ?? undefined,
+    mode: fields.mode ?? undefined,
+    prompt: fields.prompt ?? undefined,
+    input,
+    doodle: fields.doodle ?? undefined,
+    results,
+    caption: fields.caption ?? undefined,
+  }
 }
 
 type HeadingNode = {
@@ -133,6 +200,16 @@ export function makeBodyConverters(
         const doc = node?.value as Media | undefined
         if (!doc || typeof doc !== 'object') return null
         const alt = node.fields?.alt || doc.alt || ''
+        // Video suelto en el cuerpo: mismo reproductor que `videoCompare` con un
+        // solo resultado (ADR 0041). Sin campo de formato, se asume horizontal.
+        if (doc.mimeType?.startsWith('video') && doc.url) {
+          return (
+            <VideoCompare
+              caption={node.fields?.caption || doc.caption || undefined}
+              results={[{ accent: 'blue', src: doc.url, mimeType: doc.mimeType, aspect: 'horizontal' }]}
+            />
+          )
+        }
         if (!doc.mimeType?.startsWith('image')) {
           return (
             <a href={doc.url ?? undefined} rel="noopener noreferrer">
@@ -215,6 +292,11 @@ export function makeBodyConverters(
               title={fields.title}
             />
           )
+        },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        videoCompare: ({ node }: { node: SerializedBlockNode<any> }) => {
+          const typedNode = node as SerializedBlockNode<VideoCompareFields>
+          return <VideoCompare {...toVideoCompareProps(typedNode.fields ?? {})} />
         },
       },
     }

@@ -28,7 +28,9 @@ export const Media: CollectionConfig = {
       { name: 'content', width: 1000 },
     ],
     adminThumbnail: 'thumbnail',
-    mimeTypes: ['image/*', 'image/svg+xml'],
+    // Video para el bloque `videoCompare` (ADR 0041). Sharp solo procesa imágenes:
+    // las imageSizes de arriba se omiten para mp4/webm.
+    mimeTypes: ['image/*', 'image/svg+xml', 'video/mp4', 'video/webm'],
   },
   admin: {
     group: 'Admin',
