@@ -5,6 +5,8 @@ import {
   type JSXConvertersFunction,
 } from '@payloadcms/richtext-lexical/react'
 import type { SerializedBlockNode } from '@payloadcms/richtext-lexical'
+import { AudioPlayer } from '@/components/blocks/AudioPlayer'
+import type { AudioTrack } from '@/components/blocks/audioPlayerShared'
 import { Callout } from '@/components/blocks/Callout'
 import { ChmodCalculator } from '@/components/blocks/ChmodCalculator'
 import { CodeBlockClient } from '@/components/blocks/CodeBlockClient'
@@ -14,6 +16,7 @@ import { FigureTrigger } from '@/components/image-viewer/FigureViewer'
 import { escapeHtml, type LexicalChildNode } from '@/lib/code-highlight'
 import type { ViewerFigure } from '@/lib/figures'
 import type { Media } from '@/payload-types'
+import type { AudioStatus } from './audioPlayerBlock'
 import type { VideoAccent, VideoAspect, VideoMode } from './videoCompareBlock'
 
 type CalloutFields = {
@@ -54,6 +57,17 @@ type VideoCompareFields = {
     note?: string | null
   }[] | null
   caption?: string | null
+}
+
+type AudioPlayerFields = {
+  blockType: 'audioPlayer'
+  status?: AudioStatus | null
+  label?: string | null
+  provider?: string | null
+  audio?: number | Media | null
+  prompt?: string | null
+  referenceImage?: number | Media | null
+  peaks?: unknown
 }
 
 /** Un upload llega poblado (objeto) solo si el `depth` de la query alcanza; si no, es un id. */
@@ -99,6 +113,36 @@ function toVideoCompareProps(fields: Partial<VideoCompareFields>) {
     doodle: fields.doodle ?? undefined,
     results,
     caption: fields.caption ?? undefined,
+  }
+}
+
+/**
+ * Traduce el bloque `audioPlayer` a una pista plana (ADR 0042). Si el audio no
+ * llegó poblado, la pista se pinta como pendiente en vez de romper el post.
+ */
+function toAudioTrack(fields: Partial<AudioPlayerFields>, id: string): AudioTrack {
+  const audio = populated(fields.audio)
+  const ref = populated(fields.referenceImage)
+  const peaks = Array.isArray(fields.peaks) && fields.peaks.every((v) => typeof v === 'number')
+    ? (fields.peaks as number[])
+    : undefined
+  return {
+    id,
+    label: fields.label?.trim() || audio?.alt || audio?.filename || 'Audio',
+    provider: fields.provider?.trim() || undefined,
+    status: fields.status === 'pending' || !audio?.url ? 'pending' : 'ready',
+    src: fields.status === 'pending' ? undefined : (audio?.url ?? undefined),
+    mimeType: audio?.mimeType ?? undefined,
+    prompt: fields.prompt?.trim() || undefined,
+    referenceImage: ref?.url
+      ? {
+          src: ref.sizes?.content?.url ?? ref.url,
+          alt: ref.alt ?? '',
+          width: ref.sizes?.content?.width ?? ref.width ?? undefined,
+          height: ref.sizes?.content?.height ?? ref.height ?? undefined,
+        }
+      : undefined,
+    peaks,
   }
 }
 
@@ -210,6 +254,20 @@ export function makeBodyConverters(
             />
           )
         }
+        // Audio suelto en el cuerpo: mismo reproductor que `audioPlayer`, sin prompt (ADR 0042).
+        if (doc.mimeType?.startsWith('audio') && doc.url) {
+          return (
+            <AudioPlayer
+              track={{
+                id: `media-${doc.id}`,
+                label: doc.alt || doc.filename || 'Audio',
+                status: 'ready',
+                src: doc.url,
+                mimeType: doc.mimeType,
+              }}
+            />
+          )
+        }
         if (!doc.mimeType?.startsWith('image')) {
           return (
             <a href={doc.url ?? undefined} rel="noopener noreferrer">
@@ -297,6 +355,13 @@ export function makeBodyConverters(
         videoCompare: ({ node }: { node: SerializedBlockNode<any> }) => {
           const typedNode = node as SerializedBlockNode<VideoCompareFields>
           return <VideoCompare {...toVideoCompareProps(typedNode.fields ?? {})} />
+        },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        audioPlayer: ({ node }: { node: SerializedBlockNode<any> }) => {
+          const typedNode = node as SerializedBlockNode<AudioPlayerFields>
+          const fields = typedNode.fields ?? {}
+          const id = (fields as { id?: string }).id ?? fields.label ?? 'audio'
+          return <AudioPlayer track={toAudioTrack(fields, String(id))} />
         },
       },
     }
