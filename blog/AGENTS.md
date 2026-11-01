@@ -19,14 +19,16 @@ diagramas, código. El diseño viene de **Claude Design** y se entrega como bund
 - Self-hosted en **VPS Debian 12** con **Docker Compose para app + PostgreSQL** y
   **CloudPanel/Nginx** como reverse proxy. **Caddy descartado** y **Cloudflare pendiente**.
   La app mantiene `output: 'standalone'`.
-- **Tres bloques custom** en Lexical (cualquier bloque adicional requiere su propio ADR, ver ADR 0003):
+- **Cuatro bloques custom** en Lexical (cualquier bloque adicional requiere su propio ADR, ver ADR 0003):
   `Callout` (variant `note|tip|warning|danger`, `title`, `content` richText anidado),
   `chmodCalculator` (`initialMode`, `showSpecial`, `title` — calculadora interactiva de permisos,
-  ver ADR 0031) y `videoCompare` (prompt + 1..3 resultados de video con selector y lightbox
-  sincronizado; con un resultado es el reproductor genérico — ver ADR 0041).
+  ver ADR 0031), `videoCompare` (prompt + 1..3 resultados de video con selector y lightbox
+  sincronizado; con un resultado es el reproductor genérico — ver ADR 0041) y `audioPlayer`
+  (una pista con onda, prompt plegable y modo foco; estado `pending` sin audio — ver ADR 0042).
 - **Código** = nodo built-in de Lexical; **Shiki + botón copiar son RENDER** (frontend), no un bloque.
 - **Imágenes/SVG/video** = upload nativo de Lexical (colección `Media`). SVG como `<img>`, no inline.
-  Video (mp4/webm) se pinta con el componente de `videoCompare`.
+  Video (mp4/webm) se pinta con el componente de `videoCompare`; audio (mp3/m4a/wav), con el de
+  `audioPlayer`.
 
 ## Principios
 

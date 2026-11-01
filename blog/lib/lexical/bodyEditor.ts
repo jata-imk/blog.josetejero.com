@@ -7,6 +7,7 @@ import {
 import { calloutBlock } from './calloutBlock'
 import { chmodCalculatorBlock } from './chmodCalculatorBlock'
 import { videoCompareBlock } from './videoCompareBlock'
+import { audioPlayerBlock } from './audioPlayerBlock'
 
 // Factory — each call returns a fresh instance so Payload can sanitize each
 // collection's editor independently without shared-state mutation.
@@ -15,7 +16,7 @@ export function makeBodyEditor() {
     features: ({ defaultFeatures }) => [
       ...defaultFeatures,
       EXPERIMENTAL_TableFeature(),
-      BlocksFeature({ blocks: [calloutBlock, chmodCalculatorBlock, videoCompareBlock, CodeBlock()] }),
+      BlocksFeature({ blocks: [calloutBlock, chmodCalculatorBlock, videoCompareBlock, audioPlayerBlock, CodeBlock()] }),
     ],
   })
 }

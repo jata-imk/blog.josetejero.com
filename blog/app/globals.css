@@ -3861,8 +3861,29 @@ a.tag-pill:hover {
   --video-lb-line: #cbd5e1;
   --video-lb-shadow: #020617;
   --video-lb-hl: #facc15;
+
+  /* audio (ADR 0042): botón de play, onda, progreso (único degradado), espectro y error */
+  --audio-coral: #f45b4f;
+  --audio-on-coral: #0f172a;
+  --audio-bar: #cbd5e1;
+  --audio-g1: #2563eb;
+  --audio-g2: #7c3aed;
+  --audio-spec: #7c3aed;
+  --audio-rose: #be123c;
+  --audio-err: #fff1f2;
+  --audio-tip: #0f172a;
+  --audio-on-tip: #f8fafc;
 }
 [data-theme="dark"] {
+  --audio-coral: #f8685d;
+  --audio-bar: #334155;
+  --audio-g1: #3b82f6;
+  --audio-g2: #8b5cf6;
+  --audio-spec: #a78bfa;
+  --audio-rose: #fb7185;
+  --audio-err: #2b1520;
+  --audio-tip: #f1f5f9;
+  --audio-on-tip: #0f172a;
   --video-stage: #020617;
   --zine-ink: #cbd5e1;
   --zine-shadow: #020617;
@@ -4721,5 +4742,593 @@ html:has(.ab-vc-lb[open]) {
   .ab-vc-btn,
   .ab-vc-play {
     transition: none;
+  }
+}
+
+/* ============================================================
+   Reproductor de audio — bloque `audioPlayer` (ADR 0042)
+   Port recortado de Claude Design ("Reproductor de audio"): fila
+   compacta + prompt plegable + modo foco. Las --ap-* son alias
+   locales de tokens globales.
+   ============================================================ */
+.ab-ap {
+  --ap-ink: var(--ink);
+  --ap-ink-2: var(--ink-2);
+  --ap-ink-3: var(--ink-3);
+  --ap-line: var(--zine-ink);
+  --ap-shadow: var(--zine-shadow);
+  --ap-hl: var(--zine-hl);
+  --ap-on-hl: var(--zine-hl-ink);
+  --ap-surface: var(--bg);
+  --ap-surface-2: var(--bg-soft);
+  --ap-pencil: var(--muted);
+  --ap-focus: var(--blue);
+  container: ab-ap / inline-size;
+  position: relative;
+  margin: 24px 0;
+  padding: 14px 16px;
+  border: var(--zine-border) solid var(--ap-line);
+  border-radius: var(--zine-radius);
+  background: var(--ap-surface);
+  box-shadow: var(--zine-shift) var(--zine-shift) 0 var(--ap-shadow);
+  color: var(--ap-ink);
+  font: 400 14px/1.4 var(--font-sans);
+}
+.ab-ap + .ab-ap {
+  margin-top: -8px;
+}
+.ab-ap.is-pending {
+  border-style: dashed;
+  box-shadow: none;
+  background: var(--ap-surface-2);
+}
+.ab-ap :focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--ap-surface), 0 0 0 6px var(--ap-focus) !important;
+}
+.ab-ap-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 48px;
+}
+
+/* play */
+.ab-ap-play {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  border: var(--zine-border) solid var(--ap-line);
+  border-radius: 50%;
+  background: var(--audio-coral);
+  color: var(--audio-on-coral);
+  box-shadow: 3px 3px 0 var(--ap-shadow);
+  cursor: pointer;
+  transition: transform 0.08s, box-shadow 0.08s;
+}
+.ab-ap-play:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 var(--ap-shadow);
+}
+.ab-ap-play:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 var(--ap-shadow);
+}
+.ab-ap-play:disabled {
+  cursor: default;
+  transform: none;
+}
+.ab-ap-play svg {
+  animation: ab-ap-pop 0.18s ease-out;
+}
+.ab-ap-play.is-big {
+  width: 84px;
+  height: 84px;
+  box-shadow: 4px 4px 0 var(--ap-shadow);
+}
+.ab-ap.is-pending .ab-ap-play {
+  border-style: dashed;
+  border-color: var(--ap-pencil);
+  background: transparent;
+  color: var(--ap-pencil);
+  box-shadow: none;
+}
+.ab-ap.is-error .ab-ap-play {
+  border-color: var(--audio-rose);
+  background: var(--audio-err);
+  color: var(--audio-rose);
+  box-shadow: none;
+}
+.ab-ap-spin {
+  width: 18px;
+  height: 18px;
+  border: 2.5px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: ab-ap-rot 0.7s linear infinite;
+}
+@keyframes ab-ap-pop {
+  from { transform: scale(0.55); opacity: 0.3; }
+  to { transform: none; opacity: 1; }
+}
+@keyframes ab-ap-rot {
+  to { transform: rotate(360deg); }
+}
+
+/* identidad */
+.ab-ap-ref {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  margin: 0 !important;
+  border: var(--zine-border) solid var(--ap-line);
+  border-radius: var(--zine-radius-sm);
+  object-fit: cover;
+  box-shadow: none !important;
+}
+.ab-ap-id {
+  flex: 0 0 150px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.ab-ap-name {
+  overflow: hidden;
+  font: 700 13.5px/1.2 var(--font-mono);
+  color: var(--ap-ink);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.ab-ap-prov {
+  overflow: hidden;
+  font: 500 12px/1.2 var(--font-sans);
+  color: var(--ap-ink-3);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.ab-ap-wavecell {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+}
+.ab-ap-time {
+  flex: none;
+  font: 500 12.5px/1 var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--ap-ink-2);
+  white-space: nowrap;
+}
+.ab-ap-ibtn {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: var(--zine-border) solid var(--ap-line);
+  border-radius: var(--zine-radius-sm);
+  background: var(--ap-surface);
+  color: var(--ap-ink);
+  cursor: pointer;
+  transition: transform 0.08s, box-shadow 0.08s;
+}
+.ab-ap-ibtn:hover:not(:disabled) {
+  transform: translate(-1px, -1px);
+  box-shadow: 2px 2px 0 var(--ap-shadow);
+}
+.ab-ap-ibtn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+/* forma de onda (espejo) */
+.ab-ap-wave {
+  position: relative;
+  height: var(--h, 40px);
+  cursor: pointer;
+  touch-action: none;
+}
+.ab-ap-wave.is-static {
+  cursor: default;
+}
+.ab-ap-bars {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--gap, 2px);
+}
+.ab-ap-bars i {
+  display: block;
+  flex: 1 1 0;
+  min-width: 1px;
+  border-radius: 2px;
+  background: var(--audio-bar);
+}
+.ab-ap-bars.played i {
+  background-image: linear-gradient(90deg, var(--audio-g1), var(--audio-g2));
+  background-repeat: no-repeat;
+}
+.ab-ap-wave.is-pending::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 0;
+  left: 0;
+  border-top: 1.5px dashed var(--ap-pencil);
+}
+.ab-ap-wave.is-pending .ab-ap-bars i {
+  border-left: 2px dotted var(--ap-pencil);
+  border-radius: 0;
+  background: none;
+  opacity: 0.8;
+}
+.ab-ap-wave.is-loading::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, var(--ap-surface) 50%, transparent) no-repeat;
+  background-size: 40% 100%;
+  animation: ab-ap-shim 1.1s linear infinite;
+}
+@keyframes ab-ap-shim {
+  from { background-position: -60% 0; }
+  to { background-position: 160% 0; }
+}
+.ab-ap-hover {
+  position: absolute;
+  top: -5px;
+  bottom: -5px;
+  width: 2px;
+  margin-left: -1px;
+  background: var(--ap-ink);
+  pointer-events: none;
+}
+.ab-ap-tip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  z-index: 3;
+  padding: 5px 7px;
+  border-radius: 3px;
+  background: var(--audio-tip);
+  color: var(--audio-on-tip);
+  font: 600 11px/1 var(--font-mono);
+  white-space: nowrap;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+.ab-ap-pend {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 9px;
+  border: var(--zine-border) solid var(--ap-line);
+  border-radius: var(--zine-radius-sm);
+  background: var(--ap-hl);
+  color: var(--ap-on-hl);
+  font: 700 12px/1.2 var(--font-sans);
+  white-space: nowrap;
+  transform: translate(-50%, -50%) rotate(-1.5deg);
+  pointer-events: none;
+}
+
+/* error */
+.ab-ap-err {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  font: 500 13.5px/1.4 var(--font-sans);
+  color: var(--ap-ink-2);
+}
+.ab-ap-err strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  color: var(--audio-rose);
+}
+.ab-ap-err a,
+.ab-ap-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--blue);
+  font: 600 13.5px var(--font-sans);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+/* prompt */
+.ab-ap-acc {
+  margin-top: 12px;
+  padding-top: 8px;
+  border-top: 2px dashed var(--ap-pencil);
+}
+.ab-ap-acc-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ab-ap-acc-head > button:first-child {
+  appearance: none;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  border: 0;
+  border-radius: 3px;
+  background: none;
+  color: var(--ap-ink-2);
+  font: 700 11.5px/1 var(--font-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: left;
+  cursor: pointer;
+}
+.ab-ap-acc-head > button:first-child svg {
+  transition: transform 0.2s;
+}
+.ab-ap-acc-head > button[aria-expanded="false"] svg {
+  transform: rotate(-90deg);
+}
+.ab-ap-tbtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 10px;
+  border: var(--zine-border) solid var(--ap-line);
+  border-radius: var(--zine-radius-sm);
+  background: var(--ap-surface);
+  color: var(--ap-ink);
+  font: 600 12.5px/1 var(--font-sans);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: transform 0.08s, box-shadow 0.08s;
+}
+.ab-ap-tbtn:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 2px 2px 0 var(--ap-shadow);
+}
+.ab-ap-tbtn kbd {
+  font: 500 10.5px/1 var(--font-mono);
+  color: var(--ap-ink-3);
+}
+.ab-ap-prompt-wrap {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+  margin: 8px 0 4px;
+}
+.ab-ap-prompt-wrap.has-ref {
+  grid-template-columns: minmax(0, 1fr) 128px;
+}
+.ab-ap-prompt {
+  margin: 0;
+  padding: 12px 14px;
+  border: var(--zine-border) solid var(--ap-line);
+  border-radius: var(--zine-radius-sm);
+  background: var(--ap-surface-2);
+  color: var(--ap-ink-2);
+  font: 400 13px/1.65 var(--font-mono);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  box-shadow: none;
+}
+.ab-ap-refbig {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  object-fit: cover;
+  margin: 0 !important;
+  border: var(--zine-border) solid var(--ap-line);
+  border-radius: var(--zine-radius-sm);
+  box-shadow: none !important;
+}
+
+/* modo foco: hoja cuadriculada que sigue el tema */
+.ab-ap-focus {
+  --ap-ink: var(--ink);
+  --ap-ink-2: var(--ink-2);
+  --ap-ink-3: var(--ink-3);
+  --ap-line: var(--zine-ink);
+  --ap-shadow: var(--zine-shadow);
+  --ap-surface: var(--bg);
+  --ap-focus: var(--blue);
+  width: 100vw;
+  max-width: none;
+  height: 100svh;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background-color: var(--bg-soft);
+  background-image:
+    linear-gradient(var(--paper-grid-color-lines) 1px, transparent 1px),
+    linear-gradient(90deg, var(--paper-grid-color-lines) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ap-ink);
+  font-family: var(--font-sans);
+}
+.ab-ap-focus::backdrop {
+  background: var(--bg-soft);
+}
+html:has(.ab-ap-focus[open]) {
+  overflow: hidden;
+}
+.ab-ap-f-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 28px 40px;
+  animation: ab-ap-in 0.22s ease-out;
+}
+@keyframes ab-ap-in {
+  from { opacity: 0; transform: scale(0.985); }
+  to { opacity: 1; transform: none; }
+}
+.ab-ap-f-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.ab-ap-kick {
+  font: 700 11px/1 var(--font-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ap-ink-3);
+}
+.ab-ap-f-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 22px;
+  width: 100%;
+  max-width: 940px;
+  margin: 0 auto;
+}
+.ab-ap-f-title h2 {
+  margin: 0;
+  font: 800 34px/1.15 var(--font-sans);
+  letter-spacing: -0.03em;
+  color: var(--ap-ink);
+}
+.ab-ap-f-title .m {
+  margin-top: 8px;
+  font: 500 13.5px/1.4 var(--font-mono);
+  color: var(--ap-ink-3);
+}
+.ab-ap-f-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 28px 32px 26px;
+  border: var(--zine-border) solid var(--ap-line);
+  border-radius: var(--zine-radius);
+  background: var(--ap-surface);
+  box-shadow: var(--zine-shift) var(--zine-shift) 0 var(--ap-shadow);
+}
+.ab-ap-spec {
+  display: block;
+  width: 100%;
+  height: 200px;
+  color: var(--audio-spec);
+  transition: opacity 0.4s;
+}
+.ab-ap-spec.is-idle {
+  opacity: 0.25;
+}
+.ab-ap-f-times {
+  display: flex;
+  justify-content: space-between;
+  font: 500 13px/1 var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--ap-ink-2);
+}
+.ab-ap-f-ctrl {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  margin-top: 4px;
+}
+.ab-ap-cbtn {
+  width: 56px;
+  height: 56px;
+  border: var(--zine-border) solid var(--ap-line);
+  border-radius: 50%;
+  background: var(--ap-surface);
+  color: var(--ap-ink);
+  font: 700 13px/1 var(--font-mono);
+  box-shadow: 3px 3px 0 var(--ap-shadow);
+  cursor: pointer;
+  transition: transform 0.08s, box-shadow 0.08s;
+}
+.ab-ap-cbtn:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 var(--ap-shadow);
+}
+.ab-ap-focus :focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--ap-surface), 0 0 0 6px var(--ap-focus) !important;
+}
+
+/* móvil: la onda baja a su propia línea; objetivos táctiles de 44 px */
+@container ab-ap (max-width: 520px) {
+  .ab-ap-row {
+    flex-wrap: wrap;
+    gap: 10px 12px;
+  }
+  .ab-ap-id {
+    flex: 1 1 0;
+  }
+  .ab-ap-err {
+    order: 9;
+    flex: 1 0 100%;
+  }
+  /* onda y tiempo comparten la segunda línea para que el nombre no se corte */
+  .ab-ap-wavecell {
+    order: 9;
+    flex: 1 1 0;
+    min-width: 60%;
+  }
+  .ab-ap-time {
+    order: 10;
+  }
+  .ab-ap-ref {
+    width: 38px;
+    height: 38px;
+  }
+  .ab-ap-ibtn {
+    width: 44px;
+    height: 44px;
+  }
+  .ab-ap-tbtn {
+    min-height: 44px;
+    padding: 10px 12px;
+  }
+  .ab-ap-prompt-wrap.has-ref {
+    grid-template-columns: minmax(0, 1fr) 96px;
+  }
+}
+@media (max-width: 640px) {
+  .ab-ap {
+    padding: 12px;
+  }
+  .ab-ap-f-shell {
+    padding: 16px;
+  }
+  .ab-ap-f-title h2 {
+    font-size: 24px;
+  }
+  .ab-ap-f-card {
+    padding: 18px 16px;
+  }
+  .ab-ap-spec {
+    height: 120px;
+  }
+  .ab-ap-f-ctrl {
+    gap: 16px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ab-ap *,
+  .ab-ap-focus * {
+    animation: none !important;
+    transition: none !important;
   }
 }
