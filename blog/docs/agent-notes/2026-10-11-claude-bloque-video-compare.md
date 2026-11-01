@@ -99,3 +99,20 @@ mezclado y un video insertado como `upload` suelto. Con Playwright:
 
 No se creó migración: `mimeTypes` no es una columna y los bloques de Lexical se guardan como JSON
 dentro del cuerpo. `payload generate:types` no produjo cambios.
+
+## Carga en el post 30 (producción)
+
+Tras el merge del PR #14 y el deploy automático, con la sesión de José en el navegador:
+
+- Respaldo previo en `output/entrada-video/post-30-before-video.json`.
+- Se subieron a Media de producción los 6 mp4, sus 6 posters y la imagen de entrada (ids 93–105),
+  con alt descriptivo. El sandbox de Playwright no da acceso al disco, así que los archivos se
+  sirvieron un momento por `127.0.0.1` y se reenviaron con `page.request` (cookies de la sesión).
+- Prueba 1: el Code block del prompt de la langosta y los 3 placeholders se sustituyeron por un
+  `videoCompare` «Texto a video» (gatos). Prueba 2: la imagen de la ciudad de tarjetas, el Code
+  block y los placeholders, por un «Imagen a video» con el aguacate como entrada. La Prueba 3
+  (video a video) se retiró: José decidió no hacerla.
+- La nota de cada resultado lleva tiempo de generación, costo estimado y audio/resolución.
+- El script comprobaba `updatedAt` y la estructura antes de escribir. La comparación posterior
+  (`post-30-after-video.json`) confirma que solo cambiaron `body` y `updatedAt`, y que el resto del
+  cuerpo quedó idéntico. El post sigue en `draft`. En producción, un mp4 responde `206` a `Range`.
