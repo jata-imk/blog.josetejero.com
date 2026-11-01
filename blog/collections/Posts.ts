@@ -2,6 +2,7 @@ import type { CollectionConfig } from 'payload'
 import { isAdmin, isAdminOrEditor } from '@/lib/access'
 import { autoSlug } from '@/lib/slug'
 import { makeBodyEditor } from '@/lib/lexical/bodyEditor'
+import { revalidatePublishedPost } from '@/hooks/revalidate-post'
 
 export const Posts: CollectionConfig = {
   slug: 'posts',
@@ -17,6 +18,16 @@ export const Posts: CollectionConfig = {
   },
   hooks: {
     beforeValidate: [autoSlug('title')],
+    afterChange: [
+      async ({ doc, previousDoc, req }) => {
+        await revalidatePublishedPost(req.payload, doc, previousDoc)
+      },
+    ],
+    afterDelete: [
+      async ({ doc, req }) => {
+        await revalidatePublishedPost(req.payload, doc)
+      },
+    ],
   },
   endpoints: [
     {
